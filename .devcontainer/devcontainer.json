@@ -1,0 +1,30 @@
+{
+  "name": "${localWorkspaceFolderBasename}",
+  "build": {
+    "context": "..",
+    "dockerfile": "Dockerfile"
+  },
+  "runArgs": [
+    "--env-file",
+    ".devcontainer/devcontainer.env",
+    "--add-host=host.docker.internal:host-gateway"
+  ],
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/guiyomh/features/vim:0": {}
+  },
+  "forwardPorts": [
+    3000
+  ],
+  "postCreateCommand": "yarn install --production=false",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "mohsen1.prettify-json"
+      ]
+    }
+  },
+  "remoteUser": "node"
+}

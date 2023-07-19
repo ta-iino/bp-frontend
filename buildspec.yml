@@ -1,0 +1,20 @@
+version: 0.2
+env:
+  parameter-store:
+    S3_BUCKET:
+    CF_DISTRIBUTION:
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+  pre_build:
+    commands:
+      - yarn --version
+      - yarn install
+  build:
+    commands:
+      - yarn build
+  post_build:
+    commands:
+      - aws s3 sync --exact-timestamps --delete ./dist/ s3://${S3_BUCKET:?}
+      - aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION:?} --path "/*"

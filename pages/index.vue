@@ -1,4 +1,5 @@
 <template>
+  <v-app>
   <div id="app">
     <div class="ma-3" style="background-color: #d3d3d3">
       <v-card-title class="headline font-weight-bold">DMリスト一覧</v-card-title>
@@ -6,40 +7,34 @@
     <!-- 検索フォーム ここから -->
     <v-container>
       <v-row>
-        <v-col cols="2" class="px-0">
+        <v-col cols="2" class="px-0 m-0">
           <v-select
             v-model="searchParams.chargeOfTeam"
-            clearable
             label="チーム"
-            filled
             :items="pulldownChargeOfTeam"
           ></v-select>
         </v-col>
         <v-col cols="2" class="px-0">
           <v-select
             v-model="searchParams.chargeOfConsultant"
-            clearable
             label="担当コンサルタント"
-            filled
             :items="pulldownChargeOfConsultant"
           ></v-select>
         </v-col>
         <v-col cols="2" class="px-0">
-          <v-text-field v-model="searchParams.listName" clearable label="リスト名" filled></v-text-field>
+          <v-text-field v-model="searchParams.listName" label="リスト名"></v-text-field>
         </v-col>
         <v-col cols="2" class="px-0">
           <v-select
             v-model="searchParams.approachPurpose"
-            clearable
             label="アプローチ区分"
-            filled
             :items="pulldownApproachPurpose"
           ></v-select>
         </v-col>
         <!--<v-col cols="2" class="px-0">
           <v-text-field v-model="searchParams.registrationDateFrom" clearable label="登録日(from)" filled></v-text-field>
         </v-col>-->
-        <v-col cols="2">
+        <v-col cols="2" class="px-0">
           <v-text-field>
             <VueDatePicker 
               v-model="dateFrom"
@@ -53,7 +48,7 @@
             ></VueDatePicker>
           </v-text-field>
         </v-col>
-        <v-col cols="2">
+        <v-col cols="2" class="px-0">
           <v-text-field>
             <VueDatePicker 
               v-model="dateTo"
@@ -63,6 +58,7 @@
               cancel-text="Cancel"
               placeholder="登録日(to)"
               :offset="20"
+              :enable-time-picker="false"
               >
             </VueDatePicker>
           </v-text-field>
@@ -83,15 +79,17 @@
         :height="528"
         :items-per-page="-1"
         fixed-header
+        Hide-default-header
     >
     <!-- フッター削除 -->
     <template v-slot:bottom></template>
-    <template v-slot:[`item.listName`]="{ item }">
+    <template v-slot:item.listName="{ item }">
       <nuxt-link :to="`/`">{{ item.raw.listName }}</nuxt-link>
     </template>
     </v-data-table>
     <!-- 一覧表示 ここまで -->
   </div>
+  </v-app>
 </template>
 
 <script setup lang="ts">
@@ -118,13 +116,6 @@ const searchParams = ref(
 const dateFrom = ref("")
 const dateTo = ref("")
 
-// const formatDate(date) = () => {
-//   if (!date) return null;
-//   const [year, month, day] = date.split("-");
-//   this.text = `${year}${month}${day}`;
-//   this.menu = false;
-//   return
-// }
 /**
  * テーブルデータ取得（仮）
  */
@@ -197,13 +188,13 @@ const headers = ref(
       { title: '発送日', key: 'sendMailDate', sortable: false, width: 150 },
       { title: '送付社数', key: 'sendCompanyCount', sortable: false, width: 100 },
       { title: 'リスト名', key: 'listName', sortable: false, width: 250 },
-      { title: 'アプローチ区分', key: 'approachPurpose', sortable: false, width: 150},
-      { title: '担当チーム', key: 'chargeOfTeam', sortable: false, width: 150},
-      { title: '担当コンサルタント', key: 'chargeOfConsultant', sortable: false, width: 150},
-      { title: '業種', key: 'ompanyIndustry', sortable: false, width: 100},
-      { title: '地域', key: 'companyRegion', sortable: false, width: 100},
-      { title: '売上', key: 'companySales', sortable: false, width: 100},
-      { title: '状況', key: 'matchingStatus', sortable: false, width: 150},
+      { title: 'アプローチ区分', key: 'approachPurpose', sortable: false, width: 150 },
+      { title: '担当チーム', key: 'chargeOfTeam', sortable: false, width: 150 },
+      { title: '担当コンサルタント', key: 'chargeOfConsultant', sortable: false, width: 150 },
+      { title: '業種', key: 'ompanyIndustry', sortable: false, width: 100 },
+      { title: '地域', key: 'companyRegion', sortable: false, width: 100 },
+      { title: '売上', key: 'companySales', sortable: false, width: 100 },
+      { title: '状況', key: 'matchingStatus', sortable: false, width: 150 },
     ]
   )
 
@@ -222,3 +213,8 @@ const searchButton = (searchParams: any) :void => {
 
 
 </script>
+<style>
+.team {
+  height: 20px;
+}
+</style>

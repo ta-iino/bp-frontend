@@ -36,12 +36,40 @@
             :items="pulldownApproachPurpose"
           ></v-select>
         </v-col>
-        <v-col cols="2" class="px-0">
+        <!--<v-col cols="2" class="px-0">
           <v-text-field v-model="searchParams.registrationDateFrom" clearable label="登録日(from)" filled></v-text-field>
+        </v-col>-->
+        <v-col cols="2">
+          <v-text-field>
+            <VueDatePicker 
+              v-model="dateFrom"
+              locale="ja"
+              format="yyyy/MM/dd"
+              select-text="OK"
+              cancel-text="Cancel"
+              placeholder="登録日(from)"
+              :offset="20"
+              :enable-time-picker="false"
+            ></VueDatePicker>
+          </v-text-field>
         </v-col>
-        <v-col cols="2" class="px-0">
+        <v-col cols="2">
+          <v-text-field>
+            <VueDatePicker 
+              v-model="dateTo"
+              locale="jp"
+              format="yyyy/MM/dd"
+              select-text="OK"
+              cancel-text="Cancel"
+              placeholder="登録日(to)"
+              :offset="20"
+              >
+            </VueDatePicker>
+          </v-text-field>
+        </v-col>
+<!--        <v-col cols="2" class="px-0">
           <v-text-field v-model="searchParams.registrationDateTo" clearable label="登録日(to)" filled></v-text-field>
-        </v-col>
+        </v-col>-->
       </v-row>
       <v-row justify="center">
         <v-btn depressed color="primary" @click="searchButton(searchParams)">検索</v-btn>
@@ -52,7 +80,9 @@
     <v-data-table
         :headers="headers"
         :items="dmListData"
-        disable-pagination
+        :height="528"
+        :items-per-page="-1"
+        fixed-header
     >
     <!-- フッター削除 -->
     <template v-slot:bottom></template>
@@ -60,10 +90,6 @@
       <nuxt-link :to="`/`">{{ item.raw.listName }}</nuxt-link>
     </template>
     </v-data-table>
-    <!-- ページネーション -->
-    <div class="text-center pt-2">
-      <v-pagination v-model="searchParams.page" :length="totalPageNum" ></v-pagination>
-    </div>
     <!-- 一覧表示 ここまで -->
   </div>
 </template>
@@ -71,6 +97,8 @@
 <script setup lang="ts">
 import { VDataTable } from 'vuetify/lib/labs/components.mjs';
 import { ref } from 'vue'
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
 
 /**
  * 初期値設定
@@ -85,9 +113,18 @@ const searchParams = ref(
       approachPurpose : null,
       registrationDateFrom : null,
       registrationDateTo : null,
-      page: 1
   }
 )
+const dateFrom = ref("")
+const dateTo = ref("")
+
+// const formatDate(date) = () => {
+//   if (!date) return null;
+//   const [year, month, day] = date.split("-");
+//   this.text = `${year}${month}${day}`;
+//   this.menu = false;
+//   return
+// }
 /**
  * テーブルデータ取得（仮）
  */
@@ -155,18 +192,18 @@ const pulldownApproachPurpose = data1_1.value.approachPurpose
 const headers = ref(
     [
       // title,keyじゃないとヘッダーが消える
-      { title: 'ID', key: 'id', sortable: false, width: 30 },
-      { title: '登録日', key: 'registrationDate', sortable: false, width: 100 },
-      { title: '発送日', key: 'sendMailDate', sortable: false, width: 100 },
+      { title: 'ID', key: 'id', sortable: false, width: 100 },
+      { title: '登録日', key: 'registrationDate', sortable: false, width: 150 },
+      { title: '発送日', key: 'sendMailDate', sortable: false, width: 150 },
       { title: '送付社数', key: 'sendCompanyCount', sortable: false, width: 100 },
-      { title: 'リスト名', key: 'listName', sortable: false, width: 100 },
-      { title: 'アプローチ区分', key: 'approachPurpose', sortable: false, width: 100},
-      { title: '担当チーム', key: 'chargeOfTeam', sortable: false, width: 100},
-      { title: '担当コンサルタント', key: 'chargeOfConsultant', sortable: false, width: 100},
+      { title: 'リスト名', key: 'listName', sortable: false, width: 250 },
+      { title: 'アプローチ区分', key: 'approachPurpose', sortable: false, width: 150},
+      { title: '担当チーム', key: 'chargeOfTeam', sortable: false, width: 150},
+      { title: '担当コンサルタント', key: 'chargeOfConsultant', sortable: false, width: 150},
       { title: '業種', key: 'ompanyIndustry', sortable: false, width: 100},
       { title: '地域', key: 'companyRegion', sortable: false, width: 100},
       { title: '売上', key: 'companySales', sortable: false, width: 100},
-      { title: '状況', key: 'matchingStatus', sortable: false, width: 100},
+      { title: '状況', key: 'matchingStatus', sortable: false, width: 150},
     ]
   )
 

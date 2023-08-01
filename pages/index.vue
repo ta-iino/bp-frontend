@@ -1,30 +1,36 @@
 <template>
   <v-app>
   <div id="app">
-    <div class="ma-3" style="background-color: #d3d3d3">
-      <v-card-title class="headline font-weight-bold">DMリスト一覧</v-card-title>
-    </div>
-    <!-- 検索フォーム ここから -->
     <v-container>
       <v-row>
-        <v-col cols="2" class="px-0 m-0">
+        <v-col cols="12" class="px-0 my-3" style="background-color: #d3d3d3">
+          <v-card-title class="headline font-weight-bold">DMリスト一覧</v-card-title>
+        </v-col>
+      </v-row>
+    <!-- 検索フォーム ここから -->
+      <v-row>
+        <v-col cols="2" class="px-0 py-5">
           <v-select
             v-model="searchParams.chargeOfTeam"
             label="チーム"
             :items="pulldownChargeOfTeam"
           ></v-select>
         </v-col>
-        <v-col cols="2" class="px-0">
+        <v-col cols="2" class="px-0 py-5">
           <v-select
             v-model="searchParams.chargeOfConsultant"
             label="担当コンサルタント"
             :items="pulldownChargeOfConsultant"
           ></v-select>
         </v-col>
-        <v-col cols="2" class="px-0">
-          <v-text-field v-model="searchParams.listName" label="リスト名"></v-text-field>
+        <v-col cols="2" class="px-0 py-5">
+          <v-text-field
+            v-model="searchParams.listName"
+            label="リスト名"
+            class="input-color-red-class"
+          ></v-text-field>
         </v-col>
-        <v-col cols="2" class="px-0">
+        <v-col cols="2" class="px-0 py-5">
           <v-select
             v-model="searchParams.approachPurpose"
             label="アプローチ区分"
@@ -35,8 +41,9 @@
           <v-text-field v-model="searchParams.registrationDateFrom" clearable label="登録日(from)" filled></v-text-field>
         </v-col>-->
         <v-col cols="2" class="px-0">
-          <v-text-field>
-            <VueDatePicker 
+          <v-text-field class="my-2 ui-textfield">
+            <VueDatePicker
+              class="ui-datepicker"
               v-model="dateFrom"
               locale="ja"
               format="yyyy/MM/dd"
@@ -49,8 +56,9 @@
           </v-text-field>
         </v-col>
         <v-col cols="2" class="px-0">
-          <v-text-field>
+          <v-text-field class="my-2 ui-textfield">
             <VueDatePicker 
+              class="ui-datepicker"
               v-model="dateTo"
               locale="jp"
               format="yyyy/MM/dd"
@@ -67,26 +75,28 @@
           <v-text-field v-model="searchParams.registrationDateTo" clearable label="登録日(to)" filled></v-text-field>
         </v-col>-->
       </v-row>
-      <v-row justify="center">
+      <v-row justify="center" class="ma-4">
         <v-btn depressed color="primary" @click="searchButton(searchParams)">検索</v-btn>
       </v-row>
     </v-container>
     <!-- 検索フォーム ここまで -->
     <!-- 一覧表示 ここから -->
-    <v-data-table
-        :headers="headers"
-        :items="dmListData"
-        :height="528"
-        :items-per-page="-1"
-        fixed-header
-        Hide-default-header
-    >
-    <!-- フッター削除 -->
-    <template v-slot:bottom></template>
-    <template v-slot:item.listName="{ item }">
-      <nuxt-link :to="`/`">{{ item.raw.listName }}</nuxt-link>
-    </template>
-    </v-data-table>
+    <v-container class="ui-vcontaoner" >
+      <v-data-table
+          class="ui-vdatatable"
+          :headers="headers"
+          :items="dmListData"
+          :height="528"
+          :items-per-page="-1"
+          fixed-header
+      >
+      <!-- フッター削除 -->
+      <template v-slot:bottom></template>
+      <template v-slot:item.listName="{ item }">
+        <nuxt-link :to="`/`">{{ item.raw.listName }}</nuxt-link>
+      </template>
+      </v-data-table>
+    </v-container>
     <!-- 一覧表示 ここまで -->
   </div>
   </v-app>
@@ -214,7 +224,19 @@ const searchButton = (searchParams: any) :void => {
 
 </script>
 <style>
-.team {
-  height: 20px;
+.ui-textfield .v-input__control .v-field .v-field__field .v-field__input {
+  padding: 0 0 !important;
 }
+.v-data-table__th {
+  background-color: #ffeccc !important;
+}
+.ui-vcontaoner .v-table--fixed-header {
+  z-index: 1 !important;
+}
+.ui-datepicker .dp__outer_menu_wrap .dp__menu {
+  z-index: 10000;
+}
+/* .dp__instance_calendar {
+  z-index: 1000 !important;
+} */
 </style>

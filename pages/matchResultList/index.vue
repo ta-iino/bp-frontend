@@ -75,13 +75,19 @@
       <v-row class="mx-8 py-0" justify="end">
         <h3 class="mx-8 py-0">処理日時</h3>
         <span>{{ processDate }}</span>
-        <v-col v-for="(data, i) in tableBodyData" style="background-color: lightgray;" >
-          <span>買手第{{ i + 1 }}候補</span>
-          <v-col v-for="item in data" :key="item.title">
-            <ul>{{ item.title }}{{ item.value }}</ul>
-          </v-col>
-        </v-col>
       </v-row>
+      <v-container v-for="(data, i) in tableBodyData" style="background-color: lightgray;" >
+        <v-row>
+          <h3>買手第{{ i + 1 }}候補</h3>
+        </v-row>
+        <v-row>
+          <!-- <v-col> -->
+            <v-col cols="4" v-for="item in data" :key="item.title">
+              <ul>{{ item.title }}{{ item.value }}</ul>
+            </v-col>
+          <!-- </v-col> -->
+        </v-row>
+      </v-container>
     </v-container>
   </VApp>
 </template>

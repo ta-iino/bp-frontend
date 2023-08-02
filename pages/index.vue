@@ -160,27 +160,18 @@ const { data: dmListList} = await useAsyncData(
   'dmListList',
   (approachListIdList) => $fetch('/api/dmList')
 )
-/** 確認用 */
-console.log('DMリスト取得API')
-console.log(dmListList.value)
 
 // アプローチリスト取得API呼出
 const { data: approachList} = await useAsyncData(
   'approachList',
   (approachListIdList) => $fetch('/api/approachLists')
 )
-/** 確認用 */
-console.log('アプローチリスト取得API')
-console.log(approachList.value)
 
 // ユーザー取得API呼出
 const { data: user} = await useAsyncData(
   'user',
   (userId) => $fetch('/api/user')
 )
-/** 確認用 */
-console.log('ユーザー取得API')
-console.log(user.value)
 
 /**
  * プルダウンリスト生成
@@ -191,7 +182,6 @@ console.log(user.value)
  * 構想：各リストを取り出した配列を作成し、Setリストに格納する。（重複削除）
  */
 const jsonApproachList = approachList
-console.log(jsonApproachList)
 const pulldownChargeOfTeam1: any = []
 const pulldownChargeOfConsultant1: any = []
 const pulldownApproachPurpose1: any = []
@@ -246,7 +236,6 @@ const headers = ref(
  * 検索ボタン押下時処理
 */ 
 const searchButton = (searchParams: any) :void => {
-  console.log("searchButtonClicked")
   // アプローチリスト取得APIの呼出
   
   // DMリスト取得APIの呼出

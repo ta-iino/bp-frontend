@@ -70,6 +70,7 @@
         </v-col>
       </v-row>
     </v-container>
+    <!-- v-for以下にcssを適用させるとjustifyが効かなくなる。結果一覧にflex-columnが効かない。 -->
     <v-container style="background-color: rgb(212, 238, 251);">
       <v-row class="mx-8 py-0" justify="end">
         <h3 class="mx-8 py-0">処理日時</h3>

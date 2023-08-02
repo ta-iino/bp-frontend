@@ -7,87 +7,82 @@
         </v-col>
       </v-row>
       <h3 class="px-5 my-0">DM送付先企業</h3>
-      <!-- <v-row>
-        <v-row class="px-3 my-5 ">
-          <v-col cols="5" v-for="(item) in tableHeaders" :key="item.title" >
-            <v-col v-if="item.title==='企業名'" @click="clickCompanyName(sellCompany['id'])">
+      <v-row class="px-3 my-5 ">
+        <v-col cols="4" v-for="(item) in tableHeaders" :key="item.title">
+          <v-row v-if="item.title === '企業名'" @click="clickCompanyName(sellCompany['id'])">
+            <v-col cols="10" class="px-0 py-1">
               {{ item.title }}
+            </v-col>
+            <v-col cols="6" class="px-0 py-1">
               {{ item.value }}
             </v-col>
-            <v-col v-else cols="6" class="px-0 py-1">
+          </v-row>
+          <v-row v-else>
+            <v-col class="px-10 py-0">
               {{ item.title }}
-              {{ item.value }}
             </v-col>
-          </v-col>
-        </v-row>
-      </v-row> -->
-      <v-row class="px-16 py-3">
-        <v-col class="d-flex flex-column">
-          <span>企業名：
-            <span @click="clickCompanyName(sellCompany['id'])" class="px-16 my-0">{{ sellCompany.name }}</span>
-          </span>
-          <span>所在地：
-            <span class="px-16 my-0">{{ sellCompany.address }}</span>
-          </span>
-          <span>代表者名：
-            <span class="px-12 my-0">{{ sellCompany.representativeName }}</span>
-          </span>
-          <span>代表者年齢：
-            <span class="px-8 my-0">{{ sellCompany.representativeAge }}</span>
-          </span>
-        </v-col>
-        <v-col class="d-flex flex-column">
-          <span>業種１：
-            <span class="px-6 my-0"> {{ sellCompany.industry1 }}</span>
-          </span>
-          <span>業種２：
-            <span class="px-6 my-0">{{ sellCompany.industry2 }}</span>
-          </span>
-          <span>業種３：
-            <span class="px-6 my-0">{{ sellCompany.industry3 }}</span>
-          </span>
-          <span>営業種目：
-            <span class="px-2 my-0">{{ sellCompany.items }}</span>
-          </span>
-        </v-col>
-        <!-- 親要素のクラスが優先されるためかオブジェクト要素のみを後ろ揃えに出来ない -->
-        <v-col class="d-flex flex-column">
-          <span>売上：
-            <span class="px-16 my-0" style="text-align: right;">{{ sellCompany.sales }}
-              <span>百万円</span>
-            </span>
-          </span>
-          <span>営業利益：
-            <span class="px-8 my-0" style="text-align: right;">{{ sellCompany.income }}
-              <span>百万円</span>
-            </span>
-          </span>
-          <span>従業員数：
-            <span class="px-8 my-0" style="text-align: right;">{{ sellCompany.employees }}
-              <span>名</span>
-            </span>
-          </span>
+            <v-col class="px-10 py-0">
+              {{ item.value }} {{ item.bottom }}
+            </v-col>
+          </v-row>
         </v-col>
       </v-row>
     </v-container>
     <!-- v-for以下にcssを適用させるとjustifyが効かなくなる。結果一覧にflex-columnが効かない。 -->
     <v-container style="background-color: rgb(212, 238, 251);">
-      <v-row class="mx-8 py-0" justify="end">
-        <h3 class="mx-8 py-0">処理日時</h3>
-        <span>{{ processDate }}</span>
+      <v-row class="mx-8 py-1" justify="end">
+        <h3>処理日時</h3>
+        <span class="mx-10">{{ processDate }}</span>
       </v-row>
-      <v-container v-for="(data, i) in tableBodyData" style="background-color: lightgray;" >
+      <v-col v-for="(data, i) in tableBodyData" style="background-color: lightgray;" cols="11" class="mx-6 my-2">
         <v-row>
           <h3>買手第{{ i + 1 }}候補</h3>
         </v-row>
-        <v-row>
-          <!-- <v-col> -->
-            <v-col cols="4" v-for="item in data" :key="item.title">
-              <ul>{{ item.title }}{{ item.value }}</ul>
-            </v-col>
-          <!-- </v-col> -->
+        <v-row justify="center">
+          <v-col cols="12" class="ml-16">
+            <v-row>
+              <span class="ml-8">企業:</span>
+              <NuxtLink class="mx-16" @click.native="clickCompanyName(buyCompanyId[i])">{{ data[0].value }}</NuxtLink>
+              <span class="ml-16">都道府県:</span>
+              <span class="mx-8">{{ data[1].value }}</span>
+              <span class="mx-16">売上高:</span>
+              <span class="ml-16">{{ data[2].value }} 百万円</span>
+            </v-row>
+          </v-col>
+          <v-col cols="12" class="ml-16">
+            <v-row>
+              <span class="ml-8">買収実績:</span>
+              <span class="mx-16">{{ data[3].value }}</span>
+              <span class="mx-16">業種:</span>
+              <span class="mx-8">{{ data[4].value }}</span>
+            </v-row>
+          </v-col>
+          <v-col cols="12">
+            <v-row justify="end">
+              <span>営業種目:</span>
+              <span class="mx-8">{{ data[6].value }}</span>
+            </v-row>
+          </v-col>
+          <v-col cols="12" class="ml-16">
+            <v-row>
+              <span class="ml-8">買収希望エリア:</span>
+              <span class="mx-4">{{ data[7].value }}</span>
+            </v-row>
+          </v-col>
+          <v-col cols="12" class="ml-16">
+            <v-row>
+              <span class="ml-8">買収希望業種:</span>
+              <span class="mx-8">{{ data[8].value }}</span>
+            </v-row>
+          </v-col>
+          <v-col cols="12" class="ml-16">
+            <v-row>
+              <span class="ml-8">希望コメント:</span>
+              <span class="mx-8" id="comment">{{ data[9].value }}</span>
+            </v-row>
+          </v-col>
         </v-row>
-      </v-container>
+      </v-col>
     </v-container>
   </VApp>
 </template>
@@ -175,62 +170,47 @@ const { data: buyNeedsData } =
 const buyNeedsList: any = ref(buyNeedsData.value)
 
 // // テーブルヘッダー
-// const tableHeaders: any = [
-//   { title: '企業名:', value: sellCompany.value.name },
-//   { title: '所在地:', value: sellCompany.value.address },
-//   { title: '代表者名:', value: sellCompany.value.representativeName },
-//   { title: '代表者年齢:', value: sellCompany.value.representativeAge },
-//   { title: '業種１:', value: sellCompany.value.industry1 },
-//   { title: '業種２:', value: sellCompany.value.industry2 },
-//   { title: '業種３:', value: sellCompany.value.industry3 },
-//   { title: '営業種目:', value: sellCompany.value.items },
-//   { title: '売上:', value: sellCompany.value.sales },
-//   { title: '営業利益:', value: sellCompany.value.income },
-//   { title: '従業員数:', value: sellCompany.value.employees },
-// ]
+const tableHeaders: any = [
+  { title: '企業名:', value: sellCompany.value.name },
+  { title: '業種１:', value: sellCompany.value.industry1 },
+  { title: '売上:', value: sellCompany.value.sales, bottom: "百万円" },
+  { title: '所在地:', value: sellCompany.value.address },
+  { title: '業種２:', value: sellCompany.value.industry2 },
+  { title: '営業利益:', value: sellCompany.value.income, bottom: "百万円" },
+  { title: '代表者名:', value: sellCompany.value.representativeName },
+  { title: '業種３:', value: sellCompany.value.industry3 },
+  { title: '従業員数:', value: sellCompany.value.employees, bottom: "名" },
+  { title: '代表者年齢:', value: sellCompany.value.representativeAge },
+  { title: '営業種目:', value: sellCompany.value.items },
+]
 
 // ボディ部のデータ
 const tableBodyData: any = []
 for (let i = 0; i < buyCompanys.value.length; i++) {
   const buyCompany = buyCompanys.value[i]
   const buyNeeds = buyNeedsList.value[i]
+
+// 業種の文字部分だけを抽出
+  let industryLine = buyCompany.industry.match(/[^\x01-\x7Eｧ-ﾝﾞﾟ]+/g)
+  let industry = industryLine.join(",")
+
   const tableBody: any = [
-  { title: '企業名:', value: buyCompany.name },
-  { title: '買収実績:', value: buyNeeds.accuracy },
-  { title: '', value: '' },// スペース用
-  { title: '買収希望エリア:', value: buyNeeds.prefs },
-  { title: '買収希望業種:', value: buyNeeds.industries },
-  { title: '希望コメント:', value: buyNeeds.remarks },
-  { title: '都道府県:', value: buyCompany.address },
-  { title: '業種:', value: buyCompany.industry },
-  { title: '営業種目:', value: buyCompany.items },
-  { title: '売上高:', value: buyCompany.sales },
+    { title: '企業名:', value: buyCompany.name },
+    { title: '都道府県:', value: buyCompany.pref },
+    { title: '売上高:', value: buyCompany.sales },
+    { title: '買収実績:', value: buyNeeds.accuracy },
+    { title: '業種:', value: industry },
+    { title: '', value: '' },// スペース用
+    { title: '営業種目:', value: buyCompany.tsr["営業種目"] },
+    { title: '買収希望エリア:', value: buyNeeds.prefs },
+    { title: '買収希望業種:', value: buyNeeds.industries },
+    { title: '希望コメント:', value: buyNeeds.remarks },
   ]
   tableBodyData.push(tableBody)
 }
 
-
-
-// const tableBody: any = [
-//   { title: '企業名:', value: buyCompany.name },
-//   { title: '買収実績:', value: buyNeeds.accuracy },
-//   { title: '', value: '' },// スペース用
-//   { title: '買収希望エリア:', value: buyNeeds.prefs },
-//   { title: '買収希望業種:', value: buyNeeds.industries },
-//   { title: '希望コメント:', value: buyNeeds.remarks },
-//   { title: '都道府県', value: buyCompany.address },
-//   { title: '業種', value: buyCompany.industry },
-//   { title: '営業種目', value: buyCompany.items },
-//   { title: '売上高', value: buyCompany.sales },
-// ]
-
-// let candidateNumber: number = 0
-// for (let i = 1; i < buyCompany.value.length; i++) {
-//   candidateNumber = i + 1
-// }
-
 // itemにリンクをどうやって貼るか→v-ifで対応できるか？
-const clickCompanyName = (companyId: number) => {
+const clickCompanyName = (companyId: number) :void => {
   let companyUrl = router.resolve({
     path: "/",
     query: { id: companyId },
@@ -241,9 +221,7 @@ const clickCompanyName = (companyId: number) => {
 </script>
 
 <style>
-.result {
-  display: flex;
-  flex-direction: column;
-
+#comment {
+white-space: pre-line;
 }
 </style>

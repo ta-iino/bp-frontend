@@ -14,6 +14,7 @@
             v-model="searchParams.chargeOfTeam"
             label="チーム"
             :items="pulldownChargeOfTeam"
+            clearable
           ></v-select>
         </v-col>
         <v-col cols="2" class="px-0 py-5">
@@ -21,6 +22,7 @@
             v-model="searchParams.chargeOfConsultant"
             label="担当コンサルタント"
             :items="pulldownChargeOfConsultant"
+            clearable
           ></v-select>
         </v-col>
         <v-col cols="2" class="px-0 py-5">
@@ -28,6 +30,7 @@
             v-model="searchParams.listName"
             label="リスト名"
             class="input-color-red-class"
+            clearable
           ></v-text-field>
         </v-col>
         <v-col cols="2" class="px-0 py-5">
@@ -35,6 +38,7 @@
             v-model="searchParams.approachPurpose"
             label="アプローチ区分"
             :items="pulldownApproachPurpose"
+            clearable
           ></v-select>
         </v-col>
         <!--<v-col cols="2" class="px-0">
@@ -52,6 +56,7 @@
               placeholder="登録日(from)"
               :offset="20"
               :enable-time-picker="false"
+              clearable
             ></VueDatePicker>
           </v-text-field>
         </v-col>
@@ -67,6 +72,7 @@
               placeholder="登録日(to)"
               :offset="20"
               :enable-time-picker="false"
+              clearable
               >
             </VueDatePicker>
           </v-text-field>
@@ -76,7 +82,7 @@
         </v-col>-->
       </v-row>
       <v-row justify="center" class="ma-4">
-        <v-btn depressed color="primary" @click="searchButton(searchParams)">検索</v-btn>
+        <v-btn depressed color="black" @click="searchButton(searchParams)">検索</v-btn>
       </v-row>
     </v-container>
     <!-- 検索フォーム ここまで -->
@@ -90,11 +96,12 @@
           :items-per-page="-1"
           fixed-header
       >
+      <template v-slot:item.listName="{ item }">
+        <!--<nuxt-link :to="`/`">{{ item.raw.listName }}</nuxt-link>-->
+        <span class="link" @click="clickListName(item.raw.id)">{{ item.raw.listName }}</span>
+      </template>
       <!-- フッター削除 -->
       <template v-slot:bottom></template>
-      <template v-slot:item.listName="{ item }">
-        <nuxt-link :to="`/`">{{ item.raw.listName }}</nuxt-link>
-      </template>
       </v-data-table>
     </v-container>
     <!-- 一覧表示 ここまで -->
@@ -126,6 +133,9 @@ const searchParams = ref(
 const dateFrom = ref("")
 const dateTo = ref("")
 
+const route = useRoute();
+const router = useRouter();
+
 /**
  * テーブルデータ取得（仮）
  */
@@ -137,8 +147,8 @@ const dmListData: any = ref(data.value)
 
 /**
  * テーブルデータ取得
+ * 初期表示と検索で条件分岐特定のアプローチリストIDの有無により取得を分ける。
  */
-let resultData = []
 /**
  * DMリスト取得API呼出
  * return dmListId  DMリストID
@@ -150,33 +160,44 @@ const { data: dmListList} = await useAsyncData(
   'dmListList',
   (approachListIdList) => $fetch('/api/dmList')
 )
+/** 確認用 */
 console.log('DMリスト取得API')
 console.log(dmListList.value)
-resultData.push(dmListList)
-console.log(resultData)
 
 // アプローチリスト取得API呼出
 const { data: approachList} = await useAsyncData(
   'approachList',
   (approachListIdList) => $fetch('/api/approachLists')
 )
+/** 確認用 */
 console.log('アプローチリスト取得API')
 console.log(approachList.value)
-resultData.push(approachList)
-console.log(resultData)
 
 // ユーザー取得API呼出
 const { data: user} = await useAsyncData(
   'user',
   (userId) => $fetch('/api/user')
 )
+/** 確認用 */
 console.log('ユーザー取得API')
 console.log(user.value)
-resultData.push(user)
-console.log(resultData)
 
 /**
- * プルダウンリスト取得
+ * プルダウンリスト生成
+ * 各APIの結果を使って以下を作成する
+ * チームリスト(アプローチリスト取得APIの結果から作成)
+ * 担当コンサルタントリスト(ユーザー取得APIの結果から作成)
+ * アプローチ区分リスト(アプローチリスト取得APIの結果から作成)
+ * 構想：各リストを取り出した配列を作成し、Setリストに格納する。（重複削除）
+ */
+const jsonApproachList = approachList
+console.log(jsonApproachList)
+const pulldownChargeOfTeam1: any = []
+const pulldownChargeOfConsultant1: any = []
+const pulldownApproachPurpose1: any = []
+
+/**
+ * プルダウンリスト取得(削除予定)
 */ 
 const { data: data1 } = await useAsyncData(
   'pulldownLists',
@@ -186,6 +207,19 @@ const data1_1: any = ref(data1)
 const pulldownChargeOfTeam = data1_1.value.teamList
 const pulldownChargeOfConsultant = data1_1.value.consultantList
 const pulldownApproachPurpose = data1_1.value.approachPurpose
+
+
+/**
+ * リスト名押下時の処理
+ * @param listId
+ */
+const clickListName = ( listId: Number ):void => {
+  let dmDestinationCopmanyUrl = router.resolve({
+    path: `/`,
+    query: { id: Number(listId)},
+  });
+  window.open(dmDestinationCopmanyUrl.href, '_blank')
+}
 
 /**
  * 一覧表示ヘッダー設定
@@ -214,16 +248,19 @@ const headers = ref(
 const searchButton = (searchParams: any) :void => {
   console.log("searchButtonClicked")
   // アプローチリスト取得APIの呼出
-  // const { data } = useAsyncData(
-  //   'approachLists',
-  //   () => $fetch('api/approachLists')
-  // )
-  // const approachLists = ref(data)
+  
+  // DMリスト取得APIの呼出
+
 }
 
 
 </script>
 <style>
+.link {
+    color: -webkit-link;
+    cursor: pointer;
+    text-decoration: underline;
+}
 .ui-textfield .v-input__control .v-field .v-field__field .v-field__input {
   padding: 0 0 !important;
 }
@@ -231,12 +268,9 @@ const searchButton = (searchParams: any) :void => {
   background-color: #ffeccc !important;
 }
 .ui-vcontaoner .v-table--fixed-header {
-  z-index: 1 !important;
+  z-index: 0 !important;
 }
-.ui-datepicker .dp__outer_menu_wrap .dp__menu {
-  z-index: 10000;
+.ui-datepicker .dp__outer_menu_wrap .dp__menu_transitioned{
+  z-index: 99999999999999 !important;
 }
-/* .dp__instance_calendar {
-  z-index: 1000 !important;
-} */
 </style>

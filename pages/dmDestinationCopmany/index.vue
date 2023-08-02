@@ -122,10 +122,10 @@
         <v-col cols="1" class="px-0"></v-col>
         <v-col cols="4" class="px-0 d-flex">
           <div class="px-4">
-            <v-btn  depressed color="primary" @click="matchingStart(0)">ニーズマッチング</v-btn>
+            <v-btn  depressed color="black" @click="matchingStart(0)">ニーズマッチング</v-btn>
           </div>
           <div class="px-4">
-            <v-btn depressed color="primary" @click="download">ダウンロード</v-btn>
+            <v-btn depressed color="black" @click="download">ダウンロード</v-btn>
           </div>
         </v-col>
         <v-col cols="4" class="pt-4 pl-10">

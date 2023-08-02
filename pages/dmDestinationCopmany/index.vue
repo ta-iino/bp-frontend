@@ -17,97 +17,8 @@
           </v-col>
         </v-col>     
       </v-row>
-      <!-- <v-row>
-        <v-col cols="2" class="px-0 py-1">
-          <span>担当チーム：</span>
-        </v-col>
-        <v-col cols="2" class="px-0 py-1">
-          <span>{{ dmList.chargeOfTeam }}</span>
-        </v-col>
-        <v-col cols="2" class="px-0 py-1">
-          <span>担当コンサルタント：</span>
-        </v-col>
-        <v-col cols="2" class="px-0 py-1">
-          <span>{{ dmList.chargeOfConsultant }}</span>
-        </v-col>        
-        <v-col cols="2" class="px-0 py-1">
-          <span>リスト名：</span>
-        </v-col>
-        <v-col cols="2" class="px-0 py-1">
-          <span>{{ dmList.listName }}</span>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="2" class="px-0 py-1">
-          <span>アプローチ区分：</span>
-        </v-col>
-        <v-col cols="2" class="px-0 py-1">
-          <span>{{ dmList.approachPurpose }}</span>
-        </v-col>        
-        <v-col cols="2" class="px-0 py-1">
-          <span>業種：</span>
-        </v-col>
-        <v-col cols="2" class="px-0 py-1">
-          <span>{{ dmList.companyIndustry }}</span>
-        </v-col>        
-        <v-col cols="2" class="px-0 py-1">
-          <span>地域：</span>
-        </v-col>
-        <v-col cols="2" class="px-0 py-1">
-          <span>{{ dmList.companyRegion }}</span>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="2" class="px-0 py-1">
-          <span>売上：</span>
-        </v-col>
-        <v-col cols="2" class="px-0 py-1">
-          <span>{{ dmList.companySales }}</span>
-        </v-col>          
-        <v-col cols="2" class="px-0 py-1">
-          <span>送付社数：</span>
-        </v-col>
-        <v-col cols="2" class="px-0 py-1">
-          <span>{{ dmList.sendCompanyCount }}</span>
-        </v-col>        
-        <v-col cols="2" class="px-0 py-1">
-          <span>利用業者名：</span>
-        </v-col>
-        <v-col cols="2" class="px-0 py-">
-          <span>{{ dmList.useCompanyName }}</span>
-        </v-col>       
-      </v-row>
-      <v-row>
-        <v-col cols="2" class="px-0 py-1">
-          <span>備考：</span>
-        </v-col>
-        <v-col cols="2" class="px-0 py-1">
-          <span>{{ dmList.remarks }}</span>
-        </v-col> 
-      </v-row>
-      <v-row>
-        <v-col cols="2" class="px-0 py-1">
-          <span>送付日：</span>
-        </v-col>
-        <v-col cols="2" class="px-0 py-1">
-          <span>{{ dmList.sendMailDate }}</span>
-        </v-col>
-        <v-col cols="2" class="px-0 py-1">
-          <span>登録日：</span>
-        </v-col>
-        <v-col cols="2" class="px-0 py-1">
-          <span>{{ dmList.registrationDate }}</span>
-        </v-col>
-        <v-col cols="2" class="px-0 py-1">
-          <span>状況：</span>
-        </v-col>
-        <v-col cols="2" class="px-0 py-1">
-          <span>{{ dmList.matchingStatus }}</span>
-        </v-col>
-      </v-row>      -->
       <v-row class="py-3">
         <v-col cols="3" class="px-0">
-          <!-- v-model="selectedProcessingDate" -->
           <v-select
             v-model="selectedProcessingDate"
             clearable
@@ -117,7 +28,6 @@
             item-value="id"
             item-title="processingDate"
           ></v-select>
-          <!-- <p>{{ selectedProcessingDate }}</p> -->
         </v-col>
         <v-col cols="1" class="px-0"></v-col>
         <v-col cols="4" class="px-0 d-flex">
@@ -125,10 +35,11 @@
             <v-btn  depressed color="primary" @click="matchingStart(0)">ニーズマッチング</v-btn>
           </div>
           <div class="px-4">
-            <v-btn depressed color="primary" @click="download">ダウンロード</v-btn>
+            <v-btn depressed color="primary" @click="downloadCsv">ダウンロード</v-btn>
           </div>
         </v-col>
         <v-col cols="4" class="pt-4 pl-10">
+          <!-- <h2>企業数:　　{{ destinationCompanyList.data.length }}社</h2> -->
           <h2>企業数:　　{{ destinationCompanyList.length }}社</h2>
           <!-- <v-pagination v-model="page" :length="totalPageNum" ></v-pagination> -->
         </v-col>
@@ -145,12 +56,9 @@
           :items-per-page="-1"
           fixed-header
         >
-          <!-- TODO アクセストークン送る必要あり？その場合、router.pushに書き換える？その場合vue-router必要 -->
-          <!-- <template v-slot:item.listName="{ item }">
-            <nuxt-link :to="">{{ item.masterId }}</nuxt-link>
-          </template> -->
           <template v-slot:item.masterId="{ item }">
-            <nuxt-link :to="`/`">{{ item.raw.masterId }}</nuxt-link>
+            <!-- <nuxt-link :to="`/`">{{ item.raw.masterId }}</nuxt-link> -->
+            <span class="link" @click="clickCompanyId(item.raw.masterId)">{{ item.raw.masterId }}</span>
           </template>
           <template v-slot:item.matchingResult="{ item }">
               <v-btn width="120" small class="mr-2" @click="matchingResult(item.raw.masterId)">マッチング結果</v-btn>
@@ -167,25 +75,26 @@
 <script setup lang="ts">
 import { VDataTable } from 'vuetify/lib/labs/components.mjs';
 import { ref } from 'vue'
-import { appendFile } from 'fs';
+import {useRoute, useRouter} from "vue-router";
 
+const route = useRoute();
+const router = useRouter();
+const dmListId = route.query;
 /**
  * マッチングプルダウンリスト
  */
-
  // mock用
- const { data : processingDateData }  = await useAsyncData(
-  'processingDateList',
-  () => $fetch('api/processingDateList')
-)
-const processingDateList: any = ref(processingDateData.value)
+const { data : processingDateListData } = await useFetch('/api/processingDateList');
 
 // マッチング処理日時リスト取得API（backend）
+// const { data : processingDateListData } = await useFetch('エンドポイントのURL', {
+//   baseURL: 'バックエンドのベースURL（envフィルから引っ張る)',
+//   params: {'dmListId': dmListId}
+// })
 
-const selectedProcessingDate: Number = ref(processingDateList.value[0].id)
-
-// クエリパラメータにある場合はそれを取る（マッチング処理日時の変更）ない場合はマッチングプルダウンの最新のキーを入れる
-// const targetBuyNeedsMachingHistoryId = 
+const processingDateList: any = ref(processingDateListData.value);
+// 選択されたプルダウンのデータ格納用
+const selectedProcessingDate: Number = ref(processingDateList.value[0].id);
 
 
 /**
@@ -193,17 +102,12 @@ const selectedProcessingDate: Number = ref(processingDateList.value[0].id)
  */
 
 // mock用
-const { data : dmListData }  = await useAsyncData(
-  'dmList',
-  () => $fetch('api/dmList')
-)
-const dmListData2: any = ref(dmListData.value)
-const dmList: any = ref(dmListData2.value[0])
-
-// アプローチリスト取得用API
-
-
-
+const { data : dmListListData }  = await useFetch('/api/approachLists');
+// const { data : dmListListData }  = await useFetch('/api/sample')
+const dmListList: any = ref(dmListListData.value);
+const dmList: any = ref(dmListList.value[0]);
+//TODO 本データ取得はDMリスト一覧画面から引っ張る。
+// ⇒共通処理化して処理が重複しないように気を付ける。
 
 const items: any = [
         {title:'担当チーム：', value: dmList.value.chargeOfTeam},
@@ -219,22 +123,47 @@ const items: any = [
         {title:'', value: ''}, // 画面レイアウト上空欄を作るため
         {title:'', value: ''}, // 画面レイアウト上空欄を作るため
         {title:'送付日：', value: dmList.value.sendMailDate},
-        {title:'登録日：', value: dmList.value.registrationDate},
+        {title:'登録日：', value: dmList.value.created_at},
         {title:'状況：', value: dmList.value.matchingStatus},
-      ]
+      ];
 
 /**
  * 発送企業リスト一覧
  */
 
 // mock用
-const { data : destinationCompanyData }  = await useAsyncData(
-  'destinationCompanyList',
-  () => $fetch('api/destinationCompanyList')
-)
-const destinationCompanyList: any = ref(destinationCompanyData.value)
+// const { data : destinationCompanyData }  = await useFetch('api/sample2')
+const { data : sendCompanyHistoryListData }  = await useFetch('api/dmDestinationCopmanyList');
 
-// 
+// DM送付先企業リスト取得API（backend）
+// refreshを取得しておき、ニーズマッチング実行時に使用する。
+// const { data : sendCompanyHistoryListData } = await useFetch(
+//   'エンドポイントのURL', 
+//   {
+//     baseURL: 'バックエンドのベースURL（envフィルから引っ張る)',
+//     params: {'buyneedsMatchingHistoryId': selectedProcessingDate}
+//   }
+// );
+const sendCompanyHistoryList: any = ref(sendCompanyHistoryListData.value);
+const sendCompanyHistoryIdList: number[] = ref(sendCompanyHistoryList["idList"]);
+const sendCompanyIdList: number[]  = ref(sendCompanyHistoryList["companyIdList"]);
+
+
+
+//mock用
+// const { data : destinationCompanyListData }  = await useFetch('api/copmanyMasterList');
+const { data : destinationCompanyListData }  = await useFetch('api/sample2');
+
+// 企業マスタ取得用API(社内ポータル)
+// const { data : destinationCompanyData } = await useFetch(
+//   'エンドポイントのURL', 
+//   {
+//     baseURL: '社内ポータルのベースURL（envフィルから引っ張る)',
+//     headers: {'Authorization': 'Bearer アクセストークン(Cookieに保存かな、、)'},
+//     query: {'id': companyIdList}
+//   }
+// );
+const destinationCompanyList: any = ref(destinationCompanyListData.value);
 
 
 
@@ -259,47 +188,135 @@ const headers: any =
     ]
 
 
-  /**
+/**
  * ニーズマッチングボタン押下時の処理
  */
 const matchingStart = async (count: number): Promise<void> => {
   // マッチング処理開始APIの呼び出し
-  const { data : isJobCreatedData }  = await useAsyncData(
-    'matchingStart',
-    () => $fetch('/matchingStart')
-  )
-  const isJobCreated: any = ref(isJobCreatedData.value)
+  const { data : isJobCreatedData, error: jobCreatedError } = await useFetch(
+    'エンドポイントのURL', 
+    {
+      baseURL: 'バックエンドのベースURL（envフィルから引っ張る)',
+      params: {'dmListId': dmListId}
+    }
+  );
+  // エラー時の処理
+  if(jobCreatedError) {
+    console.log(jobCreatedError)
+  };
+  const isJobCreated: any = ref(isJobCreatedData.value);
   // ジョブ作成が成功したら再度初期表示を行う。
   if(isJobCreated) {
-    // 本画面の初期表示処理
-    // 現在のマッチング処理日時のIDをパラメータに載せる
-  }
+    // 外部からの接続もあるためクエリパラメータを使用する
+    router.push({ 
+      path: `/本画面のURL`,
+      query: { 
+        dmListId: Number(dmListId), 
+        selectedProcessingDate: Number(selectedProcessingDate)
+      }
+    });    
+  };
 };
 
-// ダウンロード押下時の処理
-const download = (count: number): void => {
-  // 1. 発送企業履歴IDリストの作成
+/**
+ * ダウンロード押下時の処理
+ */
+const downloadCsv = async (): Promise<void> => {
 
-  // 2. 企業マスタIDリストの作成
-  // ※1と2はmap形式で持っても良いかも。
+  // マッチング結果取得APIの呼び出し
+  const { data : matchingResultListData, error } = await useFetch(
+    'エンドポイントのURL', 
+    {
+      baseURL: 'バックエンドのベースURL（envフィルから引っ張る)',
+      params: {'sendCompanyHistoryIdList': sendCompanyHistoryIdList}
+    }
+  );
+  const matchingResultListDataList: any = ref(matchingResultListData.value);
+  const buyNeedsIdList: number[] = ref(matchingResultListDataList["buyNeedsIdList"]);
+  const buyerCompanyIdList: number[] = ref(matchingResultListDataList["buyerCompanyIdList"]);
 
-  // 3.マッチング結果取得APIを呼び出す
+  // 買いニーズ取得APIの呼び出し(社内ポータル)
+  const { data : bunNeedsListData } = await useFetch(
+    'エンドポイントのURL', 
+    {
+      baseURL: '社内ポータルのベースURL（envフィルから引っ張る)',
+      headers: {'Authorization': 'Bearer アクセストークン(Cookieに保存かな、、)'},
+      query: {'id': buyNeedsIdList}
+    }
+  );
+  const bunNeedsList: any = ref(bunNeedsListData.value);
+  
+  // 企業マスタ取得用API(社内ポータル)
+  const companyIdList: number[] = [...sendCompanyIdList, ...buyerCompanyIdList];
+  const { data : downloadCompanyData } = await useFetch(
+    'エンドポイントのURL', 
+    {
+      baseURL: '社内ポータルのベースURL（envフィルから引っ張る)',
+      headers: {'Authorization': 'Bearer アクセストークン(Cookieに保存かな、、)'},
+      query: {'id': companyIdList}
+    }
+  );
+  const downloadCompanyList: any = ref(downloadCompanyData.value);
 
-  // 4.買いニーズ取得APIの呼び出し
-
-  // 5.企業情報APIの呼び出し
-
-  // 6.DM発送先企業一覧ダウンロードAPIの呼び出し
+  // DM発送先企業一覧ダウンロードAPIの呼び出し(社内ポータル)
+  const { data : downloadListData, error:  downloadListError } = await useFetch(
+    'エンドポイントのURL', 
+    {
+      baseURL: 'バックエンドのベースURL（envフィルから引っ張る)',
+      params: {
+        'downloadCompanyList': downloadCompanyList,
+        'bunNeedsList': bunNeedsList
+      }
+    }
+  );
+  const downloadList: any = ref(downloadListData.value);
 
   // 7. csvダウンロードさせる
+  // ファイルをBlob形式で取得
+  const blobData = new Blob(downloadList.value.csv);
+  // ダウンロードリンクを作成
+  const downloadLink = document.createElement('a');
+  downloadLink.href = URL.createObjectURL(blobData);
+   // ダウンロード時のファイル名
+  downloadLink.download = '発送先企業一覧'+new Date().toLocaleString()+'.csv';
+  downloadLink.click();
+  URL.revokeObjectURL(downloadLink.href); // 不要になったURLを解放
+
 };
 
-// マッチング結果押下時の処理
-const matchingResult = (masterId: Number): void => {
-  // 1. マッチング結果画面への遷移
-  // 発送企業IDリストはルートパラメータ or クエリパラメータで前の画面から情報を取得する。
-  // ヘッダーに必要な情報（発送先企業情報）も前画面から引き継がれる。
+
+// 
+/**
+ * マッチング結果押下時の処理
+ * @param companyId 企業マスタId
+ */
+const matchingResult = (companyId: Number): void => {
+  router.push({ 
+    path: `/マッチング結果画面のpath/${[companyId]}/${[destinationCompanyList.data]}`
+  });
+};
+
+/**
+ * 会社ID押下時の処理
+ * @param companyId 
+ */
+const clickCompanyId = (companyId: Number): void => {
+  // TODO バックエンド？フロントエンド？
+  // 一旦フロントエンドの場合の処理
+  // URLは？アクセストークン渡す
+  let compnayUrl = router.resolve({
+    path: `/`,
+    query: { id: Number(companyId)},
+  });
+  window.open(compnayUrl.href, '_blank');
+
 };
 
 </script>
-
+<style>
+.link {
+    color: -webkit-link;
+    cursor: pointer;
+    text-decoration: underline;
+}
+</style>

@@ -82,7 +82,7 @@
         </v-col>-->
       </v-row>
       <v-row justify="center" class="ma-4">
-        <v-btn depressed color="black" @click="searchButton(searchParams)">検索</v-btn>
+        <v-btn class="ui-btn" depressed color="grey-darken-4" @click="searchButton(searchParams)">検索</v-btn>
       </v-row>
     </v-container>
     <!-- 検索フォーム ここまで -->
@@ -263,6 +263,9 @@ const searchButton = (searchParams: any) :void => {
 }
 .ui-textfield .v-input__control .v-field .v-field__field .v-field__input {
   padding: 0 0 !important;
+}
+.v-btn {
+  border: 4px outset black;
 }
 .v-data-table__th {
   background-color: #ffeccc !important;

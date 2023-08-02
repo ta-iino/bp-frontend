@@ -122,10 +122,10 @@
         <v-col cols="1" class="px-0"></v-col>
         <v-col cols="4" class="px-0 d-flex">
           <div class="px-4">
-            <v-btn  depressed color="black" @click="matchingStart(0)">ニーズマッチング</v-btn>
+            <v-btn class="v-btn" depressed color="grey-darken-4" @click="matchingStart(0)">ニーズマッチング</v-btn>
           </div>
           <div class="px-4">
-            <v-btn depressed color="black" @click="download">ダウンロード</v-btn>
+            <v-btn class="v-btn" depressed color="grey-darken-4" @click="download">ダウンロード</v-btn>
           </div>
         </v-col>
         <v-col cols="4" class="pt-4 pl-10">
@@ -153,7 +153,7 @@
             <nuxt-link :to="`/`">{{ item.raw.masterId }}</nuxt-link>
           </template>
           <template v-slot:item.matchingResult="{ item }">
-              <v-btn width="120" small class="mr-2" @click="matchingResult(item.raw.masterId)">マッチング結果</v-btn>
+              <v-btn width="120" small class="mr-2 ui-matching-btn" @click="matchingResult(item.raw.masterId)" color="grey-darken-4">マッチング結果</v-btn>
           </template>
           <!-- フッターの不要な文字を消す為に記載 -->
           <template v-slot:bottom></template>
@@ -302,4 +302,9 @@ const matchingResult = (masterId: Number): void => {
 };
 
 </script>
+<style>
+.ui-matching-btn {
+  border-radius: 10px;
+}
+</style>
 

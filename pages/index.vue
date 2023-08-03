@@ -45,37 +45,33 @@
           <v-text-field v-model="searchParams.registrationDateFrom" clearable label="登録日(from)" filled></v-text-field>
         </v-col>-->
         <v-col cols="2" class="px-0">
-          <v-text-field class="my-2 ui-textfield">
-            <VueDatePicker
-              class="ui-datepicker"
-              v-model="dateFrom"
-              locale="ja"
-              format="yyyy/MM/dd"
-              select-text="OK"
-              cancel-text="Cancel"
-              placeholder="登録日(from)"
-              :offset="20"
-              :enable-time-picker="false"
-              clearable
-            ></VueDatePicker>
-          </v-text-field>
+          <VueDatePicker
+            class="ui-datepicker"
+            v-model="dateFrom"
+            locale="ja"
+            format="yyyy/MM/dd"
+            select-text="OK"
+            cancel-text="Cancel"
+            placeholder="登録日(from)"
+            :offset="20"
+            :enable-time-picker="false"
+            clearable
+          ></VueDatePicker>
         </v-col>
         <v-col cols="2" class="px-0">
-          <v-text-field class="my-2 ui-textfield">
-            <VueDatePicker 
-              class="ui-datepicker"
-              v-model="dateTo"
-              locale="jp"
-              format="yyyy/MM/dd"
-              select-text="OK"
-              cancel-text="Cancel"
-              placeholder="登録日(to)"
-              :offset="20"
-              :enable-time-picker="false"
-              clearable
-              >
-            </VueDatePicker>
-          </v-text-field>
+          <VueDatePicker 
+            class="ui-datepicker"
+            v-model="dateTo"
+            locale="jp"
+            format="yyyy/MM/dd"
+            select-text="OK"
+            cancel-text="Cancel"
+            placeholder="登録日(to)"
+            :offset="20"
+            :enable-time-picker="false"
+            >
+            clearable
+          </VueDatePicker>
         </v-col>
 <!--        <v-col cols="2" class="px-0">
           <v-text-field v-model="searchParams.registrationDateTo" clearable label="登録日(to)" filled></v-text-field>
@@ -90,8 +86,8 @@
     <v-container class="ui-vcontaoner" >
       <v-data-table
           class="ui-vdatatable"
-          :headers="headers"
           :items="dmListData"
+          :headers="headers"
           :height="528"
           :items-per-page="-1"
           fixed-header
@@ -130,8 +126,8 @@ const searchParams = ref(
       registrationDateTo : null,
   }
 )
-const dateFrom = ref("")
-const dateTo = ref("")
+const dateFrom = ref()
+const dateTo = ref()
 
 const route = useRoute();
 const router = useRouter();
@@ -258,19 +254,23 @@ const searchButton = (searchParams: any) :void => {
     cursor: pointer;
     text-decoration: underline;
 }
-.ui-textfield .v-input__control .v-field .v-field__field .v-field__input {
-  padding: 0 0 !important;
+.ui-datepicker div .dp__input_wrap {
+  padding-top: 8px;
+}
+.ui-datepicker div .dp__input_wrap div .dp__icon {
+  padding-top: 20px;
+}
+.ui-datepicker div .dp__input_wrap .dp__icon {
+  padding-top: 20px;
+}
+.ui-datepicker div .dp__input_wrap .dp__input_reg {
+  padding-top: 20px; 
+  padding-bottom: 12px;
 }
 .v-btn {
   border: 4px outset black;
 }
 .v-data-table__th {
   background-color: #ffeccc !important;
-}
-.ui-vcontaoner .v-table--fixed-header {
-  z-index: 0 !important;
-}
-.ui-datepicker .dp__outer_menu_wrap .dp__menu_transitioned{
-  z-index: 99999999999999 !important;
 }
 </style>

@@ -1,129 +1,133 @@
 <template>
   <VApp>
-    <v-container class="pb-0">
-      <v-row>
-        <v-col cols="16" class="px-0 my-3">
-          <VCardTitle class="headline front-weight-bold" style="background-color: lightgray;">買いニーズマッチング結果</VCardTitle>
-        </v-col>
-      </v-row>
-      <h3 class="px-5 my-0">DM送付先企業</h3>
-      <v-row class="px-3 my-5 ">
-        <v-col cols="4" v-for="(item, i) in tableHeaders" :key="item.title">
-          <v-row v-if="i === 0">
-            <v-col class="px-10 py-0">
-              {{ item.title }}
-            </v-col>
-            <v-col class="px-0 py-0" @click="clickCompanyName(sellCompany['id'])">
-              {{ item.value }}
-            </v-col>
-          </v-row>
-          <v-row v-else>
-            <v-col class="px-10 py-0">
-              {{ item.title }}
-            </v-col>
-            <v-col class="px-10 py-0">
-              {{ item.value }} {{ item.bottom }}
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
-    </v-container>
-    <v-container style="background-color: rgb(212, 238, 251);">
-      <v-row class="mx-8 py-1" justify="end">
-        <h3>処理日時</h3>
-        <span class="mx-10">{{ processDate }}</span>
-      </v-row>
-      <v-col v-for="(data, i) in tableBodyData" style="background-color: lightgray;" cols="11" class="mx-6 my-2">
+    <v-container>
+      <v-container class="pb-0" id="sticky">
         <v-row>
-          <h3>買手第{{ i + 1 }}候補</h3>
+          <v-col cols="16" class="px-0 my-3">
+            <VCardTitle class="headline front-weight-bold" style="background-color: lightgray;">買いニーズマッチング結果</VCardTitle>
+          </v-col>
         </v-row>
         <v-row>
-          <v-col cols="12" class="mb-n6">
-            <v-row>
-              <v-col cols="2">
-                企業:
-              </v-col>
-              <v-col cols="3">
-                <NuxtLink @click.native="clickCompanyName(buyCompanyId[i])">{{ data[0].value }}</NuxtLink>
-              </v-col>
-              <v-col cols="2">
-                都道府県:
-              </v-col>
-              <v-col cols="2">
-                {{ data[1].value }}
-              </v-col>
-              <v-col cols="1">
-                売上高:
-              </v-col>
-              <v-col cols="2">
-                {{ data[2].value }} 百万円
-              </v-col>
-            </v-row>
-          </v-col>
-          <v-col cols="12" class="mb-n6">
-            <v-row>
-              <v-col cols="2">
-                買収実績:
-              </v-col>
-              <v-col cols="3">
-                {{ data[3].value }}
-              </v-col>
-              <v-col cols="2">
-                業種:
-              </v-col>
-              <v-col cols="5">
-                {{ data[4].value }}
-              </v-col>
-            </v-row>
-          </v-col>
-          <v-col cols="12" class="mb-n6">
-            <v-row>
-              <v-col cols="5">
-                <v-spacer></v-spacer>
-              </v-col>
-              <v-col cols="2">
-                営業種目:
-              </v-col>
-              <v-col cols="5">
-                {{ data[6].value }}
-              </v-col>
-            </v-row>
-          </v-col>
-          <v-col cols="12" class="mb-n6">
-            <v-row>
-              <v-col cols="2">
-                買収希望エリア:
-              </v-col>
-              <v-col cols="3">
-                {{ data[7].value }}
-              </v-col>
-              <v-col cols="7">
-                <v-spacer></v-spacer>
-              </v-col>
-            </v-row>
-          </v-col>
-          <v-col cols="12" class="mb-n6">
-            <v-row>
-              <v-col cols="2">
-                買収希望業種:
-              </v-col>
-              <v-col cols="10">
-                {{ data[8].value }}
-              </v-col>
-            </v-row>
-          </v-col>
-          <v-col cols="12">
-            <v-row>
-              <v-col cols="2">
-                希望コメント:
-              </v-col>
-              <v-col cols="10">
-                <span id="comment">{{ data[9].value }}</span>
-              </v-col>
-            </v-row>
-          </v-col>
+          <h3 class="px-5 my-0">DM送付先企業</h3>
+          <v-row class="px-16 mb-10 mt-2">
+            <v-col cols="4" v-for="(item, i) in tableHeaders" :key="item.title">
+              <v-row v-if="i === 0">
+                <v-col class="px-10 py-0">
+                  {{ item.title }}
+                </v-col>
+                <v-col class="px-0 py-0" @click="clickCompanyName(sellCompany['id'])">
+                  {{ item.value }}
+                </v-col>
+              </v-row>
+              <v-row v-else>
+                <v-col class="px-10 py-0">
+                  {{ item.title }}
+                </v-col>
+                <v-col class="px-10 py-0">
+                  {{ item.value }} {{ item.bottom }}
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
         </v-row>
-      </v-col>
+      </v-container>
+      <v-container style="background-color: rgb(212, 238, 251);">
+        <v-row class="mx-8 py-1" justify="end">
+          <h3>処理日時</h3>
+          <span class="mx-10">{{ processDate }}</span>
+        </v-row>
+        <v-col v-for="(data, i) in tableBodyData" style="background-color: lightgray;" cols="11" class="mx-6 my-2">
+          <v-row>
+            <h3>買手第{{ i + 1 }}候補</h3>
+          </v-row>
+          <v-row>
+            <v-col cols="12" class="mb-n6">
+              <v-row>
+                <v-col cols="2">
+                  企業:
+                </v-col>
+                <v-col cols="3">
+                  <NuxtLink @click.native="clickCompanyName(buyCompanyId[i])">{{ data[0].value }}</NuxtLink>
+                </v-col>
+                <v-col cols="2">
+                  都道府県:
+                </v-col>
+                <v-col cols="2">
+                  {{ data[1].value }}
+                </v-col>
+                <v-col cols="1">
+                  売上高:
+                </v-col>
+                <v-col cols="2">
+                  {{ data[2].value }} 百万円
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col cols="12" class="mb-n6">
+              <v-row>
+                <v-col cols="2">
+                  買収実績:
+                </v-col>
+                <v-col cols="3">
+                  {{ data[3].value }}
+                </v-col>
+                <v-col cols="2">
+                  業種:
+                </v-col>
+                <v-col cols="5">
+                  {{ data[4].value }}
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col cols="12" class="mb-n6">
+              <v-row>
+                <v-col cols="5">
+                  <v-spacer></v-spacer>
+                </v-col>
+                <v-col cols="2">
+                  営業種目:
+                </v-col>
+                <v-col cols="5">
+                  {{ data[6].value }}
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col cols="12" class="mb-n6">
+              <v-row>
+                <v-col cols="2">
+                  買収希望エリア:
+                </v-col>
+                <v-col cols="3">
+                  {{ data[7].value }}
+                </v-col>
+                <v-col cols="7">
+                  <v-spacer></v-spacer>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col cols="12" class="mb-n6">
+              <v-row>
+                <v-col cols="2">
+                  買収希望業種:
+                </v-col>
+                <v-col cols="10">
+                  {{ data[8].value }}
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col cols="12">
+              <v-row>
+                <v-col cols="2">
+                  希望コメント:
+                </v-col>
+                <v-col cols="10">
+                  <span id="comment">{{ data[9].value }}</span>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-container>
     </v-container>
   </VApp>
 </template>
@@ -263,6 +267,14 @@ const clickCompanyName = (companyId: number) :void => {
 
 <style>
 #comment {
-white-space: pre-line;
+  white-space: pre-line;
+}
+#sticky{
+  background-color: white;
+  position: sticky;
+  top: 0;
+}
+.header{
+  height: 400px;
 }
 </style>

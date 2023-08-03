@@ -8,12 +8,12 @@
       </v-row>
       <h3 class="px-5 my-0">DM送付先企業</h3>
       <v-row class="px-3 my-5 ">
-        <v-col cols="4" v-for="(item) in tableHeaders" :key="item.title">
-          <v-row v-if="item.title === '企業名'" @click="clickCompanyName(sellCompany['id'])">
-            <v-col cols="10" class="px-0 py-1">
+        <v-col cols="4" v-for="(item, i) in tableHeaders" :key="item.title">
+          <v-row v-if="i === 0">
+            <v-col class="px-10 py-0">
               {{ item.title }}
             </v-col>
-            <v-col cols="6" class="px-0 py-1">
+            <v-col class="px-0 py-0" @click="clickCompanyName(sellCompany['id'])">
               {{ item.value }}
             </v-col>
           </v-row>
@@ -28,7 +28,6 @@
         </v-col>
       </v-row>
     </v-container>
-    <!-- v-for以下にcssを適用させるとjustifyが効かなくなる。結果一覧にflex-columnが効かない。 -->
     <v-container style="background-color: rgb(212, 238, 251);">
       <v-row class="mx-8 py-1" justify="end">
         <h3>処理日時</h3>
@@ -38,47 +37,89 @@
         <v-row>
           <h3>買手第{{ i + 1 }}候補</h3>
         </v-row>
-        <v-row justify="center">
-          <v-col cols="12" class="ml-16">
+        <v-row>
+          <v-col cols="12" class="mb-n6">
             <v-row>
-              <span class="ml-8">企業:</span>
-              <NuxtLink class="mx-16" @click.native="clickCompanyName(buyCompanyId[i])">{{ data[0].value }}</NuxtLink>
-              <span class="ml-16">都道府県:</span>
-              <span class="mx-8">{{ data[1].value }}</span>
-              <span class="mx-16">売上高:</span>
-              <span class="ml-16">{{ data[2].value }} 百万円</span>
+              <v-col cols="2">
+                企業:
+              </v-col>
+              <v-col cols="3">
+                <NuxtLink @click.native="clickCompanyName(buyCompanyId[i])">{{ data[0].value }}</NuxtLink>
+              </v-col>
+              <v-col cols="2">
+                都道府県:
+              </v-col>
+              <v-col cols="2">
+                {{ data[1].value }}
+              </v-col>
+              <v-col cols="1">
+                売上高:
+              </v-col>
+              <v-col cols="2">
+                {{ data[2].value }} 百万円
+              </v-col>
             </v-row>
           </v-col>
-          <v-col cols="12" class="ml-16">
+          <v-col cols="12" class="mb-n6">
             <v-row>
-              <span class="ml-8">買収実績:</span>
-              <span class="mx-16">{{ data[3].value }}</span>
-              <span class="mx-16">業種:</span>
-              <span class="mx-8">{{ data[4].value }}</span>
+              <v-col cols="2">
+                買収実績:
+              </v-col>
+              <v-col cols="3">
+                {{ data[3].value }}
+              </v-col>
+              <v-col cols="2">
+                業種:
+              </v-col>
+              <v-col cols="5">
+                {{ data[4].value }}
+              </v-col>
+            </v-row>
+          </v-col>
+          <v-col cols="12" class="mb-n6">
+            <v-row>
+              <v-col cols="5">
+                <v-spacer></v-spacer>
+              </v-col>
+              <v-col cols="2">
+                営業種目:
+              </v-col>
+              <v-col cols="5">
+                {{ data[6].value }}
+              </v-col>
+            </v-row>
+          </v-col>
+          <v-col cols="12" class="mb-n6">
+            <v-row>
+              <v-col cols="2">
+                買収希望エリア:
+              </v-col>
+              <v-col cols="3">
+                {{ data[7].value }}
+              </v-col>
+              <v-col cols="7">
+                <v-spacer></v-spacer>
+              </v-col>
+            </v-row>
+          </v-col>
+          <v-col cols="12" class="mb-n6">
+            <v-row>
+              <v-col cols="2">
+                買収希望業種:
+              </v-col>
+              <v-col cols="10">
+                {{ data[8].value }}
+              </v-col>
             </v-row>
           </v-col>
           <v-col cols="12">
-            <v-row justify="end">
-              <span>営業種目:</span>
-              <span class="mx-8">{{ data[6].value }}</span>
-            </v-row>
-          </v-col>
-          <v-col cols="12" class="ml-16">
             <v-row>
-              <span class="ml-8">買収希望エリア:</span>
-              <span class="mx-4">{{ data[7].value }}</span>
-            </v-row>
-          </v-col>
-          <v-col cols="12" class="ml-16">
-            <v-row>
-              <span class="ml-8">買収希望業種:</span>
-              <span class="mx-8">{{ data[8].value }}</span>
-            </v-row>
-          </v-col>
-          <v-col cols="12" class="ml-16">
-            <v-row>
-              <span class="ml-8">希望コメント:</span>
-              <span class="mx-8" id="comment">{{ data[9].value }}</span>
+              <v-col cols="2">
+                希望コメント:
+              </v-col>
+              <v-col cols="10">
+                <span id="comment">{{ data[9].value }}</span>
+              </v-col>
             </v-row>
           </v-col>
         </v-row>

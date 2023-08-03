@@ -20,7 +20,7 @@
       <v-row class="py-3">
         <v-col cols="3" class="px-0">
           <v-select
-            v-model="selectedProcessingDate"
+            v-model="selectedBuyneedsHistoryId"
             clearable
             label="マッチング処理日時"
             filled
@@ -32,10 +32,10 @@
         <v-col cols="1" class="px-0"></v-col>
         <v-col cols="4" class="px-0 d-flex">
           <div class="px-4">
-            <v-btn  depressed color="primary" @click="matchingStart(0)">ニーズマッチング</v-btn>
+            <v-btn class="v-btn" depressed color="grey-darken-4" @click="matchingStart(0)">ニーズマッチング</v-btn>
           </div>
           <div class="px-4">
-            <v-btn depressed color="primary" @click="downloadCsv">ダウンロード</v-btn>
+            <v-btn class="v-btn" depressed color="grey-darken-4" @click="downloadCsv">ダウンロード</v-btn>
           </div>
         </v-col>
         <v-col cols="4" class="pt-4 pl-10">
@@ -57,11 +57,10 @@
           fixed-header
         >
           <template v-slot:item.masterId="{ item }">
-            <!-- <nuxt-link :to="`/`">{{ item.raw.masterId }}</nuxt-link> -->
             <span class="link" @click="clickCompanyId(item.raw.masterId)">{{ item.raw.masterId }}</span>
           </template>
           <template v-slot:item.matchingResult="{ item }">
-              <v-btn width="120" small class="mr-2" @click="matchingResult(item.raw.masterId)">マッチング結果</v-btn>
+              <v-btn width="120" small class="mr-2 ui-matching-btn" @click="matchingResult(item.raw.masterId)" color="grey-darken-4">マッチング結果</v-btn>
           </template>
           <!-- フッターの不要な文字を消す為に記載 -->
           <template v-slot:bottom></template>
@@ -87,14 +86,16 @@ const dmListId = route.query;
 const { data : processingDateListData } = await useFetch('/api/processingDateList');
 
 // マッチング処理日時リスト取得API（backend）
+
+//TODO マッチング履歴取得APIからfront側でmap形式のリストを作るよう修正。
 // const { data : processingDateListData } = await useFetch('エンドポイントのURL', {
 //   baseURL: 'バックエンドのベースURL（envフィルから引っ張る)',
-//   params: {'dmListId': dmListId}
+//   params: {'dm_list_id': dmListId}
 // })
 
 const processingDateList: any = ref(processingDateListData.value);
 // 選択されたプルダウンのデータ格納用
-const selectedProcessingDate: Number = ref(processingDateList.value[0].id);
+const selectedBuyneedsHistoryId: Number = ref(processingDateList.value[0].id);
 
 
 /**
@@ -102,10 +103,12 @@ const selectedProcessingDate: Number = ref(processingDateList.value[0].id);
  */
 
 // mock用
-const { data : dmListListData }  = await useFetch('/api/approachLists');
+
+const { data : dmListsData }  = await useFetch('/api/approachLists');
 // const { data : dmListListData }  = await useFetch('/api/sample')
-const dmListList: any = ref(dmListListData.value);
-const dmList: any = ref(dmListList.value[0]);
+const dmLists: any = ref(dmListsData.value);
+const dmList: any = ref(dmLists.value[0]);
+
 //TODO 本データ取得はDMリスト一覧画面から引っ張る。
 // ⇒共通処理化して処理が重複しないように気を付ける。
 
@@ -135,6 +138,7 @@ const items: any = [
 // const { data : destinationCompanyData }  = await useFetch('api/sample2')
 const { data : sendCompanyHistoryListData }  = await useFetch('api/dmDestinationCopmanyList');
 
+
 // DM送付先企業リスト取得API（backend）
 // refreshを取得しておき、ニーズマッチング実行時に使用する。
 // const { data : sendCompanyHistoryListData } = await useFetch(
@@ -147,8 +151,6 @@ const { data : sendCompanyHistoryListData }  = await useFetch('api/dmDestination
 const sendCompanyHistoryList: any = ref(sendCompanyHistoryListData.value);
 const sendCompanyHistoryIdList: number[] = ref(sendCompanyHistoryList["idList"]);
 const sendCompanyIdList: number[]  = ref(sendCompanyHistoryList["companyIdList"]);
-
-
 
 //mock用
 // const { data : destinationCompanyListData }  = await useFetch('api/copmanyMasterList');
@@ -212,7 +214,8 @@ const matchingStart = async (count: number): Promise<void> => {
       path: `/本画面のURL`,
       query: { 
         dmListId: Number(dmListId), 
-        selectedProcessingDate: Number(selectedProcessingDate)
+
+        selectedProcessingDate: Number(selectedBuyneedsHistoryId)
       }
     });    
   };
@@ -221,57 +224,21 @@ const matchingStart = async (count: number): Promise<void> => {
 /**
  * ダウンロード押下時の処理
  */
-const downloadCsv = async (): Promise<void> => {
 
-  // マッチング結果取得APIの呼び出し
-  const { data : matchingResultListData, error } = await useFetch(
-    'エンドポイントのURL', 
-    {
-      baseURL: 'バックエンドのベースURL（envフィルから引っ張る)',
-      params: {'sendCompanyHistoryIdList': sendCompanyHistoryIdList}
-    }
-  );
-  const matchingResultListDataList: any = ref(matchingResultListData.value);
-  const buyNeedsIdList: number[] = ref(matchingResultListDataList["buyNeedsIdList"]);
-  const buyerCompanyIdList: number[] = ref(matchingResultListDataList["buyerCompanyIdList"]);
+const downloadCsv = async (): Promise<void> => {  
 
-  // 買いニーズ取得APIの呼び出し(社内ポータル)
-  const { data : bunNeedsListData } = await useFetch(
-    'エンドポイントのURL', 
-    {
-      baseURL: '社内ポータルのベースURL（envフィルから引っ張る)',
-      headers: {'Authorization': 'Bearer アクセストークン(Cookieに保存かな、、)'},
-      query: {'id': buyNeedsIdList}
-    }
-  );
-  const bunNeedsList: any = ref(bunNeedsListData.value);
-  
-  // 企業マスタ取得用API(社内ポータル)
-  const companyIdList: number[] = [...sendCompanyIdList, ...buyerCompanyIdList];
-  const { data : downloadCompanyData } = await useFetch(
-    'エンドポイントのURL', 
-    {
-      baseURL: '社内ポータルのベースURL（envフィルから引っ張る)',
-      headers: {'Authorization': 'Bearer アクセストークン(Cookieに保存かな、、)'},
-      query: {'id': companyIdList}
-    }
-  );
-  const downloadCompanyList: any = ref(downloadCompanyData.value);
-
-  // DM発送先企業一覧ダウンロードAPIの呼び出し(社内ポータル)
+  // 買いニーズマッチング結果CSV取得APIの呼び出し
   const { data : downloadListData, error:  downloadListError } = await useFetch(
     'エンドポイントのURL', 
     {
-      baseURL: 'バックエンドのベースURL（envフィルから引っ張る)',
+      baseURL: 'バックエンドのベースURL',
       params: {
-        'downloadCompanyList': downloadCompanyList,
-        'bunNeedsList': bunNeedsList
+        'buyneeds_history_id': selectedBuyneedsHistoryId,
       }
     }
   );
   const downloadList: any = ref(downloadListData.value);
 
-  // 7. csvダウンロードさせる
   // ファイルをBlob形式で取得
   const blobData = new Blob(downloadList.value.csv);
   // ダウンロードリンクを作成
@@ -292,7 +259,9 @@ const downloadCsv = async (): Promise<void> => {
  */
 const matchingResult = (companyId: Number): void => {
   router.push({ 
-    path: `/マッチング結果画面のpath/${[companyId]}/${[destinationCompanyList.data]}`
+
+    path: `/マッチング結果画面のpath/${[companyId]}`
+
   });
 };
 
@@ -301,15 +270,11 @@ const matchingResult = (companyId: Number): void => {
  * @param companyId 
  */
 const clickCompanyId = (companyId: Number): void => {
-  // TODO バックエンド？フロントエンド？
-  // 一旦フロントエンドの場合の処理
-  // URLは？アクセストークン渡す
+
   let compnayUrl = router.resolve({
-    path: `/`,
-    query: { id: Number(companyId)},
+    path: `社内ポータルフロントURL` + `/company/` + companyId,
   });
   window.open(compnayUrl.href, '_blank');
-
 };
 
 </script>
@@ -318,5 +283,9 @@ const clickCompanyId = (companyId: Number): void => {
     color: -webkit-link;
     cursor: pointer;
     text-decoration: underline;
+}
+
+.ui-matching-btn {
+  border-radius: 10px;
 }
 </style>

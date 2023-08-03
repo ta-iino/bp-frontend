@@ -104,8 +104,8 @@ const selectedBuyneedsHistoryId: Number = ref(processingDateList.value[0].id);
 
 // mock用
 
-const { data : dmListsData }  = await useFetch('/api/approachLists');
-// const { data : dmListListData }  = await useFetch('/api/sample')
+// const { data : dmListsData }  = await useFetch('/api/approachLists');
+const { data : dmListsData }  = await useFetch('/api/sample')
 const dmLists: any = ref(dmListsData.value);
 const dmList: any = ref(dmLists.value[0]);
 
@@ -260,8 +260,8 @@ const downloadCsv = async (): Promise<void> => {
 const matchingResult = (companyId: Number): void => {
   router.push({ 
 
-    path: `/マッチング結果画面のpath/${[companyId]}`
-
+    // path: `/マッチング結果画面のpath/${[companyId]}`
+    path: `/matchResultList`
   });
 };
 

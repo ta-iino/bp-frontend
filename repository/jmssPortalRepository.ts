@@ -21,7 +21,7 @@ export class jmssPortalRepository {
    * @returns アプローチリスト
    */
   getApproachList(approachListId: string, searchParams: any, limit: Number) {
-    const query: any = {
+    const params: any = {
       id: approachListId,
       method: 1,
       team_id: searchParams.chargeOfTeam,
@@ -32,7 +32,7 @@ export class jmssPortalRepository {
       created_at_max: searchParams.registrationDateTo,
       limit: limit
     };
-    return this.baseApi(Urls.getApproachList, query);      
+    return this.baseApi(Urls.getApproachList, params);      
   }
 
   // 
@@ -52,7 +52,7 @@ export class jmssPortalRepository {
    * @returns 
    */
   getBuyneeds(buyneedsId: string) {
-    const query: any = {
+    const params: any = {
       id: buyneedsId,
       // source_type: sourceType,
       // company_industry_id: companyIndustryId,
@@ -64,35 +64,34 @@ export class jmssPortalRepository {
       // remarks: remarks,
       // limit: limit
     }
-    return this.baseApi(Urls.getBuyneeds, query);
+    return this.baseApi(Urls.getBuyneeds, params);
   }
 
   // ユーザ取得API
   getUsers(userIds: string[]) {
-    const query: any = {
+    const params: any = {
       id: userIds,
     }
-    return this.baseApi(Urls.getBuyneeds, query);
+    return this.baseApi(Urls.getBuyneeds, params);
   }
   
   // 企業マスタ取得用API
   getComanies(companyIdList: number[]) {
-    const query: any = {id: companyIdList};
-    return this.baseApi(Urls.getCompanies, query);
+    const params: any = {id: companyIdList};
+    return this.baseApi(Urls.getCompanies, params);
   }
 
 
   // 各APIのベースメソッド
-  async baseApi(url: string, query: any) {
-    //tokenのメソッド噛ませる
-    const data = await useFetch(
+  async baseApi(url: string, params: any) {
+    const {data, error} = await useFetch(
       url, {
         baseURL:  runtimeConfig.public.jmssPortalbaseURL,
         headers: {'Authorization': `Bearer ${this.authJmssPortalToken()}`},
-        query: query
+        params: params
       }
     );
-    return data;
+    return {data, error};
   }
 
   // 社内ポータル接続用アクセストークン取得メソッド
@@ -104,7 +103,7 @@ export class jmssPortalRepository {
       // APIキーをフロントで持たないためにBackendからアクセスする。
       const data: any = await useFetch(
         Urls.getAccessToken, {
-            baseURL:  runtimeConfig.public.baseURL
+            baseURL:  runtimeConfig.public.approachBaseURL
         }
       );
       // TODO access_tokenの値をエンコードする必要あり？

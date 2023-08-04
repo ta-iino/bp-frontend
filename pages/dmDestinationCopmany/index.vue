@@ -3,7 +3,7 @@
     <!-- ヘッダ部分 ここから -->
     <v-container class="pb-0">
       <v-row>
-        <v-col cols="12" class="px-0 my-3" style="background-color: #81D4FA">
+        <v-col cols="12" class="px-0 my-3 py-0" style="background-color: #81D4FA">
           <v-card-title class="headline font-weight-bold">DM発送企業一覧</v-card-title>
         </v-col>
       </v-row>
@@ -47,26 +47,44 @@
     </v-container>
     <!-- ヘッダ部分 ここまで -->
     <!-- 一覧表示 ここから -->
-    <v-container class="pt-0 mb-4">
-      <v-row>
-        <v-data-table
-          :headers="headers"
-          :items="destinationCompanyList"
-          :height="528"
-          :items-per-page="-1"
-          fixed-header
-        >
-          <template v-slot:item.masterId="{ item }">
+    <v-container class="ui-vcontaoner pt-0 mb-4" >
+      <v-data-table
+        v-model:page="page"
+        :headers="headers"
+        :items="destinationCompanyList"
+        :items-per-page="parPage"
+        hide-default-footer
+        class="elevation-1 ui-vdatatable"
+        :height="528"
+        fixed-header
+      >
+        <template v-slot:bottom>
+          <div class="text-center pt-2">
+            <v-pagination
+              v-model="page"
+              :length="totalPage"
+              @input="onChangePage"
+            ></v-pagination>
+<!--            <v-text-field
+              :model-value="parPage"
+              class="pa-2"
+              label="Items per page"
+              type="number"
+              min="-1"
+              max="15"
+              hide-details
+              @update:model-value="parPage = parseInt($event, 10)"
+            ></v-text-field>-->
+          </div>
+        </template>
+        <template v-slot:item.masterId="{ item }">
             <span class="link" @click="clickCompanyId(item.raw.masterId)">{{ item.raw.masterId }}</span>
           </template>
           <template v-slot:item.matchingResult="{ item }">
               <v-btn width="120" small class="mr-2 ui-matching-btn ui-btn" @click="matchingResult(item.raw.masterId)" color="light-blue-darken-3">マッチング結果</v-btn>
           </template>
-          <!-- フッターの不要な文字を消す為に記載 -->
-          <template v-slot:bottom></template>
-        </v-data-table>
-      </v-row>
-          <!-- 一覧表示 ここまで -->
+      </v-data-table>
+      <!-- 一覧表示 ここまで -->
     </v-container>
   </div>
 </template>
@@ -75,6 +93,10 @@
 import { VDataTable } from 'vuetify/lib/labs/components.mjs';
 import { ref } from 'vue'
 import {useRoute, useRouter} from "vue-router";
+import '@mdi/font/css/materialdesignicons.css'
+
+const page = ref(1)
+const parPage = ref(10)
 
 const route = useRoute();
 const router = useRouter();
@@ -191,6 +213,17 @@ const headers: any =
 
 
 /**
+ * ページネーション用
+ * 取得した一覧データの量でページの長さを設定する
+ */
+ const destinationCompanyLists: any = destinationCompanyListData.value
+ function totalPageNum() {
+  return Math.ceil(destinationCompanyLists.length / parPage.value)
+}
+let totalPage = totalPageNum();
+
+
+/**
  * ニーズマッチングボタン押下時の処理
  */
 const matchingStart = async (count: number): Promise<void> => {
@@ -287,5 +320,9 @@ const clickCompanyId = (companyId: Number): void => {
 
 .ui-matching-btn {
   border-radius: 10px;
+}
+
+.v-data-table__th {
+  background-color: #B3E5FC !important;
 }
 </style>

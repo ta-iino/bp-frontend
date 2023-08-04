@@ -3,13 +3,13 @@
   <div id="app">
     <v-container>
       <v-row>
-        <v-col cols="12" class="px-0 my-3" style="background-color: #81D4FA">
+        <v-col cols="12" class="px-0 my-3 py-0" style="background-color: #81D4FA">
           <v-card-title class="headline font-weight-bold">DMリスト一覧</v-card-title>
         </v-col>
       </v-row>
       <!-- 検索フォーム ここから -->
       <v-row>
-        <v-col cols="2" class="px-0 py-5">
+        <v-col cols="2" class="px-0 py-0">
           <v-select
             v-model="searchParams.chargeOfTeam"
             label="チーム"
@@ -17,7 +17,7 @@
             clearable
           ></v-select>
         </v-col>
-        <v-col cols="2" class="px-0 py-5">
+        <v-col cols="2" class="px-0 py-0">
           <v-select
             v-model="searchParams.chargeOfConsultant"
             label="担当コンサルタント"
@@ -25,7 +25,7 @@
             clearable
           ></v-select>
         </v-col>
-        <v-col cols="2" class="px-0 py-5">
+        <v-col cols="2" class="px-0 py-0">
           <v-text-field
             v-model="searchParams.listName"
             label="リスト名"
@@ -33,7 +33,7 @@
             clearable
           ></v-text-field>
         </v-col>
-        <v-col cols="2" class="px-0 py-5">
+        <v-col cols="2" class="px-0 py-0">
           <v-select
             v-model="searchParams.approachPurpose"
             label="アプローチ区分"
@@ -41,7 +41,7 @@
             clearable
           ></v-select>
         </v-col>
-        <v-col cols="2" class="px-0">
+        <v-col cols="2" class="px-0 py-0">
           <VueDatePicker
             class="ui-datepicker"
             v-model="dateFrom"
@@ -55,7 +55,7 @@
             clearable
           ></VueDatePicker>
         </v-col>
-        <v-col cols="2" class="px-0">
+        <v-col cols="2" class="px-0 py-0" >
           <VueDatePicker 
             class="ui-datepicker"
             v-model="dateTo"
@@ -70,14 +70,17 @@
             clearable
           </VueDatePicker>
         </v-col>
-      </v-row>
-      <v-row justify="center" class="ma-4">
-        <v-btn class="ui-btn" depressed color="light-blue-darken-3" @click="searchButton(searchParams)">検索</v-btn>
+        <v-col col="11"></v-col>
+        <v-col class="pt-2 " cols="1">
+          <v-btn class="ui-btn" depressed color="light-blue-darken-3" @click="searchButton(searchParams)">
+            <v-icon dark size="large">mdi-magnify</v-icon>
+          </v-btn>  
+        </v-col>
       </v-row>
     </v-container>
     <!-- 検索フォーム ここまで -->
     <!-- 一覧表示 ここから -->
-    <v-container class="ui-vcontaoner" >
+    <v-container class="ui-vcontaoner pt-3" >
       <v-data-table
         v-model:page="page"
         :headers="headers"
@@ -88,11 +91,12 @@
         :height="528"
         fixed-header
       >
-        <template v-slot:top>
+        <template v-slot:bottom>
           <div class="text-center pt-2">
             <v-pagination
               v-model="page"
               :length="totalPage"
+              @input="onChangePage"
             ></v-pagination>
 <!--            <v-text-field
               :model-value="parPage"
@@ -111,7 +115,6 @@
         <span class="link" @click="clickListName(item.raw.id)">{{ item.raw.listName }}</span>
       </template>
       <!-- フッター削除 -->
-      <template v-slot:bottom></template>
       </v-data-table>
     </v-container>
     <!-- 一覧表示 ここまで -->
@@ -124,6 +127,7 @@ import { VDataTable } from 'vuetify/lib/labs/components.mjs';
 import { ref } from 'vue'
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
+import '@mdi/font/css/materialdesignicons.css'
 
 /**
  * 初期値設定
@@ -165,6 +169,13 @@ function totalPageNum() {
 }
 let totalPage = totalPageNum();
 
+/**
+ * ページネーション用
+ * ページ数クリック時の処理
+ */
+function onChangePage() {
+  
+}
 
 /**
  * テーブルデータ取得
@@ -279,20 +290,14 @@ const searchButton = (searchParams: any) :void => {
     cursor: pointer;
     text-decoration: underline;
 }
-.ui-datepicker div .dp__input_wrap {
-  padding-top: 8px;
-}
-.ui-datepicker div .dp__input_wrap div .dp__icon {
-  padding-top: 20px;
-}
-.ui-datepicker div .dp__input_wrap .dp__icon {
-  padding-top: 20px;
-}
 .ui-datepicker div .dp__input_wrap .dp__input_reg {
   padding-top: 20px; 
   padding-bottom: 12px;
 }
 .v-data-table__th {
   background-color: #B3E5FC !important;
+}
+.v-input .v-input__details {
+  display: none;
 }
 </style>

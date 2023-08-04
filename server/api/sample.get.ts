@@ -27,7 +27,7 @@ export default defineEventHandler(() => {
       companySales: "0～50百万円",
       matchingStatus: "マッチング済み" 
     },
-    { id: 2,
+    { id: 3,
       registrationDate: '2022-12-12',
       sendMailDate: '2022-11-11',
       sendCompanyCount: 1000,
@@ -40,7 +40,7 @@ export default defineEventHandler(() => {
       companySales: "0～50百万円",
       matchingStatus: "マッチング済み" 
     },
-    { id: 2,
+    { id: 4,
       registrationDate: '2022-12-12',
       sendMailDate: '2022-11-11',
       sendCompanyCount: 1000,
@@ -53,7 +53,7 @@ export default defineEventHandler(() => {
       companySales: "0～50百万円",
       matchingStatus: "マッチング済み" 
     },
-    { id: 2,
+    { id: 5,
       registrationDate: '2022-12-12',
       sendMailDate: '2022-11-11',
       sendCompanyCount: 1000,
@@ -66,7 +66,7 @@ export default defineEventHandler(() => {
       companySales: "0～50百万円",
       matchingStatus: "マッチング済み" 
     },
-    { id: 2,
+    { id: 6,
       registrationDate: '2022-12-12',
       sendMailDate: '2022-11-11',
       sendCompanyCount: 1000,
@@ -79,7 +79,7 @@ export default defineEventHandler(() => {
       companySales: "0～50百万円",
       matchingStatus: "マッチング済み" 
     },
-    { id: 2,
+    { id: 7,
       registrationDate: '2022-12-12',
       sendMailDate: '2022-11-11',
       sendCompanyCount: 1000,
@@ -92,7 +92,7 @@ export default defineEventHandler(() => {
       companySales: "0～50百万円",
       matchingStatus: "マッチング済み" 
     },
-    { id: 2,
+    { id: 8,
       registrationDate: '2022-12-12',
       sendMailDate: '2022-11-11',
       sendCompanyCount: 1000,
@@ -105,7 +105,7 @@ export default defineEventHandler(() => {
       companySales: "0～50百万円",
       matchingStatus: "マッチング済み" 
     },
-    { id: 2,
+    { id: 9,
       registrationDate: '2022-12-12',
       sendMailDate: '2022-11-11',
       sendCompanyCount: 1000,
@@ -118,7 +118,7 @@ export default defineEventHandler(() => {
       companySales: "0～50百万円",
       matchingStatus: "マッチング済み" 
     },
-    { id: 2,
+    { id: 10,
       registrationDate: '2022-12-12',
       sendMailDate: '2022-11-11',
       sendCompanyCount: 1000,
@@ -131,10 +131,7 @@ export default defineEventHandler(() => {
       companySales: "0～50百万円",
       matchingStatus: "マッチング済み" 
       },
-
     ]
-
     return data
-
   });
   

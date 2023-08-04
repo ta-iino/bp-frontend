@@ -161,23 +161,6 @@ const { data }  = await useAsyncData(
 const dmListData: any = data.value
 
 /**
- * ページネーション用
- * 取得した一覧データの量でページの長さを設定する
- */
-function totalPageNum() {
-  return Math.ceil(dmListData.length / parPage.value)
-}
-let totalPage = totalPageNum();
-
-/**
- * ページネーション用
- * ページ数クリック時の処理
- */
-function onChangePage() {
-  
-}
-
-/**
  * テーブルデータ取得
  * 初期表示と検索で条件分岐特定のアプローチリストIDの有無により取得を分ける。
  */
@@ -206,17 +189,40 @@ const { data: user} = await useAsyncData(
 )
 
 /**
+ * ページネーション用
+ * 取得した一覧データの量でページの長さを設定する
+ */
+ function totalPageNum() {
+  return Math.ceil(dmListData.length / parPage.value)
+}
+let totalPage = totalPageNum();
+
+/**
+ * ページネーション用
+ * ページ数クリック時の処理
+ */
+function onChangePage() {
+  
+}
+
+/**
  * プルダウンリスト生成
  * 各APIの結果を使って以下を作成する
  * チームリスト(アプローチリスト取得APIの結果から作成)
- * 担当コンサルタントリスト(ユーザー取得APIの結果から作成)
- * アプローチ区分リスト(アプローチリスト取得APIの結果から作成)
+ * 担当コンサルタントリスト(ユーザー取得APIの結果（display_name?）から作成)
+ * アプローチ区分リスト(アプローチリスト取得API(type?)の結果から作成)
  * 構想：各リストを取り出した配列を作成し、Setリストに格納する。（重複削除）
+ * 
  */
-const jsonApproachList = approachList
-const pulldownChargeOfTeam1: any = []
-const pulldownChargeOfConsultant1: any = []
-const pulldownApproachPurpose1: any = []
+let pulldownChargeOfTeam1: any = new Set()
+let pulldownChargeOfConsultant: any = new Set()
+let pulldownApproachPurpose: any = new Set()
+const dataUserList: any = unref(user)
+const approachLists: any = unref(approachList)
+for(let i = 0; i < dataUserList.length; i++){
+  pulldownChargeOfConsultant.add(dataUserList[i].display_name)
+  pulldownApproachPurpose.add(approachLists[i].type)
+}
 
 /**
  * プルダウンリスト取得(削除予定)
@@ -227,8 +233,8 @@ const { data: data1 } = await useAsyncData(
 )
 const data1_1: any = ref(data1)
 const pulldownChargeOfTeam = data1_1.value.teamList
-const pulldownChargeOfConsultant = data1_1.value.consultantList
-const pulldownApproachPurpose = data1_1.value.approachPurpose
+// const pulldownChargeOfConsultant = data1_1.value.consultantList
+// const pulldownApproachPurpose = data1_1.value.approachPurpose
 
 
 /**

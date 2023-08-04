@@ -3,11 +3,11 @@
   <div id="app">
     <v-container>
       <v-row>
-        <v-col cols="12" class="px-0 my-3" style="background-color: #d3d3d3">
+        <v-col cols="12" class="px-0 my-3" style="background-color: #81D4FA">
           <v-card-title class="headline font-weight-bold">DMリスト一覧</v-card-title>
         </v-col>
       </v-row>
-    <!-- 検索フォーム ここから -->
+      <!-- 検索フォーム ここから -->
       <v-row>
         <v-col cols="2" class="px-0 py-5">
           <v-select
@@ -41,9 +41,6 @@
             clearable
           ></v-select>
         </v-col>
-        <!--<v-col cols="2" class="px-0">
-          <v-text-field v-model="searchParams.registrationDateFrom" clearable label="登録日(from)" filled></v-text-field>
-        </v-col>-->
         <v-col cols="2" class="px-0">
           <VueDatePicker
             class="ui-datepicker"
@@ -73,26 +70,43 @@
             clearable
           </VueDatePicker>
         </v-col>
-<!--        <v-col cols="2" class="px-0">
-          <v-text-field v-model="searchParams.registrationDateTo" clearable label="登録日(to)" filled></v-text-field>
-        </v-col>-->
       </v-row>
       <v-row justify="center" class="ma-4">
-        <v-btn class="ui-btn" depressed color="grey-darken-4" @click="searchButton(searchParams)">検索</v-btn>
+        <v-btn class="ui-btn" depressed color="light-blue-darken-3" @click="searchButton(searchParams)">検索</v-btn>
       </v-row>
     </v-container>
     <!-- 検索フォーム ここまで -->
     <!-- 一覧表示 ここから -->
     <v-container class="ui-vcontaoner" >
       <v-data-table
-          class="ui-vdatatable"
-          :items="dmListData"
-          :headers="headers"
-          :height="528"
-          :items-per-page="-1"
-          fixed-header
+        v-model:page="page"
+        :headers="headers"
+        :items="dmListData"
+        :items-per-page="parPage"
+        hide-default-footer
+        class="elevation-1 ui-vdatatable"
+        :height="528"
+        fixed-header
       >
-      <template v-slot:item.listName="{ item }">
+        <template v-slot:top>
+          <div class="text-center pt-2">
+            <v-pagination
+              v-model="page"
+              :length="totalPage"
+            ></v-pagination>
+<!--            <v-text-field
+              :model-value="parPage"
+              class="pa-2"
+              label="Items per page"
+              type="number"
+              min="-1"
+              max="15"
+              hide-details
+              @update:model-value="parPage = parseInt($event, 10)"
+            ></v-text-field>-->
+          </div>
+        </template>
+        <template v-slot:item.listName="{ item }">
         <!--<nuxt-link :to="`/`">{{ item.raw.listName }}</nuxt-link>-->
         <span class="link" @click="clickListName(item.raw.id)">{{ item.raw.listName }}</span>
       </template>
@@ -114,8 +128,8 @@ import '@vuepic/vue-datepicker/dist/main.css'
 /**
  * 初期値設定
  */
-const totalPageNum = ref(1)
-const perpage = ref(30)
+const page = ref(1)
+const parPage = ref(10)
 const searchParams = ref(
   {
       chargeOfTeam : null,
@@ -124,6 +138,7 @@ const searchParams = ref(
       approachPurpose : null,
       registrationDateFrom : null,
       registrationDateTo : null,
+      page : 1
   }
 )
 const dateFrom = ref()
@@ -139,7 +154,17 @@ const { data }  = await useAsyncData(
   'dmList',
   () => $fetch('api/sample')
 )
-const dmListData: any = ref(data.value)
+const dmListData: any = data.value
+
+/**
+ * ページネーション用
+ * 取得した一覧データの量でページの長さを設定する
+ */
+function totalPageNum() {
+  return Math.ceil(dmListData.length / parPage.value)
+}
+let totalPage = totalPageNum();
+
 
 /**
  * テーブルデータ取得
@@ -267,10 +292,7 @@ const searchButton = (searchParams: any) :void => {
   padding-top: 20px; 
   padding-bottom: 12px;
 }
-.v-btn {
-  border: 4px outset black;
-}
 .v-data-table__th {
-  background-color: #ffeccc !important;
+  background-color: #B3E5FC !important;
 }
 </style>

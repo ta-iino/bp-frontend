@@ -3,7 +3,7 @@
     <!-- ヘッダ部分 ここから -->
     <v-container class="pb-0">
       <v-row>
-        <v-col cols="12" class="px-0 my-3" style="background-color: #d3d3d3">
+        <v-col cols="12" class="px-0 my-3" style="background-color: #81D4FA">
           <v-card-title class="headline font-weight-bold">DM発送企業一覧</v-card-title>
         </v-col>
       </v-row>
@@ -32,10 +32,10 @@
         <v-col cols="1" class="px-0"></v-col>
         <v-col cols="4" class="px-0 d-flex">
           <div class="px-4">
-            <v-btn class="v-btn" depressed color="grey-darken-4" @click="matchingStart(0)">ニーズマッチング</v-btn>
+            <v-btn class="v-btn" depressed color="light-blue-darken-3" @click="matchingStart(0)">ニーズマッチング</v-btn>
           </div>
           <div class="px-4">
-            <v-btn class="v-btn" depressed color="grey-darken-4" @click="downloadCsv">ダウンロード</v-btn>
+            <v-btn class="v-btn" depressed color="light-blue-darken-3" @click="downloadCsv">ダウンロード</v-btn>
           </div>
         </v-col>
         <v-col cols="4" class="pt-4 pl-10">
@@ -60,7 +60,7 @@
             <span class="link" @click="clickCompanyId(item.raw.masterId)">{{ item.raw.masterId }}</span>
           </template>
           <template v-slot:item.matchingResult="{ item }">
-              <v-btn width="120" small class="mr-2 ui-matching-btn" @click="matchingResult(item.raw.masterId)" color="grey-darken-4">マッチング結果</v-btn>
+              <v-btn width="120" small class="mr-2 ui-matching-btn ui-btn" @click="matchingResult(item.raw.masterId)" color="light-blue-darken-3">マッチング結果</v-btn>
           </template>
           <!-- フッターの不要な文字を消す為に記載 -->
           <template v-slot:bottom></template>

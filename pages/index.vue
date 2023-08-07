@@ -31,6 +31,7 @@
             label="リスト名"
             class="input-color-red-class"
             clearable
+            maxlength=50
           ></v-text-field>
         </v-col>
         <v-col cols="2" class="px-0 py-0">
@@ -44,9 +45,10 @@
         <v-col cols="2" class="px-0 py-0">
           <VueDatePicker
             class="ui-datepicker"
-            v-model="dateFrom"
+            v-model="searchParams.registrationDateFrom"
             locale="ja"
-            format="yyyy/MM/dd"
+            format="yyyy-MM-dd"
+            model-type="yyyy-MM-dd"
             select-text="OK"
             cancel-text="Cancel"
             placeholder="登録日(from)"
@@ -58,9 +60,10 @@
         <v-col cols="2" class="px-0 py-0" >
           <VueDatePicker 
             class="ui-datepicker"
-            v-model="dateTo"
+            v-model="searchParams.registrationDateTo"
             locale="jp"
-            format="yyyy/MM/dd"
+            format="yyyy-MM-dd"
+            model-type="yyyy-MM-dd"
             select-text="OK"
             cancel-text="Cancel"
             placeholder="登録日(to)"
@@ -84,19 +87,24 @@
       <v-data-table
         v-model:page="page"
         :headers="headers"
-        :items="dmListData"
+        :items="dmListDataItems"
         :items-per-page="parPage"
         hide-default-footer
         class="elevation-1 ui-vdatatable"
         :height="528"
         fixed-header
       >
+        <template v-slot:item.matchingStatus="{ item }">
+          {{ getTableData(item.raw.id, Object.keys(item.raw)[11]) }}
+        </template>
         <template v-slot:bottom>
           <div class="text-center pt-2">
             <v-pagination
+              cols="12"
               v-model="page"
               :length="totalPage"
               @input="onChangePage"
+              :total-visible="22"
             ></v-pagination>
 <!--            <v-text-field
               :model-value="parPage"
@@ -113,7 +121,7 @@
         <template v-slot:item.listName="{ item }">
         <!--<nuxt-link :to="`/`">{{ item.raw.listName }}</nuxt-link>-->
         <span class="link" @click="clickListName(item.raw.id)">{{ item.raw.listName }}</span>
-      </template>
+        </template>
       <!-- フッター削除 -->
       </v-data-table>
     </v-container>
@@ -133,7 +141,7 @@ import '@mdi/font/css/materialdesignicons.css'
  * 初期値設定
  */
 const page = ref(1)
-const parPage = ref(10)
+const parPage = ref(50)
 const searchParams = ref(
   {
       chargeOfTeam : null,
@@ -154,39 +162,62 @@ const router = useRouter();
 /**
  * テーブルデータ取得（仮）
  */
-const { data }  = await useAsyncData(
-  'dmList',
-  () => $fetch('api/sample')
-)
+const { data }  = await useFetch('api/sample')
 const dmListData: any = data.value
 
+// データのソート処理
+let dmListDataItems = dmListData.sort(function(a, b) {
+  //オブジェクトを登録日が新しい順にソートする
+  return (a.registrationDate < b.registrationDate) ? 1 : -1;  
+});
+
 /**
- * テーブルデータ取得
+ * 初期表示処理
  * 初期表示と検索で条件分岐特定のアプローチリストIDの有無により取得を分ける。
  */
-/**
- * DMリスト取得API呼出
- * return dmListId  DMリストID
- *        approachListId アプローチリストID
- *        sendCompanyCount 送付社数
- *        matchingStatus マッチング状況
- */
-const { data: dmListList} = await useAsyncData(
-  'dmListList',
-  (approachListIdList) => $fetch('/api/dmList')
-)
 
+// DMリスト取得API呼出
+const { data: dmListList} = await useFetch('/api/dmList')
 // アプローチリスト取得API呼出
-const { data: approachList} = await useAsyncData(
-  'approachList',
-  (approachListIdList) => $fetch('/api/approachLists')
-)
-
+const { data: approachList} = await useFetch('/api/approachLists')
 // ユーザー取得API呼出
-const { data: user} = await useAsyncData(
-  'user',
-  (userId) => $fetch('/api/user')
-)
+const { data: user} = await useFetch('/api/user')
+
+/**
+ * アプローチリスト取得APIのデータを軸にDMリストAPIとユーザー取得APIから取得したデータ内を検索して
+ * テーブル表示用のデータを生成する
+ */
+
+// let approachListData:any = unref(approachList)
+let tmpDmListListData:any = unref(dmListList)
+let dmListListDatas:any = tmpDmListListData[0].dmLists
+// let c:any = unref(user)
+// console.log(approachListData[0].id) //441
+
+  // アプローチリストIDは「a[i].id」で参照可能
+  // TODO DMリストデータのアプローチリストIDをfilterで探しに行けない
+  // var approachList1 = dmListListData.filter(function(elm:any) {
+  //   console.log(approachListData[i].id)
+  //   console.log(elm.approachListId)
+  //   console.log(elm.dmLists[0].approachListId)
+  //   return elm.approachListId == approachListData[i].id;
+  // })
+  // let approachList1 = dmListListDatas.filter((dmListListData: any) => dmListListData)
+// console.log(approachList1)
+
+/**
+ * approachListIdに紐づくデータをtargetKeyをキーにDMリストを検索する。
+ * @param approachListId // アプローチリストID
+ * @param targetKey // ターゲットとなる項目のキー
+ */
+function getTableData(approachListId:any, targetKey:any) {
+  console.log(approachListId) // テーブルデータに紐づくアプローチリストID
+  console.log(targetKey) // matchingStatus
+  var result = dmListListDatas.filter((dmListListData: any) => approachListId == dmListListData.approachListId)
+  // TODO matchingStatusの値取れない. Proxy(Object)から値を取得する方法を調査する。
+  console.log(result.targetKey)
+}
+
 
 /**
  * ページネーション用
@@ -227,10 +258,7 @@ for(let i = 0; i < dataUserList.length; i++){
 /**
  * プルダウンリスト取得(削除予定)
 */ 
-const { data: data1 } = await useAsyncData(
-  'pulldownLists',
-  () => $fetch('/api/pulldownList')
-)
+const { data: data1 } = await useFetch('/api/pulldownList')
 const data1_1: any = ref(data1)
 const pulldownChargeOfTeam = data1_1.value.teamList
 // const pulldownChargeOfConsultant = data1_1.value.consultantList

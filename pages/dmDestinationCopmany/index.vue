@@ -46,6 +46,12 @@
       </v-row>
     </v-container>
     <!-- ヘッダ部分 ここまで -->
+    <!-- ニーズマッチングボタン押下時メッセージ表示 -->
+    <v-row>
+      <v-col col="12" class="pt-0">
+        <p class="msg" id="msg">{{ msg }}</p>
+      </v-col>
+    </v-row>
     <!-- 一覧表示 ここから -->
     <v-container class="ui-vcontaoner pt-0 mb-4" >
       <v-data-table
@@ -101,6 +107,8 @@ const parPage = ref(10)
 const route = useRoute();
 const router = useRouter();
 const dmListId = route.query;
+
+const msg: string = "マッチング処理を開始しました。時間をおいて再度開いてください。"
 /**
  * マッチングプルダウンリスト
  */
@@ -227,6 +235,9 @@ let totalPage = totalPageNum();
  * ニーズマッチングボタン押下時の処理
  */
 const matchingStart = async (count: number): Promise<void> => {
+  // メッセージの表示
+  var change = document.getElementById("msg")
+  change.style.display ="block";
   // マッチング処理開始APIの呼び出し
   const { data : isJobCreatedData, error: jobCreatedError } = await useFetch(
     'エンドポイントのURL', 
@@ -324,5 +335,10 @@ const clickCompanyId = (companyId: Number): void => {
 
 .v-data-table__th {
   background-color: #B3E5FC !important;
+}
+
+.msg {
+  text-align: center;
+  display: none;
 }
 </style>

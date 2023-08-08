@@ -1,45 +1,65 @@
 <template>
   <VApp>
     <v-container>
-      <v-container class="pb-0" id="sticky">
+      <!-- 現状だと上半分くらい固定されてしまって若干見づらいので何とかしたい -->
+      <v-row id="sticky" class="my-n6">
         <v-row>
           <v-col cols="16" class="px-0 my-3">
-            <VCardTitle class="headline front-weight-bold" style="background-color: lightgray;">買いニーズマッチング結果</VCardTitle>
+            <VCardTitle class="ml-3 mr-9" style="background-color: #81d4fa;">買いニーズマッチング結果</VCardTitle>
           </v-col>
         </v-row>
-        <v-row>
-          <h3 class="px-5 my-0">DM送付先企業</h3>
-          <v-row class="px-16 mb-10 mt-2">
+        <v-sheet color="white" elevation="1" height="172" class="mr-6">
+          <v-card-title style="background-color: #b3e5fc;" class="header-back">
+            <h4 class="mt-n2 ml-n2">DM送付先企業</h4>
+          </v-card-title>
+          <v-row class="px-16 mb-6 mt-2">
             <v-col cols="4" v-for="(item, i) in tableHeaders" :key="item.title">
               <v-row v-if="i === 0">
+                <v-divider class="border-opacity-25" vertical></v-divider>
                 <v-col class="px-10 py-0">
                   {{ item.title }}
                 </v-col>
-                <v-col class="px-0 py-0" @click="clickCompanyName(sellCompany['id'])">
+                <v-col class="pl-4 py-0" @click="clickCompanyName(sellCompany['id'])">
                   {{ item.value }}
                 </v-col>
+                <v-divider class="border-opacity-25" vertical></v-divider>
+                <v-divider class="border-opacity-25"></v-divider>
               </v-row>
               <v-row v-else>
+                <v-divider class="border-opacity-25" vertical></v-divider>
                 <v-col class="px-10 py-0">
                   {{ item.title }}
                 </v-col>
                 <v-col class="px-10 py-0">
                   {{ item.value }} {{ item.bottom }}
                 </v-col>
+                <v-divider class="border-opacity-25" vertical></v-divider>
+                <v-divider class="border-opacity-25"></v-divider>
               </v-row>
             </v-col>
           </v-row>
-        </v-row>
-      </v-container>
-      <v-container style="background-color: rgb(212, 238, 251);">
-        <v-row class="mx-8 py-1" justify="end">
+          <v-row justify="center" class="mt-n6">
+            <!-- DM送付先画面で別タブで開かれたら閉じれるはず -->
+            <v-btn color="light-blue-darken-4" class="mb-4" border="0" @click="clickCloseButton()">閉じる</v-btn>
+          </v-row>
+        </v-sheet>
+      </v-row>
+      <!-- そのままではヘッダーの下に潜ってしまうので無理やりスペースを作る -->
+      <v-row class="my-16 comment">
+        <br>
+        <br>
+        <br>
+        <br>
+      </v-row>
+      <v-row class="mt-16 mr-8">
+        <v-row class="mr-n16 pt-1" justify="end">
           <h3>処理日時</h3>
           <span class="mx-10">{{ processDate }}</span>
         </v-row>
-        <v-col v-for="(data, i) in tableBodyData" style="background-color: lightgray;" cols="11" class="mx-6 my-2">
-          <v-row>
-            <h3>買手第{{ i + 1 }}候補</h3>
-          </v-row>
+        <v-sheet v-for="(data, i) in tableBodyData" :key="i" cols="16" class="mx-6 my-2" elevation="1" height="230">
+          <v-card-title style="background-color: #e1f5fe;" class="header-back">
+            <h4 class="mt-n2 ml-n2">買手第{{ i + 1 }}候補</h4>
+          </v-card-title>
           <v-row>
             <v-col cols="12" class="mb-n6">
               <v-row>
@@ -47,21 +67,18 @@
                   企業:
                 </v-col>
                 <v-col cols="3">
-                  <NuxtLink @click.native="clickCompanyName(buyCompanyId[i])">{{ data[0].value }}</NuxtLink>
+                  <NuxtLink @click="clickCompanyName(buyCompanyId[i])">{{ data[0].value }}</NuxtLink>
                 </v-col>
+                <v-divider class="border-opacity-25 my-3" vertical></v-divider>
                 <v-col cols="2">
                   都道府県:
                 </v-col>
                 <v-col cols="2">
                   {{ data[1].value }}
                 </v-col>
-                <v-col cols="1">
-                  売上高:
-                </v-col>
-                <v-col cols="2">
-                  {{ data[2].value }} 百万円
-                </v-col>
+                <v-col cols="3"></v-col>
               </v-row>
+              <v-divider class="border-opacity-25"></v-divider>
             </v-col>
             <v-col cols="12" class="mb-n6">
               <v-row>
@@ -71,6 +88,7 @@
                 <v-col cols="3">
                   {{ data[3].value }}
                 </v-col>
+                <v-divider class="border-opacity-25 my-3" vertical></v-divider>
                 <v-col cols="2">
                   業種:
                 </v-col>
@@ -78,12 +96,17 @@
                   {{ data[4].value }}
                 </v-col>
               </v-row>
+              <v-divider class="border-opacity-25"></v-divider>
             </v-col>
             <v-col cols="12" class="mb-n6">
               <v-row>
-                <v-col cols="5">
-                  <v-spacer></v-spacer>
+                <v-col cols="2">
+                  売上高:
                 </v-col>
+                <v-col cols="3">
+                  {{ data[2].value }} 百万円
+                </v-col>
+                <v-divider class="border-opacity-25 my-3" vertical></v-divider>
                 <v-col cols="2">
                   営業種目:
                 </v-col>
@@ -91,6 +114,7 @@
                   {{ data[6].value }}
                 </v-col>
               </v-row>
+              <v-divider class="border-opacity-25"></v-divider>
             </v-col>
             <v-col cols="12" class="mb-n6">
               <v-row>
@@ -100,34 +124,45 @@
                 <v-col cols="3">
                   {{ data[7].value }}
                 </v-col>
+                <v-divider class="border-opacity-25 my-3" vertical></v-divider>
                 <v-col cols="7">
                   <v-spacer></v-spacer>
                 </v-col>
               </v-row>
+              <v-divider class="border-opacity-25"></v-divider>
             </v-col>
             <v-col cols="12" class="mb-n6">
               <v-row>
                 <v-col cols="2">
                   買収希望業種:
                 </v-col>
-                <v-col cols="10">
+                <v-col cols="3">
                   {{ data[8].value }}
                 </v-col>
+                <v-divider class="border-opacity-25 my-3" vertical></v-divider>
+                <v-col cols="7">
+                  <v-spacer></v-spacer>
+                </v-col>
               </v-row>
+              <v-divider class="border-opacity-25"></v-divider>
             </v-col>
             <v-col cols="12">
               <v-row>
                 <v-col cols="2">
                   希望コメント:
                 </v-col>
-                <v-col cols="10">
+                <v-col cols="3">
                   <span id="comment">{{ data[9].value }}</span>
+                </v-col>
+                <v-divider class="border-opacity-25 my-3" vertical></v-divider>
+                <v-col cols="7">
+                  <v-spacer></v-spacer>
                 </v-col>
               </v-row>
             </v-col>
           </v-row>
-        </v-col>
-      </v-container>
+        </v-sheet>
+      </v-row>
     </v-container>
   </VApp>
 </template>
@@ -235,7 +270,7 @@ for (let i = 0; i < buyCompanys.value.length; i++) {
   const buyCompany = buyCompanys.value[i]
   const buyNeeds = buyNeedsList.value[i]
 
-// 業種の文字部分だけを抽出
+  // 業種の文字部分だけを抽出
   let industryLine = buyCompany.industry.match(/[^\x01-\x7Eｧ-ﾝﾞﾟ]+/g)
   let industry = industryLine.join(",")
 
@@ -254,8 +289,8 @@ for (let i = 0; i < buyCompanys.value.length; i++) {
   tableBodyData.push(tableBody)
 }
 
-// itemにリンクをどうやって貼るか→v-ifで対応できるか？
-const clickCompanyName = (companyId: number) :void => {
+// itemにリンクをどうやって貼るか→v-ifで対応
+const clickCompanyName = (companyId: number): void => {
   let companyUrl = router.resolve({
     path: "/",
     query: { id: companyId },
@@ -263,18 +298,24 @@ const clickCompanyName = (companyId: number) :void => {
 
   window.open(companyUrl.href, "_blank")
 }
+const clickCloseButton = (): void => {
+  window.close()
+}
 </script>
 
 <style>
 #comment {
   white-space: pre-line;
 }
-#sticky{
+
+#sticky {
+  position: fixed;
+  z-index: 1;
+  width: 1200px;
   background-color: white;
-  position: sticky;
-  top: 0;
 }
-.header{
-  height: 400px;
+
+.header-back {
+  height: 30px;
 }
 </style>

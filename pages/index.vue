@@ -204,11 +204,19 @@ const pulldownApproachPurpose = data1_1.value.approachPurpose
  * @param listId
  */
 const clickListName = ( listId: Number ):void => {
-  let dmDestinationCopmanyUrl = router.resolve({
-    path: `/`,
-    query: { id: Number(listId)},
-  });
-  window.open(dmDestinationCopmanyUrl.href, '_blank')
+  // let dmDestinationCopmanyUrl = router.resolve({
+  //   path: `/dmDestinationCopmany`,
+  //   // query: { id: Number(listId)},
+  // });
+  // window.open(dmDestinationCopmanyUrl.href, '_blank')
+  router.push({ 
+      path: `/dmDestinationCopmany`,
+      // query: { 
+      //   dmListId: Number(dmListId), 
+
+      //   selectedProcessingDate: Number(selectedBuyneedsHistoryId)
+      // }
+    });    
 }
 
 /**

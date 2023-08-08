@@ -87,6 +87,7 @@ const { $api } = useNuxtApp();
 const { data : processingDateListData } = await useFetch('/api/processingDateList');
 
 // マッチング処理日時リスト取得API（backend）
+
 //TODO マッチング履歴取得APIからfront側でmap形式のリストを作るよう修正。
 // const { data : processingDateListData } = await useFetch('エンドポイントのURL', {
 //   baseURL: 'バックエンドのベースURL（envフィルから引っ張る)',
@@ -103,10 +104,12 @@ const selectedBuyneedsHistoryId: Number = ref(processingDateList.value[0].id);
  */
 
 // mock用
-const { data : dmListsData }  = await useFetch('/api/approachLists');
-// const { data : dmListListData }  = await useFetch('/api/sample')
+
+// const { data : dmListsData }  = await useFetch('/api/approachLists');
+const { data : dmListsData }  = await useFetch('/api/sample')
 const dmLists: any = ref(dmListsData.value);
 const dmList: any = ref(dmLists.value[0]);
+
 //TODO 本データ取得はDMリスト一覧画面から引っ張る。
 // ⇒共通処理化して処理が重複しないように気を付ける。
 // const {
@@ -140,6 +143,7 @@ const items: any = [
 // const { data : destinationCompanyData }  = await useFetch('api/sample2')
 const { data : sendCompanyHistoryListData }  = await useFetch('api/dmDestinationCopmanyList');
 
+
 // DM送付先企業リスト取得API（backend）
 // refreshを取得しておき、ニーズマッチング実行時に使用する。
 // const { data : sendCompanyHistoryListData } = await useFetch(
@@ -152,8 +156,6 @@ const { data : sendCompanyHistoryListData }  = await useFetch('api/dmDestination
 const sendCompanyHistoryList: any = ref(sendCompanyHistoryListData.value);
 const sendCompanyHistoryIdList: number[] = ref(sendCompanyHistoryList["idList"]);
 const sendCompanyIdList: number[]  = ref(sendCompanyHistoryList["companyIdList"]);
-
-
 
 //mock用
 // const { data : destinationCompanyListData }  = await useFetch('api/copmanyMasterList');
@@ -217,6 +219,7 @@ const matchingStart = async (count: number): Promise<void> => {
       path: `/本画面のURL`,
       query: { 
         dmListId: Number(dmListId), 
+
         selectedProcessingDate: Number(selectedBuyneedsHistoryId)
       }
     });    
@@ -226,6 +229,7 @@ const matchingStart = async (count: number): Promise<void> => {
 /**
  * ダウンロード押下時の処理
  */
+
 const downloadCsv = async (): Promise<void> => {  
 
   // 買いニーズマッチング結果CSV取得APIの呼び出し
@@ -267,9 +271,11 @@ const {
 };
 
 // const matchingResult = async (companyId: Number): Promise<void> => {
-//   router.push({ 
-//     path: `/マッチング結果画面のpath/${[companyId]}`
-//   });
+//  router.push({ 
+//
+//  path: `/マッチング結果画面のpath/${[companyId]}`
+//  path: `/matchResultList`
+//  });
 // };
 
 
@@ -278,6 +284,7 @@ const {
  * @param companyId 
  */
 const clickCompanyId = (companyId: Number): void => {
+
   let compnayUrl = router.resolve({
     path: `社内ポータルフロントURL` + `/company/` + companyId,
   });
@@ -291,6 +298,7 @@ const clickCompanyId = (companyId: Number): void => {
     cursor: pointer;
     text-decoration: underline;
 }
+
 .ui-matching-btn {
   border-radius: 10px;
 }

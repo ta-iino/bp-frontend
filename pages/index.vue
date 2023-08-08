@@ -244,22 +244,24 @@ function onChangePage() {
 
 /**
  * プルダウンリスト生成
- * 各APIの結果を使って以下を作成する
- * チームリスト(アプローチリスト取得APIの結果から作成)
- * 担当コンサルタントリスト(ユーザー取得APIの結果（display_name?）から作成)
- * アプローチ区分リスト(アプローチリスト取得API(type?)の結果から作成)
- * 構想：各リストを取り出した配列を作成し、Setリストに格納する。（重複削除）
- * 
  */
+// TODO チームのプルダウンはJMSS様のAPI作成待ち
+// DMリスト取得API呼出
 let pulldownChargeOfTeam1: any = new Set()
 let pulldownChargeOfConsultant: any = new Set()
 let pulldownApproachPurpose: any = new Set()
-const dataUserList: any = unref(user)
+const dataUserLists: any = unref(user)
 const approachLists: any = unref(approachList)
-for(let i = 0; i < dataUserList.length; i++){
-  pulldownChargeOfConsultant.add(dataUserList[i].display_name)
-  // pulldownApproachPurpose.add(approachLists[i].type)
+// 担当コンサルタントのプルダウンリストを作成
+for(let i = 0; i < dataUserLists.length; i++){
+  // TODO アプローチリスト取得疑似APIのnameを「chargeOfConsultant」に変更しているため、一旦これで実装する。要修正。
+  pulldownChargeOfConsultant.add(dataUserLists[i].chargeOfConsultant)
 }
+// アプローチ区分のプルダウンを作成
+for(let i = 0; i < approachLists.length; i++){
+  pulldownApproachPurpose.add(approachLists[i].type)
+}
+
 
 /**
  * プルダウンリスト取得(削除予定)

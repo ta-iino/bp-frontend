@@ -12,7 +12,8 @@ export default defineEventHandler(() => {
       ompanyIndustry: "不動産",
       companyRegion: "北陸",
       companySales: "0～50百万円",
-      matchingStatus: "マッチング中" 
+      matchingStatus: "マッチング中",
+      created_by: { "1": "テスト　太郎" },
     },
     { id: 442,
       registrationDate: '2022-12-10',
@@ -25,7 +26,8 @@ export default defineEventHandler(() => {
       ompanyIndustry: "不動産",
       companyRegion: "北陸",
       companySales: "0～50百万円",
-      matchingStatus: "マッチング済み" 
+      matchingStatus: "マッチング済み",
+      created_by: { "2": "テスト　次郎" },
     },
     { id: 443,
       registrationDate: '2022-12-15',
@@ -38,7 +40,8 @@ export default defineEventHandler(() => {
       ompanyIndustry: "不動産",
       companyRegion: "北陸",
       companySales: "0～50百万円",
-      matchingStatus: "マッチング済み" 
+      matchingStatus: "マッチング済み" ,
+      created_by: { "3": "テスト　三郎" },
     },
     { id: 445,
       registrationDate: '2022-12-20',
@@ -51,7 +54,8 @@ export default defineEventHandler(() => {
       ompanyIndustry: "不動産",
       companyRegion: "北陸",
       companySales: "0～50百万円",
-      matchingStatus: "マッチング済み" 
+      matchingStatus: "マッチング済み" ,
+      created_by: { "5": "テスト　五郎" },
     },
     { id: 446,
       registrationDate: '2022-12-25',
@@ -64,7 +68,8 @@ export default defineEventHandler(() => {
       ompanyIndustry: "不動産",
       companyRegion: "北陸",
       companySales: "0～50百万円",
-      matchingStatus: "マッチング済み" 
+      matchingStatus: "マッチング済み" ,
+      created_by: { "6": "テスト　六郎" },
     },
     { id: 447,
       registrationDate: '2022-12-30',
@@ -77,7 +82,8 @@ export default defineEventHandler(() => {
       ompanyIndustry: "不動産",
       companyRegion: "北陸",
       companySales: "0～50百万円",
-      matchingStatus: "マッチング済み" 
+      matchingStatus: "マッチング済み" ,
+      created_by: { "7": "テスト　七郎" },
     },
     { id: 448,
       registrationDate: '2023-01-05',
@@ -90,7 +96,8 @@ export default defineEventHandler(() => {
       ompanyIndustry: "不動産",
       companyRegion: "北陸",
       companySales: "0～50百万円",
-      matchingStatus: "マッチング済み" 
+      matchingStatus: "マッチング済み" ,
+      created_by: { "8": "テスト　八郎" },
     },
     { id: 449,
       registrationDate: '2023-01-20',
@@ -103,7 +110,8 @@ export default defineEventHandler(() => {
       ompanyIndustry: "不動産",
       companyRegion: "北陸",
       companySales: "0～50百万円",
-      matchingStatus: "マッチング済み" 
+      matchingStatus: "マッチング済み" ,
+      created_by: { "9": "テスト　九郎" },
     },
     { id: 450,
       registrationDate: '2023-01-15',
@@ -116,7 +124,8 @@ export default defineEventHandler(() => {
       ompanyIndustry: "不動産",
       companyRegion: "北陸",
       companySales: "0～50百万円",
-      matchingStatus: "マッチング済み" 
+      matchingStatus: "マッチング済み" ,
+      created_by: { "10": "テスト　十郎" },
     },
     { id: 451,
       registrationDate: '2023-01-10',
@@ -129,7 +138,8 @@ export default defineEventHandler(() => {
       ompanyIndustry: "不動産",
       companyRegion: "北陸",
       companySales: "0～50百万円",
-      matchingStatus: "マッチング済み" 
+      matchingStatus: "マッチング済み" ,
+      created_by: { "11": "テスト　十一郎" },
       },
     ]
     return data

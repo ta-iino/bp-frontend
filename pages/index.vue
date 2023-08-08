@@ -95,7 +95,13 @@
         fixed-header
       >
         <template v-slot:item.matchingStatus="{ item }">
-          {{ getTableData(item.raw.id, Object.keys(item.raw)[11]) }}
+          {{ getTableDmListData(item.raw.id, Object.keys(item.raw)[11]) }}
+        </template>
+        <template v-slot:item.sendCompanyCount="{ item }">
+          {{ getTableDmListData(item.raw.id, Object.keys(item.raw)[3]) }}
+        </template>
+        <template v-slot:item.chargeOfConsultant="{ item }">
+          {{ getTableUserData(Object.keys(item.raw.created_by), Object.keys(item.raw)[7]) }}
         </template>
         <template v-slot:bottom>
           <div class="text-center pt-2">
@@ -175,7 +181,6 @@ let dmListDataItems = dmListData.sort(function(a, b) {
  * 初期表示処理
  * 初期表示と検索で条件分岐特定のアプローチリストIDの有無により取得を分ける。
  */
-
 // DMリスト取得API呼出
 const { data: dmListList} = await useFetch('/api/dmList')
 // アプローチリスト取得API呼出
@@ -183,41 +188,42 @@ const { data: approachList} = await useFetch('/api/approachLists')
 // ユーザー取得API呼出
 const { data: user} = await useFetch('/api/user')
 
-/**
- * アプローチリスト取得APIのデータを軸にDMリストAPIとユーザー取得APIから取得したデータ内を検索して
- * テーブル表示用のデータを生成する
- */
-
-// let approachListData:any = unref(approachList)
 let tmpDmListListData:any = unref(dmListList)
 let dmListListDatas:any = tmpDmListListData[0].dmLists
-// let c:any = unref(user)
-// console.log(approachListData[0].id) //441
-
-  // アプローチリストIDは「a[i].id」で参照可能
-  // TODO DMリストデータのアプローチリストIDをfilterで探しに行けない
-  // var approachList1 = dmListListData.filter(function(elm:any) {
-  //   console.log(approachListData[i].id)
-  //   console.log(elm.approachListId)
-  //   console.log(elm.dmLists[0].approachListId)
-  //   return elm.approachListId == approachListData[i].id;
-  // })
-  // let approachList1 = dmListListDatas.filter((dmListListData: any) => dmListListData)
-// console.log(approachList1)
+let userDatas:any = unref(user)
 
 /**
  * approachListIdに紐づくデータをtargetKeyをキーにDMリストを検索する。
  * @param approachListId // アプローチリストID
  * @param targetKey // ターゲットとなる項目のキー
  */
-function getTableData(approachListId:any, targetKey:any) {
-  console.log(approachListId) // テーブルデータに紐づくアプローチリストID
-  console.log(targetKey) // matchingStatus
-  var result = dmListListDatas.filter((dmListListData: any) => approachListId == dmListListData.approachListId)
-  // TODO matchingStatusの値取れない. Proxy(Object)から値を取得する方法を調査する。
-  console.log(result.targetKey)
+function getTableDmListData(approachListId:any, targetKey:any) {
+  let result = dmListListDatas.filter((dmListListData: any) => approachListId == dmListListData.approachListId)[0]
+  if(result) {
+    if(targetKey == 'matchingStatus') {
+      if(result[targetKey] == 1) {
+        return 'マッチング中'
+      }else {
+        return 'マッチング済'
+      }
+    }
+    return result[targetKey]
+  } 
 }
 
+/**
+ * approachListIdに紐づくデータをtargetKeyをキーにユーザーリストを検索する。
+ * @param userId // ユーザーID
+ * @param targetKey // ターゲットとなる項目のキー
+ */
+// TODO TargetKeyに「name」を設定したかったが他箇所にも影響がありそうな変更が必要だったため、
+//      一旦アプローチリスト取得APIからの仮データ（approachLists.get.ts）のnameをchargeOfConsultantに変更している。要修正。
+ function getTableUserData(userId:any, targetKey:any) {
+  let result = userDatas.filter((userData: any) => userId[0] == userData.id)[0]
+  if(result) {
+    return result[targetKey]
+  }
+}
 
 /**
  * ページネーション用
@@ -252,7 +258,7 @@ const dataUserList: any = unref(user)
 const approachLists: any = unref(approachList)
 for(let i = 0; i < dataUserList.length; i++){
   pulldownChargeOfConsultant.add(dataUserList[i].display_name)
-  pulldownApproachPurpose.add(approachLists[i].type)
+  // pulldownApproachPurpose.add(approachLists[i].type)
 }
 
 /**

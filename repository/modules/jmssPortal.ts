@@ -1,18 +1,25 @@
+// エンドポイントが増えてきたら分割する
+import BaseApiFactory from '../factory';
 import { useCookies } from "vue3-cookies";
 
-const runtimeConfig = useRuntimeConfig()
-
-export const Urls = {
+class JmssPortalModule extends BaseApiFactory {
+  private urls: any = {
     getAccessToken: `/api/jmss_portal_auth`,
     getApproachList: `/api/v1/approach_lists`,
     getApproachCompanyList: (approachListId: string) => `/api/v1/approach_lists/${approachListId}`,
     getBuyneeds: `/api/v1/buyers`,
     getUsers: `/api/v1/users`,
     getCompanies: `/api/v1/companies`,
-}
+  }
+  private baseURL;
+  private approachBaseURL;
+  private options: any = { headers: {'Authorization': `Bearer ${this.authJmssPortalToken()}`}}
+  constructor(baseURL: string, approachBaseURL: string) {
+    super();
+    this.baseURL = baseURL,
+    this.approachBaseURL = approachBaseURL
+  }
 
-export class jmssPortalRepository {
-  
   /**
    * アプローチリスト取得用API
    * @param approachListId 
@@ -20,8 +27,8 @@ export class jmssPortalRepository {
    * @param limit 
    * @returns アプローチリスト
    */
-  getApproachList(approachListId: string, searchParams: any, limit: Number) {
-    const params: any = {
+  async getApproachList(approachListId: string, searchParams: any, limit: Number) {
+    this.options.params = {
       id: approachListId,
       method: 1,
       team_id: searchParams.chargeOfTeam,
@@ -32,7 +39,7 @@ export class jmssPortalRepository {
       created_at_max: searchParams.registrationDateTo,
       limit: limit
     };
-    return this.baseApi(Urls.getApproachList, params);      
+    return this.call(this.urls.getApproachList, this.baseURL, this.options);
   }
 
   // 
@@ -42,7 +49,7 @@ export class jmssPortalRepository {
    * @returns アプローチリスト企業
    */
   getApproachCompanyList(approachListId: string) {
-    return this.baseApi(Urls.getApproachCompanyList(approachListId), null);      
+    return this.call(this.urls.getApproachCompanyList(approachListId), this.baseURL);
   }  
 
   // 買いニーズ取得API
@@ -52,7 +59,7 @@ export class jmssPortalRepository {
    * @returns 
    */
   getBuyneeds(buyneedsId: string) {
-    const params: any = {
+    this.options.params = {
       id: buyneedsId,
       // source_type: sourceType,
       // company_industry_id: companyIndustryId,
@@ -64,36 +71,26 @@ export class jmssPortalRepository {
       // remarks: remarks,
       // limit: limit
     }
-    return this.baseApi(Urls.getBuyneeds, params);
+    return this.call(this.urls.getBuyneeds, this.baseURL, this.options);
   }
 
   // ユーザ取得API
-  getUsers(userIds: string[]) {
-    const params: any = {
+  getUsersById(userIds: string[]) {
+    this.options.params = {
       id: userIds,
     }
-    return this.baseApi(Urls.getBuyneeds, params);
+    return this.call(this.urls.getUsers, this.baseURL, this.options);
   }
   
   // 企業マスタ取得用API
   getComanies(companyIdList: number[]) {
-    const params: any = {id: companyIdList};
-    return this.baseApi(Urls.getCompanies, params);
+    this.options.params = {
+      id: companyIdList
+    };
+    return this.call(this.urls.getCompanies, this.baseURL, this.options);
   }
 
-
-  // 各APIのベースメソッド
-  async baseApi(url: string, params: any) {
-    const {data, error} = await useFetch(
-      url, {
-        baseURL:  runtimeConfig.public.jmssPortalbaseURL,
-        headers: {'Authorization': `Bearer ${this.authJmssPortalToken()}`},
-        params: params
-      }
-    );
-    return {data, error};
-  }
-
+  // 社内ポータルで使用するため一旦こちらに入れている。
   // 社内ポータル接続用アクセストークン取得メソッド
   async authJmssPortalToken() {
     const cookies = useCookies();
@@ -102,8 +99,8 @@ export class jmssPortalRepository {
       // アクセストークン取得用API
       // APIキーをフロントで持たないためにBackendからアクセスする。
       const data: any = await useFetch(
-        Urls.getAccessToken, {
-            baseURL:  runtimeConfig.public.approachBaseURL
+        this.urls.getAccessToken, {
+            baseURL: this.approachBaseURL
         }
       );
       // TODO access_tokenの値をエンコードする必要あり？
@@ -112,6 +109,6 @@ export class jmssPortalRepository {
 
     return cookies.cookies.get('jmss_portal_access_token');
   }
-
-    
 }
+
+export default JmssPortalModule;

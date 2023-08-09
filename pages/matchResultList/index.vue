@@ -204,9 +204,10 @@ const processDate = ref('2021/09/01 12:00:00')
 //       baseURL: `${process.env.API_URL}/matchingResult/`,
 //       query: { matching_history_id: matchingHistoryId }
 //     })
-// if (matchingResultError.value) {
-//   throw matchingResultError.value
+// if (matchingResultError) {
+//   throw matchingResultError
 // }
+
 
 // モック
 const { data: matchingResultData } =
@@ -216,15 +217,15 @@ const matchingResult: any = ref(matchingResultData.value)
 const buyCompanyId: number[] = ref(matchingResult["candidates_company_id"])
 const buyNeedsId: number[] = ref(matchingResult["buyneeds_id"])
 
-// 買い手企業情報取得APIの呼び出し
+// 買い手企業情報取得APIの呼び出し(発送企業一覧画面と共通処理にしたい)
 // const { data: buyCompanyData, error: getCompanyError } =
 //   await useFetch("エンドポイントのURL",
 //     {
 //       baseURL: `${process.env.API_URL}`,
-//       query: { "id": buyCompanyId }
+//       query: { "id": buyCompanyId.join(',') }
 //     })
-// if (getCompanyError.value) {
-//   throw getCompanyError.value
+// if (getCompanyError) {
+//   throw getCompanyError
 // }
 
 // モック
@@ -239,8 +240,8 @@ const buyCompanys: any = ref(buyCompanyData.value)
 //     baseURL: `${process.env.API_URL}`,
 //     query: { "id": buyNeedsId }
 //   })
-// if (getBuyneedsError.value) {
-//   throw getBuyneedsError.value
+// if (getBuyneedsError) {
+//   throw getBuyneedsError
 // }
 
 // モック

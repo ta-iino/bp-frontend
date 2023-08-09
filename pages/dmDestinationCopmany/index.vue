@@ -80,6 +80,7 @@ import { VDataTable } from 'vuetify/lib/labs/components.mjs';
 import { ref } from 'vue'
 import { useRoute, useRouter } from "vue-router";
 
+const config = useRuntimeConfig();
 const route = useRoute();
 const router = useRouter();
 const dmListId = route.query;
@@ -304,11 +305,8 @@ const matchingResult = (companyId: Number): void => {
  * @param companyId 
  */
 const clickCompanyId = (companyId: Number): void => {
-
-  let compnayUrl = router.resolve({
-    path: `社内ポータルフロントURL` + `/company/` + companyId,
-  });
-  window.open(compnayUrl.href, '_blank');
+  const url = config.public.jmssPortalbaseURL + '/company/' + companyId;
+  window.open(url)
 };
 
 const pageBack = (): void => {

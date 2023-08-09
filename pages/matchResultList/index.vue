@@ -292,9 +292,8 @@ for (let i = 0; i < buyCompanys.value.length; i++) {
 
 // itemにリンクをどうやって貼るか→v-ifで対応
 const clickCompanyName = (companyId: number): void => {
-  let companyUrl = router.resolve({
-    path: "/",
-    query: { id: companyId },
+  const url = config.public.jmssPortalbaseURL + '/company/' + companyId;
+  window.open(url)
   })
 
   window.open(companyUrl.href, "_blank")

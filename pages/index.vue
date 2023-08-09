@@ -75,7 +75,7 @@
         </v-col>
         <v-col col="11"></v-col>
         <v-col class="pt-2 " cols="1">
-          <v-btn class="ui-btn" depressed color="light-blue-darken-3" @click="searchButton(searchParams)">
+          <v-btn class="ui-btn" depressed color="light-blue-darken-3" @click="searchButton()">
             <v-icon dark size="large">mdi-magnify</v-icon>
           </v-btn>  
         </v-col>
@@ -87,21 +87,30 @@
       <v-data-table
         v-model:page="page"
         :headers="headers"
-        :items="dmListDataItems"
+        :items="approachListItems"
         :items-per-page="parPage"
         hide-default-footer
         class="elevation-1 ui-vdatatable"
         :height="528"
         fixed-header
       >
+        <template v-slot:item.createdAt="{ item }">
+          {{ formatDate(item.raw.createdAt) }}
+        </template>
+        <template v-slot:item.requestTeam="{ item }">
+          {{ getValueObject(Object.values(item.raw.requestTeam)) }}
+        </template>
+        <template v-slot:item.jmssIndustries="{ item }">
+          {{ getValueObject(Object.values(item.raw.jmssIndustries)) }}
+        </template>
         <template v-slot:item.matchingStatus="{ item }">
-          {{ getTableDmListData(item.raw.id, Object.keys(item.raw)[11]) }}
+          {{ getTableDmListData(item.raw.id, 'matchingStatus') }}
         </template>
         <template v-slot:item.sendCompanyCount="{ item }">
-          {{ getTableDmListData(item.raw.id, Object.keys(item.raw)[3]) }}
+          {{ getTableDmListData(item.raw.id, 'sendCompanyCount') }}
         </template>
         <template v-slot:item.chargeOfConsultant="{ item }">
-          {{ getTableUserData(Object.keys(item.raw.created_by), Object.keys(item.raw)[7]) }}
+          {{ getTableUserData(Object.keys(item.raw.createdBy), 'name') }}
         </template>
         <template v-slot:bottom>
           <div class="text-center pt-2">
@@ -112,16 +121,6 @@
               @input="onChangePage"
               :total-visible="22"
             ></v-pagination>
-<!--            <v-text-field
-              :model-value="parPage"
-              class="pa-2"
-              label="Items per page"
-              type="number"
-              min="-1"
-              max="15"
-              hide-details
-              @update:model-value="parPage = parseInt($event, 10)"
-            ></v-text-field>-->
           </div>
         </template>
         <template v-slot:item.listName="{ item }">
@@ -142,6 +141,7 @@ import { ref } from 'vue'
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 import '@mdi/font/css/materialdesignicons.css'
+import camelcaseKeys from 'camelcase-keys'
 
 /**
  * 初期値設定
@@ -171,15 +171,8 @@ const router = useRouter();
 const { data }  = await useFetch('api/sample')
 const dmListData: any = data.value
 
-// データのソート処理
-let dmListDataItems = dmListData.sort(function(a, b) {
-  //オブジェクトを登録日が新しい順にソートする
-  return (a.registrationDate < b.registrationDate) ? 1 : -1;  
-});
-
 /**
  * 初期表示処理
- * 初期表示と検索で条件分岐特定のアプローチリストIDの有無により取得を分ける。
  */
 // DMリスト取得API呼出
 const { data: dmListList} = await useFetch('/api/dmList')
@@ -188,19 +181,32 @@ const { data: approachList} = await useFetch('/api/approachLists')
 // ユーザー取得API呼出
 const { data: user} = await useFetch('/api/user')
 
-let tmpDmListListData:any = unref(dmListList)
-let dmListListDatas:any = tmpDmListListData[0].dmLists
+let tmpDmListData:any = unref(dmListList)
+let dmListDatas:any = tmpDmListData[0].dmLists
 let userDatas:any = unref(user)
+let approachLists: any = unref(approachList)
+
+// 取得したデータのキーをキャメルケースに変換する
+const tmpData = camelcaseKeys(approachLists, { deep: true })
+let a = 'consulNagoyaTeam'
+console.log(tmpData[0].requestTeam[a])
+
+// 一覧表示データのソート処理
+let approachListItems = tmpData.sort(function(a, b) {
+  //オブジェクトを登録日が新しい順にソートする
+  return (a.createdAt < b.createdAt) ? 1 : -1;  
+});
 
 /**
- * approachListIdに紐づくデータをtargetKeyをキーにDMリストを検索する。
+ * 一覧のアプローチリストIDをキーにDMリストを検索する。
  * @param approachListId // アプローチリストID
  * @param targetKey // ターゲットとなる項目のキー
  */
 function getTableDmListData(approachListId:any, targetKey:any) {
-  let result = dmListListDatas.filter((dmListListData: any) => approachListId == dmListListData.approachListId)[0]
+  let result = dmListDatas.filter((dmListData: any) => approachListId == dmListData.approachListId)[0]
   if(result) {
     if(targetKey == 'matchingStatus') {
+      // TODO utilとかtypeフォルダ作ってメソッド呼出にしたい
       if(result[targetKey] == 1) {
         return 'マッチング中'
       }else {
@@ -212,17 +218,30 @@ function getTableDmListData(approachListId:any, targetKey:any) {
 }
 
 /**
- * approachListIdに紐づくデータをtargetKeyをキーにユーザーリストを検索する。
+ * 一覧のユーザーIDをキーにユーザーリストを検索する。
  * @param userId // ユーザーID
  * @param targetKey // ターゲットとなる項目のキー
  */
-// TODO TargetKeyに「name」を設定したかったが他箇所にも影響がありそうな変更が必要だったため、
-//      一旦アプローチリスト取得APIからの仮データ（approachLists.get.ts）のnameをchargeOfConsultantに変更している。要修正。
  function getTableUserData(userId:any, targetKey:any) {
   let result = userDatas.filter((userData: any) => userId[0] == userData.id)[0]
   if(result) {
     return result[targetKey]
   }
+}
+
+/**
+ *  APIから取得した日時をYYYY-MM-DDにフォーマットする
+ */
+function formatDate(date: any) {
+  return date.slice(0, 10)
+}
+
+/**
+ * オブジェクトのvalueを配列で取り出し、表示する
+ */
+function getValueObject(arrayValue: any) {
+  let joinObject = arrayValue.join(",")
+  return joinObject;
 }
 
 /**
@@ -245,33 +264,28 @@ function onChangePage() {
 /**
  * プルダウンリスト生成
  */
-// TODO チームのプルダウンはJMSS様のAPI作成待ち
-// DMリスト取得API呼出
-let pulldownChargeOfTeam1: any = new Set()
+// 部・チーム情報取得API呼出
+const { data: tmpDepTeam} = await useFetch('/api/depTeam')
+const depTeamsLists: any = unref(tmpDepTeam)
+const dataUserLists: any = unref(user)
+const approachLists1: any = unref(approachList)
+let pulldownChargeOfTeam: any = new Set()
 let pulldownChargeOfConsultant: any = new Set()
 let pulldownApproachPurpose: any = new Set()
-const dataUserLists: any = unref(user)
-const approachLists: any = unref(approachList)
+// チームのプルダウンリストを生成
+for(let i =0; i < depTeamsLists.length; i++) {
+  if(depTeamsLists[i].parent_id !== 0) {
+    pulldownChargeOfTeam.add(depTeamsLists[i].name)
+  }
+}
 // 担当コンサルタントのプルダウンリストを作成
-for(let i = 0; i < dataUserLists.length; i++){
-  // TODO アプローチリスト取得疑似APIのnameを「chargeOfConsultant」に変更しているため、一旦これで実装する。要修正。
-  pulldownChargeOfConsultant.add(dataUserLists[i].chargeOfConsultant)
+for(let i = 0; i < dataUserLists.length; i++) {
+  pulldownChargeOfConsultant.add(dataUserLists[i].name)
 }
 // アプローチ区分のプルダウンを作成
-for(let i = 0; i < approachLists.length; i++){
-  pulldownApproachPurpose.add(approachLists[i].type)
+for(let i = 0; i < approachLists1.length; i++) {
+  pulldownApproachPurpose.add(approachLists1[i].type)
 }
-
-
-/**
- * プルダウンリスト取得(削除予定)
-*/ 
-const { data: data1 } = await useFetch('/api/pulldownList')
-const data1_1: any = ref(data1)
-const pulldownChargeOfTeam = data1_1.value.teamList
-// const pulldownChargeOfConsultant = data1_1.value.consultantList
-// const pulldownApproachPurpose = data1_1.value.approachPurpose
-
 
 /**
  * リスト名押下時の処理
@@ -300,16 +314,16 @@ const headers = ref(
     [
       // title,keyじゃないとヘッダーが消える
       { title: 'ID', key: 'id', sortable: false, width: 100 },
-      { title: '登録日', key: 'registrationDate', sortable: false, width: 150 },
-      { title: '発送日', key: 'sendMailDate', sortable: false, width: 150 },
-      { title: '送付社数', key: 'sendCompanyCount', sortable: false, width: 100 },
-      { title: 'リスト名', key: 'listName', sortable: false, width: 250 },
-      { title: 'アプローチ区分', key: 'approachPurpose', sortable: false, width: 150 },
-      { title: '担当チーム', key: 'chargeOfTeam', sortable: false, width: 150 },
+      { title: '登録日', key: 'createdAt', sortable: false, width: 150 },
+      { title: '発送日', key: 'dmDate', sortable: false, width: 150 },
+      { title: '発送社数', key: 'sendCompanyCount', sortable: false, width: 100 },
+      { title: 'リスト名', key: 'name', sortable: false, width: 250 },
+      { title: 'アプローチ区分', key: 'type', sortable: false, width: 150 },
+      { title: '担当チーム', key: 'requestTeam', sortable: false, width: 150 },
       { title: '担当コンサルタント', key: 'chargeOfConsultant', sortable: false, width: 150 },
-      { title: '業種', key: 'ompanyIndustry', sortable: false, width: 100 },
-      { title: '地域', key: 'companyRegion', sortable: false, width: 100 },
-      { title: '売上', key: 'companySales', sortable: false, width: 100 },
+      { title: '業種', key: 'jmssIndustries', sortable: false, width: 100 },
+      { title: '地域', key: 'areas', sortable: false, width: 100 },
+      { title: '売上', key: 'salesRanges', sortable: false, width: 100 },
       { title: '状況', key: 'matchingStatus', sortable: false, width: 150 },
     ]
   )
@@ -317,11 +331,11 @@ const headers = ref(
 /**
  * 検索ボタン押下時処理
 */ 
-const searchButton = (searchParams: any) :void => {
-  // アプローチリスト取得APIの呼出
-  
-  // DMリスト取得APIの呼出
-
+const searchButton = () :void => {
+  // DMリスト取得APIの呼出（引数はアプローチリストIDのリスト）
+  // アプローチリスト取得APIの呼出（引数はserchParams）
+  // ユーザー取得APIの呼出（引数はユーザーIDのリスト）
+  // 初期表示の処理と同じなので共通処理化したい。
 }
 
 

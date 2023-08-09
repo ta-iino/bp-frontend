@@ -79,6 +79,7 @@ import {useRoute, useRouter} from "vue-router";
 const route = useRoute();
 const router = useRouter();
 const dmListId = route.query;
+const { $api } = useNuxtApp();
 /**
  * マッチングプルダウンリスト
  */
@@ -111,6 +112,10 @@ const dmList: any = ref(dmLists.value[0]);
 
 //TODO 本データ取得はDMリスト一覧画面から引っ張る。
 // ⇒共通処理化して処理が重複しないように気を付ける。
+// const {
+//     data: dmList,
+//     error
+//   } = await $api.approach.getDmList([String(approachListId)]);
 
 const items: any = [
         {title:'担当チーム：', value: dmList.value.chargeOfTeam},
@@ -257,13 +262,22 @@ const downloadCsv = async (): Promise<void> => {
  * マッチング結果押下時の処理
  * @param companyId 企業マスタId
  */
-const matchingResult = (companyId: Number): void => {
-  router.push({ 
-
-    // path: `/マッチング結果画面のpath/${[companyId]}`
-    path: `/matchResultList`
-  });
+const matchingResult = async (companyId: Number): Promise<void> => {
+  //API接続例
+const {
+    data: dmList,
+    error
+  } = await $api.approach.getDmList([String(dmListId)]);
 };
+
+// const matchingResult = async (companyId: Number): Promise<void> => {
+//  router.push({ 
+//
+//  path: `/マッチング結果画面のpath/${[companyId]}`
+//  path: `/matchResultList`
+//  });
+// };
+
 
 /**
  * 会社ID押下時の処理

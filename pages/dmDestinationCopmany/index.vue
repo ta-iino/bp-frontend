@@ -49,9 +49,9 @@
     <v-container class="pt-0 mb-4">
       <v-row>
         <v-data-table :headers="headers" :items="companyList" :height="528" :items-per-page="-1" fixed-header>
-          <template v-slot:item.id="{ item }">
-            <span class="link" @click="clickCompanyId(item.raw.masterId)">{{ item.raw.masterId }}</span>
-            <v-btn width="120" small class="mr-2 ui-matching-btn" @click="matchingResult(item.raw.masterId)"
+          <template v-slot:item.id="{ item, index }">
+            <span class="link" @click="clickCompanyId(item.raw.id)">{{ item.raw.id }}</span>
+            <v-btn width="120" small class="mr-2 ui-matching-btn" @click="matchingResult(item.raw.id, companyInfoList[index].id)"
               color="light-blue-darken-4" border="0">マッチング結果</v-btn>
           </template>
           <!-- フッターの不要な文字を消す為に記載 -->
@@ -84,15 +84,16 @@ const { $api } = useNuxtApp();
 // DM送付先企業リスト取得API（backend）
 // refreshを取得しておき、ニーズマッチング実行時に使用する。
 
-const companyIdList: number[] = [];
-const getSendCompanyListData = async(selectedBuyneedsHistoryId: Number): Promise<any> => {
+const companyInfoList: any[] = [];
+const getSendCompanyListData = async(selectedBuyneedsHistoryId: number): Promise<any> => {
   const QUERY = selectedBuyneedsHistoryId;
   const { data: sendCompanyHistoryListData } = await $api.approach.getBuyneedsMatchingResult(QUERY);
 
-  const sendCompanyIdList: number[] = ref(ref(sendCompanyHistoryListData.value).filter((sendCompanyHistoryListData: any) => 
-    sendCompanyHistoryListData.companyId.map((sendCompanyHistoryListData: any) => sendCompanyHistoryListData.value)));
-  companyIdList.values = sendCompanyIdList.values;
+  const sendCompanyInfoList: any[] = ref(ref(sendCompanyHistoryListData.value).filter((sendCompanyHistoryListData: any) => 
+  sendCompanyHistoryListData.id && sendCompanyHistoryListData.companyId).map((sendCompanyHistoryListData: any) => sendCompanyHistoryListData.value)));
+  companyInfoList.values = sendCompanyInfoList.values;
 }
+const companyIdList: number[] = companyInfoList.map((companyInfoList: any) => companyInfoList.companyId);
 
 
 // マッチング処理日時リスト取得API（backend）
@@ -108,7 +109,7 @@ const processingDateList: any = ref((matchingHistoryList.value)
 );
 
 // 最新のマッチング処理日時をAPIに渡す
-const selectedBuyneedsHistoryId: Number = ref(processingDateList.value[0].id);
+const selectedBuyneedsHistoryId: number = ref(processingDateList.value[0].id);
 getSendCompanyListData(selectedBuyneedsHistoryId);
 
 // const processingDateList: any = ref(matchingHistoryList.value);
@@ -197,7 +198,7 @@ const headers: any =
   [
     // title,keyでないとヘッダーが消える
     { title: '', key: 'matchingResult', sortable: false, width: 50, color: '#b3e5fc' },
-    { title: 'マスタID', key: 'masterId', sortable: false, width: 100 },
+    { title: 'マスタID', key: 'id', sortable: false, width: 100 },
     { title: '企業名', key: 'companyName', sortable: false, width: 200 },
     { title: '代表者名', key: 'representativeName', sortable: false, width: 150 },
     { title: '郵便番号', key: 'postCode', sortable: false, width: 150 },
@@ -274,11 +275,16 @@ const downloadCsv = async (): Promise<void> => {
  * マッチング結果押下時の処理
  * @param companyId 企業マスタId
  */
-const matchingResult = (companyId: Number): void => {
+const matchingResult = (companyId: number, sendCompanyHistoryId: any): void => {
   let matchResultUrl = router.resolve({
 
     // path: `/マッチング結果画面のpath/${[companyId]}`
-    path: `/matchResultList`
+    path: `/matchResultList`,
+    query: {
+      "companyId": companyId,
+      "sendCompanyHistoryId": sendCompanyHistoryId
+    }
+
   });
   window.open(matchResultUrl.href, '_blank');
 };
@@ -287,7 +293,7 @@ const matchingResult = (companyId: Number): void => {
  * 会社ID押下時の処理
  * @param companyId 
  */
-const clickCompanyId = (companyId: Number): void => {
+const clickCompanyId = (companyId: number): void => {
   const url = config.public.jmssPortalbaseURL + '/company/' + companyId;
   window.open(url)
 };

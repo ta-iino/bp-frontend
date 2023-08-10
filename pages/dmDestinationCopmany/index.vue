@@ -10,19 +10,13 @@
       <v-row>
         <v-col cols="4" class="d-flex px-0 py-0" v-for="(item) in items" :key="item.title">
           <!-- 上が少しはみ出るのでv-if:0<=i, i<=2で対応？ -->
-          <v-divider class="border-opacity-25" vertical></v-divider>
           <v-col cols="6" class="px-0 py-1">
-          <v-divider class="border-opacity-25"></v-divider>
             {{ item.title }}
           </v-col>
-          <v-divider class="border-opacity-25"></v-divider>
           <v-col cols="6" class="px-0 py-1">
-            <v-divider class="border-opacity-25"></v-divider>
             {{ item.value }}
           </v-col>
-          <v-divider class="border-opacity-25" vertical></v-divider>
         </v-col>
-        <v-divider class="border-opacity-25"></v-divider>
       </v-row>
       <v-row class="py-3">
         <v-col cols="3" class="px-0">
@@ -32,7 +26,8 @@
         <v-col cols="1" class="px-0"></v-col>
         <v-col cols="4" class="px-0 d-flex">
           <div class="ml-n8 mr-2">
-            <v-btn class="v-btn" depressed color="light-blue-darken-4" border="0" @click="matchingStart(0)">ニーズマッチング</v-btn>
+            <v-btn class="v-btn" depressed color="light-blue-darken-4" border="0"
+              @click="matchingStart(0)">ニーズマッチング</v-btn>
           </div>
           <div class="px-2">
             <v-btn class="v-btn" depressed color="light-blue-darken-4" border="0" @click="downloadCsv">ダウンロード</v-btn>
@@ -42,15 +37,10 @@
           </div>
         </v-col>
         <v-col cols="4" class="pt-4 pl-10">
-          <!-- ページネーションで取得している情報でのみ検索できる -->
-          <v-text-field
-            dense
-            v-model="search"
-            append-inner-icon="mdi-magnify"
-            label="企業名検索"
-            clearable
-            hide-details
-          />
+          <v-form @submit.prevent="searchCompany">
+            <v-text-field v-model="search" label="企業名検索" append-inner-icon="mdi-magnify">
+            </v-text-field>
+          </v-form>
         </v-col>
       </v-row>
     </v-container>
@@ -58,7 +48,7 @@
     <!-- 一覧表示 ここから -->
     <v-container class="pt-0 mb-4">
       <v-row>
-        <v-data-table :headers="headers" :items="destinationCompanyList" :search="search" :custom-filter="filter" :height="528" :items-per-page="-1" fixed-header>
+        <v-data-table :headers="headers" :items="companyList" :height="528" :items-per-page="-1" fixed-header>
           <template v-slot:item.masterId="{ item }">
             <span class="link" @click="clickCompanyId(item.raw.masterId)">{{ item.raw.masterId }}</span>
           </template>
@@ -79,6 +69,7 @@
 import { VDataTable } from 'vuetify/lib/labs/components.mjs';
 import { ref } from 'vue'
 import { useRoute, useRouter } from "vue-router";
+import '@mdi/font/css/materialdesignicons.css'
 
 const config = useRuntimeConfig();
 const route = useRoute();
@@ -89,25 +80,49 @@ const dmListId = route.query;
  * マッチングプルダウンリスト
  */
 // mock用
-const { data: processingDateListData } = await useFetch('/api/processingDateList');
+// const { data: processingDateListData } = await useFetch('/api/processingDateList');
+
+// DM送付先企業リスト取得API（backend）
+// refreshを取得しておき、ニーズマッチング実行時に使用する。
+
+const companyIdList: number[] = [];
+const getSendCompanyListData = async(selectedBuyneedsHistoryId: Number): Promise<any> => {
+  const URL = 'エンドポイントのURL';
+  const METHOD = 'GET';
+  const QUERY = selectedBuyneedsHistoryId;
+  const { data: sendCompanyHistoryListData } = await useFetch(URL, {
+    method: METHOD,
+    query: QUERY
+  },
+  );
+  const sendCompanyIdList: number[] = ref(sendCompanyHistoryListData.filter((sendCompanyHistoryListData: any) => 
+    sendCompanyHistoryListData["companyId"].map((sendCompanyHistoryListData: any) => sendCompanyHistoryListData.value)));
+  companyIdList.values = sendCompanyIdList.values;
+}
+
 
 // マッチング処理日時リスト取得API（backend）
 
 //TODO 買いニーズマッチング履歴取得APIからfront側でmap形式のリストを作るよう修正。
-// const { data : processingDateListData } = await useFetch('エンドポイントのURL', {
-//   baseURL: 'バックエンドのベースURL（envフィルから引っ張る)',
-//   params: {'dm_list_id': dmListId}
-// })
+const { data : processingDateListData } = await useFetch('エンドポイントのURL', 
+  {
+    baseURL: 'バックエンドのベースURL(envフィルから引っ張る)',
+    params: {'dm_list_id': dmListId}
+  }
+);
 
-// const processingDateList: number[] = ref(processingDateListData.filter((processingDateListData: any) =>
-//  processingDateListData["id", "processed_datetime"].map((processingDateListData: any) => processingDateListData.value)));
+const processingDateList: any = ref((processingDateListData.value)
+  .filter((processingDateListData: any) => processingDateListData.id && processingDateListData.processed_datetime)
+  .map((processingDateListData: any) => ({ id: processingDateListData.id, processingDate: processingDateListData.processed_datetime }))
+);
 
-// 最新のマッチング処理日時を
-// getSendCompanyListData(processingDateList[0][0])
-
-const processingDateList: any = ref(processingDateListData.value);
-// 選択されたプルダウンのデータ格納用
+// 最新のマッチング処理日時をAPIに渡す
 const selectedBuyneedsHistoryId: Number = ref(processingDateList.value[0].id);
+getSendCompanyListData(selectedBuyneedsHistoryId);
+
+// const processingDateList: any = ref(processingDateListData.value);
+// // 選択されたプルダウンのデータ格納用
+// 
 
 
 /**
@@ -149,7 +164,7 @@ const items: any = [
 
 // mock用
 // const { data : destinationCompanyData }  = await useFetch('api/sample2')
-const { data: sendCompanyHistoryListData } = await useFetch('api/dmDestinationCopmanyList');
+// const { data: sendCompanyHistoryListData } = await useFetch('api/dmDestinationCopmanyList');
 
 /**
  * リスト取得して最新の日時の発送履歴IDを結果取得APIに渡す
@@ -158,41 +173,33 @@ const { data: sendCompanyHistoryListData } = await useFetch('api/dmDestinationCo
  */
 
 
-// DM送付先企業リスト取得API（backend）
-// refreshを取得しておき、ニーズマッチング実行時に使用する。
 
-// const getSendCompanyListData = async(selectedBuyneedsHistoryId: Number): Promise<any> => {
-//   const URL = 'エンドポイントのURL';
-//   const METHOD = 'GET';
-//   const QUERY = selectedBuyneedsHistoryId;
-//   const { data: sendCompanyHistoryListData } = await useFetch(URL, {
-//     method: METHOD,
-//     query: QUERY
-//   },
-//   );
-// }
 
-// const sendCompanyIdList: number[] = ref(sendCompanyHistoryListData.filter((sendCompanyHistoryListData: any) => 
-//   sendCompanyHistoryListData["companyId"].map((sendCompanyHistoryListData: any) => sendCompanyHistoryListData.value)));
-
-const sendCompanyHistoryList: any = ref(sendCompanyHistoryListData.value);
-const sendCompanyHistoryIdList: number[] = ref(sendCompanyHistoryList["idList"]);
-const sendCompanyIdList: number[] = ref(sendCompanyHistoryList["companyIdList"]);
+// const sendCompanyHistoryList: any = ref(sendCompanyHistoryListData.value);
+// const sendCompanyHistoryIdList: number[] = ref(sendCompanyHistoryList["idList"]);
+// const sendCompanyIdList: number[] = ref(sendCompanyHistoryList["companyIdList"]);
 
 //mock用
 // const { data : destinationCompanyListData }  = await useFetch('api/copmanyMasterList');
-const { data: destinationCompanyListData } = await useFetch('api/sample2');
+// const { data: destinationCompanyListData } = await useFetch('api/sample2');
 
 // 企業マスタ取得用API(社内ポータル)
-// const { data : destinationCompanyData } = await useFetch(
-//   'エンドポイントのURL', 
-//   {
-//     baseURL: '社内ポータルのベースURL（envフィルから引っ張る)',
-//     headers: {'Authorization': 'Bearer アクセストークン(Cookieに保存かな、、)'},
-//     query: {'id': companyIdList}
-//   }
-// );
-const destinationCompanyList: any = ref(destinationCompanyListData.value);
+const companyList: any = ref();
+const getCompanyData = async(companyIdList: number[], searchCompanyName: string, page: number, totalPage: number): Promise<any> => {
+  const URL = 'エンドポイントのURL';
+  const METHOD = 'GET';
+  const QUERY = {'id': companyIdList, 'name': searchCompanyName};
+  const PARAMS = {'page': page, 'totalPage': totalPage};
+  const { data: destinationCompanyListData } = await useFetch(URL, {
+    method: METHOD,
+    query: QUERY,
+    params: PARAMS
+  },
+  );
+  const destinationCompanyList: any = ref(destinationCompanyListData.value);
+  companyList.value = destinationCompanyList.value;
+}
+
 
 // ヘッダ
 //空itemを一番上にすることで、左端にマッチング結果ボタンが表示される。
@@ -216,12 +223,13 @@ const headers: any =
   ]
 
 // 企業名検索
-const search: any = ref('');
-// const filter = computed(() => {
-//   return destinationCompanyList.value.filter((item: any) => {
-//     return item.companyName.includes(search.value.toLowerCase());
-//   });
-// });
+const search: Ref<string> = ref('');
+
+const searchCompany = () => {
+  const searchCompanyName = search.value;
+  getCompanyData(companyIdList, searchCompanyName, 1, 1);
+  search.value = '';
+  };
 
 
 /**
@@ -248,7 +256,6 @@ const matchingStart = async (count: number): Promise<void> => {
       path: `/本画面のURL`,
       query: {
         dmListId: Number(dmListId),
-
         selectedProcessingDate: Number(selectedBuyneedsHistoryId)
       }
     });
@@ -324,5 +331,4 @@ const pageBack = (): void => {
 .ui-matching-btn {
   border-radius: 10px;
 }
-
 </style>

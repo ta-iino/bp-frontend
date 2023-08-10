@@ -152,55 +152,57 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 const route = useRoute();
-const router = useRouter();
+const sellCompanyId = route.query;
 const matchingHistoryId = route.query;
+const processDate = route.query;
 const { $api } = useNuxtApp();
 
-// 前画面からのデータ受け取り
-props: ['sellCompany', 'processDate']
-
 // モック
-const sellCompanyData = {
-  id: 1,
-  name: '株式会社テスト',
-  address: '東京都渋谷区',
-  representativeName: 'テスト太郎',
-  representativeAge: 50,
-  industry1: 'IT',
-  industry2: 'ソフトウェア',
-  industry3: 'システム開発',
-  items: 'システム開発',
-  sales: 100,
-  income: 30,
-  employees: 100
-}
+// const sellCompanyData = {
+//   id: 1,
+//   name: '株式会社テスト',
+//   address: '東京都渋谷区',
+//   representativeName: 'テスト太郎',
+//   representativeAge: 50,
+//   industry1: 'IT',
+//   industry2: 'ソフトウェア',
+//   industry3: 'システム開発',
+//   items: 'システム開発',
+//   sales: 100,
+//   income: 30,
+//   employees: 100
+// }
 
-const sellCompany = ref(sellCompanyData)
-const processDate = ref('2021/09/01 12:00:00')
+// 買い手企業情報取得APIの呼び出し
+const { data: sellCompanyData } =
+  await $api.jmssPortal.getCompany(sellCompanyId)
+
+const sellCompany = ref(sellCompanyData.value)
+
 
 // マッチング結果取得APIの呼び出し
-const { data: matchingResultData, error: matchingResultError } =
+const { data: matchingResultData } =
   await $api.approach.getMatchingResult(matchingHistoryId)
 
 
 // モック
-const { data: matchingResultData } =
-  await useFetch('api/matchingResult')
+// const { data: matchingResultData } =
+//   await useFetch('api/matchingResult')
 
 const matchingResult: any = ref(matchingResultData.value)
-const buyCompanyId: number[] = ref(matchingResult["candidates_company_id"])
-const buyNeedsId: number[] = ref(matchingResult["buyneeds_id"])
+const buyCompanyId: number[] = ref(matchingResult.value.candidate_company_id)
+const buyNeedsId: number[] = ref(matchingResult.value.buyneeds_id)
 
-// 買い手企業情報取得APIの呼び出し(発送企業一覧画面と共通処理にしたい)
-const { data: buyCompanyData, error: getCompanyError } =
+// 買い手企業情報取得APIの呼び出し(売手企業呼び出し及び発送企業一覧画面と共通処理にしたい)
+const { data: buyCompanyData } =
   await $api.jmssPortal.getCompanies(buyCompanyId)
 
 // モック
-const { data: buyCompanyData } =
-  await useFetch('api/buyCompany')
+// const { data: buyCompanyData } =
+//   await useFetch('api/buyCompany')
 
 const buyCompanys: any = ref(buyCompanyData.value)
 
@@ -209,8 +211,8 @@ const { data: buyNeedsData, error: getBuyneedsError } =
   await $api.jmssPortal.getBuyNeeds(buyNeedsId)
 
 // モック
-const { data: buyNeedsData } =
-  await useFetch('api/buyNeeds')
+// const { data: buyNeedsData } =
+//   await useFetch('api/buyNeeds')
 
 const buyNeedsList: any = ref(buyNeedsData.value)
 

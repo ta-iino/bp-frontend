@@ -1,9 +1,8 @@
 version: 0.2
 env:
   parameter-store:
-    BASE_URL:
+    APPROACH_BASE_URL:
     JMSS_PORTAL_BASE_URL:
-    JMSS_PORTAL_BROWSER_URL:
     S3_BUCKET:
     CF_DISTRIBUTION:
 phases:

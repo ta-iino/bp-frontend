@@ -51,7 +51,7 @@
         <v-data-table :headers="headers" :items="companyList" :height="528" :items-per-page="-1" fixed-header>
           <template v-slot:item.id="{ item, index }">
             <span class="link" @click="clickCompanyId(item.raw.id)">{{ item.raw.id }}</span>
-            <v-btn width="120" small class="mr-2 ui-matching-btn" @click="matchingResult(item.raw.id, companyInfoList[index].id)"
+            <v-btn width="120" small class="mr-2 ui-matching-btn" @click="matchingResult(item.raw.id, companyInfoList[index].id, processingDateList[0].processed_datetime)"
               color="light-blue-darken-4" border="0">マッチング結果</v-btn>
           </template>
           <!-- フッターの不要な文字を消す為に記載 -->
@@ -275,14 +275,15 @@ const downloadCsv = async (): Promise<void> => {
  * マッチング結果押下時の処理
  * @param companyId 企業マスタId
  */
-const matchingResult = (companyId: number, sendCompanyHistoryId: any): void => {
+const matchingResult = (companyId: number, sendCompanyHistoryId: any, processDate: number): void => {
   let matchResultUrl = router.resolve({
 
     // path: `/マッチング結果画面のpath/${[companyId]}`
     path: `/matchResultList`,
     query: {
       "companyId": companyId,
-      "sendCompanyHistoryId": sendCompanyHistoryId
+      "sendCompanyHistoryId": sendCompanyHistoryId,
+      "processDate": processDate
     }
 
   });

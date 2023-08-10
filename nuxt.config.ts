@@ -3,13 +3,9 @@ export default defineNuxtConfig({
   runtimeConfig: {
       public: {
           approachBaseURL:process.env.APPROACH_BASE_URL,
-          needsBaseURL:process.env.NEEDS_BASE_URL,
           jmssPortalbaseURL:process.env.JMSS_PORTAL_BASE_URL,
-          jmssPortalbrowserURL:process.env.JMSS_PORTAL_BROWSER_URL,
-          
       }
   },
-
   app: {
       head: {
           title: 'DMマッチングシステム',
@@ -23,15 +19,12 @@ export default defineNuxtConfig({
           link: [{ rel: 'icon', type: 'image/x-icon', href: 'public/favicon.ico' }],
       },
   },
-
   css: [
       "vuetify/lib/styles/main.sass"
   ],
-
   build: {
       transpile: ["vuetify"]
   },
-
   vite: {
       define: {
           "process.env.DEBUG": false
@@ -45,5 +38,5 @@ export default defineNuxtConfig({
   },
 
   ssr: false,
-  plugins: ['~/plugins/api.ts', '~/plugins/vuetify.ts'],
+  plugins: ['~/plugins/vuetify.ts', '~/plugins/api.ts'],
 });

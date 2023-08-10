@@ -5,6 +5,6 @@ ARG USER=node
 ENV LANG=C.UTF-8
 ENV TZ=Asia/Tokyo
 
-WORKDIR /workspaces/hajime-frontend
+WORKDIR /workspaces/bp-frontend
 
 USER ${USER}

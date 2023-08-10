@@ -75,7 +75,7 @@
         </v-col>
         <v-col col="11"></v-col>
         <v-col class="pt-2 " cols="1">
-          <v-btn class="ui-btn" depressed color="light-blue-darken-3" @click="searchButton()">
+          <v-btn class="ui-btn" depressed color="light-blue-darken-3" @click="searchButton(searchParams)">
             <v-icon dark size="large">mdi-magnify</v-icon>
           </v-btn>  
         </v-col>
@@ -87,45 +87,47 @@
       <v-data-table
         v-model:page="page"
         :headers="headers"
-        :items="approachListItems"
+        :items="dmLists"
         :items-per-page="parPage"
         hide-default-footer
         class="elevation-1 ui-vdatatable"
         :height="528"
         fixed-header
       >
-        <template v-slot:item.createdAt="{ item }">
+        <template v-slot:[`item.createdAt`]="{ item }">
           {{ formatDate(item.raw.createdAt) }}
         </template>
-        <template v-slot:item.requestTeam="{ item }">
+        <template v-slot:[`item.requestTeam`]="{ item }">
           {{ getValueObject(Object.values(item.raw.requestTeam)) }}
         </template>
-        <template v-slot:item.jmssIndustries="{ item }">
+        <template v-slot:[`item.jmssIndustries`]="{ item }">
           {{ getValueObject(Object.values(item.raw.jmssIndustries)) }}
         </template>
-        <template v-slot:item.matchingStatus="{ item }">
+        <template v-slot:[`item.matchingStatus`]="{ item }">
           {{ getTableDmListData(item.raw.id, 'matchingStatus') }}
         </template>
-        <template v-slot:item.sendCompanyCount="{ item }">
+        <template v-slot:[`item.sendCompanyCount`]="{ item }">
           {{ getTableDmListData(item.raw.id, 'sendCompanyCount') }}
         </template>
-        <template v-slot:item.chargeOfConsultant="{ item }">
+        <template v-slot:[`item.chargeOfConsultant`]="{ item }">
           {{ getTableUserData(Object.keys(item.raw.createdBy), 'name') }}
         </template>
+        <!-- ページネーション ここから -->
         <template v-slot:bottom>
           <div class="text-center pt-2">
             <v-pagination
               cols="12"
               v-model="page"
-              :length="totalPage"
-              @input="onChangePage"
+              :length="totalPageNum()"
+              :input="onChangePage(page, searchParams)"
               :total-visible="22"
             ></v-pagination>
           </div>
         </template>
-        <template v-slot:item.listName="{ item }">
-        <!--<nuxt-link :to="`/`">{{ item.raw.listName }}</nuxt-link>-->
-        <span class="link" @click="clickListName(item.raw.id)">{{ item.raw.listName }}</span>
+        <!-- ページネーション ここまで -->
+        <template v-slot:[`item.listName`]="{ item }">
+          <!--<nuxt-link :to="`/`">{{ item.raw.listName }}</nuxt-link>-->
+          <span class="link" @click="clickListName(item.raw.id)">{{ item.raw.listName }}</span>
         </template>
       <!-- フッター削除 -->
       </v-data-table>
@@ -150,13 +152,15 @@ const page = ref(1)
 const parPage = ref(50)
 const searchParams = ref(
   {
+      approachListIds: null,
       chargeOfTeam : null,
       chargeOfConsultant : null,
-      listName : "",
+      listName : null,
       approachPurpose : null,
       registrationDateFrom : null,
       registrationDateTo : null,
-      page : 1
+      limit : 50,
+      page: 1
   }
 )
 const dateFrom = ref()
@@ -164,38 +168,71 @@ const dateTo = ref()
 
 const route = useRoute();
 const router = useRouter();
+const approachListId = route.query
 
-/**
- * テーブルデータ取得（仮）
- */
-const { data }  = await useFetch('api/sample')
-const dmListData: any = data.value
+const { $api } = useNuxtApp();
 
 /**
  * 初期表示処理
  */
+const promiseApproachListDatas = getApproachListDatas(searchParams)
+
+const promiseToArray = new Array()
+promiseToArray.push(promiseApproachListDatas)
+
+// getApproachListDatasの戻り値であるPromiseからPromiseresultを配列として取得する。
+let dmLists = await Promise.all(promiseToArray).then(results => {
+  return results[0];
+})
+
+/**
+ * 一覧に表示するデータをアプローチリスト取得APIから取得する処理
+ * @param searchParams 
+ */
+async function getApproachListDatas (searchParams: any) {
+  // アプローチリスト取得API呼出
+  const { data: approachList} = await useFetch('/api/approachLists')
+
+  // 社内ポータルからのアプローチリスト取得
+  // const { data: approachList} = await $api.jmssPortal.getApproachList('', searchParams, 50)
+  // console.log(approachList)
+
+  let unrefApproachLists: any = unref(approachList)
+
+  // 取得したデータのキーをキャメルケースに変換する
+  const tmpData = camelcaseKeys(unrefApproachLists[0].data, { deep: true })
+
+  // 一覧表示データのソート処理
+  let approachListItems = tmpData.sort(function(a: any, b: any) {
+    //オブジェクトを登録日が新しい順にソートする
+    return (a.createdAt < b.createdAt) ? 1 : -1;  
+  });
+
+  return approachListItems
+
+}
+
 // DMリスト取得API呼出
 const { data: dmListList} = await useFetch('/api/dmList')
-// アプローチリスト取得API呼出
-const { data: approachList} = await useFetch('/api/approachLists')
+// const { data: dmListList} = await $api.approach.getDmList([String(approachListId)])
+
+
+// ユーザー取得APIに渡すuserIDのリストを生成する
+let userIds: any = new Array()
+// dmListsに格納されているデータからuserIDだけを取り出して配列に格納する
+for(let i =0; i < dmLists.length; i++) {
+  let tmpIds = Object.keys(dmLists[i].createdBy)
+  userIds.push(tmpIds[0])
+}
+
 // ユーザー取得API呼出
 const { data: user} = await useFetch('/api/user')
+
+// const { data: user} = await $api.jmssPortal.getUsersById(userIds)
 
 let tmpDmListData:any = unref(dmListList)
 let dmListDatas:any = tmpDmListData[0].dmLists
 let userDatas:any = unref(user)
-let approachLists: any = unref(approachList)
-
-// 取得したデータのキーをキャメルケースに変換する
-const tmpData = camelcaseKeys(approachLists, { deep: true })
-let a = 'consulNagoyaTeam'
-console.log(tmpData[0].requestTeam[a])
-
-// 一覧表示データのソート処理
-let approachListItems = tmpData.sort(function(a, b) {
-  //オブジェクトを登録日が新しい順にソートする
-  return (a.createdAt < b.createdAt) ? 1 : -1;  
-});
 
 /**
  * 一覧のアプローチリストIDをキーにDMリストを検索する。
@@ -246,20 +283,44 @@ function getValueObject(arrayValue: any) {
 
 /**
  * ページネーション用
- * 取得した一覧データの量でページの長さを設定する
+ * 取得したデータのトータルページ数を設定する
  */
+// TODO アプローチリスト取得APIの戻り値の総数または最終ページ数を設定したい
  function totalPageNum() {
-  return Math.ceil(dmListData.length / parPage.value)
+  console.log('ページの総数', dmLists)
+  return Number(2)
 }
-let totalPage = totalPageNum();
 
 /**
  * ページネーション用
  * ページ数クリック時の処理
  */
-function onChangePage() {
+async function onChangePage(num: Number, searchParams: any) {  
+  // serchParamsにクリックされたページ数をセットする
+  searchParams.page = num
   
+  // テーブルデータ表示用のデータを取得するメソッドを呼び出す
+  const changePageData = getApproachListDatas(searchParams)
+
+  // PromiseからArrayに変換する
+  const promiseToArray = new Array()
+  promiseToArray.push(changePageData)
+
+  console.log('promiseToArray', promiseToArray)
+  console.log('searchParams.page', searchParams.page)
+
+  // getApproachListDatasの戻り値であるPromiseからPromiseresultを配列として取得する
+  const getPageDmLists = await Promise.all(promiseToArray).then(results => {
+    return results;
+  })
+  console.log('getPageDmLists', getPageDmLists)
+  
+  // テーブルデータにページ指定して取得したデータを格納する
+  // TODO これ入れるとpromiseToArrayと,searchParams.pageのconsole.logが見れなくなる。そして動作確認どうする？
+  // dmLists = getPageDmLists
+
 }
+
 
 /**
  * プルダウンリスト生成
@@ -267,11 +328,12 @@ function onChangePage() {
 // 部・チーム情報取得API呼出
 const { data: tmpDepTeam} = await useFetch('/api/depTeam')
 const depTeamsLists: any = unref(tmpDepTeam)
-const dataUserLists: any = unref(user)
-const approachLists1: any = unref(approachList)
+
+// 重複削除のためSetオブジェクトを生成
 let pulldownChargeOfTeam: any = new Set()
 let pulldownChargeOfConsultant: any = new Set()
 let pulldownApproachPurpose: any = new Set()
+
 // チームのプルダウンリストを生成
 for(let i =0; i < depTeamsLists.length; i++) {
   if(depTeamsLists[i].parent_id !== 0) {
@@ -279,12 +341,12 @@ for(let i =0; i < depTeamsLists.length; i++) {
   }
 }
 // 担当コンサルタントのプルダウンリストを作成
-for(let i = 0; i < dataUserLists.length; i++) {
-  pulldownChargeOfConsultant.add(dataUserLists[i].name)
+for(let i = 0; i < userDatas.length; i++) {
+  pulldownChargeOfConsultant.add(userDatas[i].name)
 }
 // アプローチ区分のプルダウンを作成
-for(let i = 0; i < approachLists1.length; i++) {
-  pulldownApproachPurpose.add(approachLists1[i].type)
+for(let i = 0; i < dmLists.length; i++) {
+  pulldownApproachPurpose.add(dmLists[i].type)
 }
 
 /**
@@ -331,13 +393,22 @@ const headers = ref(
 /**
  * 検索ボタン押下時処理
 */ 
-const searchButton = () :void => {
-  // DMリスト取得APIの呼出（引数はアプローチリストIDのリスト）
-  // アプローチリスト取得APIの呼出（引数はserchParams）
-  // ユーザー取得APIの呼出（引数はユーザーIDのリスト）
-  // 初期表示の処理と同じなので共通処理化したい。
-}
+async function searchButton(searchParams: any) {
+  // 一覧に表示するアプローチリストのデータを取得する
+  const searchApproachLists =  getApproachListDatas(searchParams)
 
+  // Promiseで返ってきたアプローチリスト取得結果を配列に入れる
+  const promiseToArray = new Array()
+  promiseToArray.push(promiseApproachListDatas)
+
+  // getApproachListDatasの戻り値であるPromiseからPromiseresultを配列として取得する。
+  let searchResultDmLists = await Promise.all(promiseToArray).then(results => {
+    return results[0];
+  })
+
+  dmLists = searchResultDmLists
+
+}
 
 </script>
 <style>

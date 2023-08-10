@@ -15,26 +15,20 @@
           <v-row class="px-16 mb-6 mt-2">
             <v-col cols="4" v-for="(item, i) in tableHeaders" :key="item.title">
               <v-row v-if="i === 0">
-                <v-divider class="border-opacity-25" vertical></v-divider>
                 <v-col class="px-10 py-0">
                   {{ item.title }}
                 </v-col>
                 <v-col class="pl-4 py-0" @click="clickCompanyName(sellCompany['id'])">
                   {{ item.value }}
                 </v-col>
-                <v-divider class="border-opacity-25" vertical></v-divider>
-                <v-divider class="border-opacity-25"></v-divider>
               </v-row>
               <v-row v-else>
-                <v-divider class="border-opacity-25" vertical></v-divider>
                 <v-col class="px-10 py-0">
                   {{ item.title }}
                 </v-col>
                 <v-col class="px-10 py-0">
                   {{ item.value }} {{ item.bottom }}
                 </v-col>
-                <v-divider class="border-opacity-25" vertical></v-divider>
-                <v-divider class="border-opacity-25"></v-divider>
               </v-row>
             </v-col>
           </v-row>
@@ -69,7 +63,6 @@
                 <v-col cols="3">
                   <NuxtLink @click="clickCompanyName(buyCompanyId[i])">{{ data[0].value }}</NuxtLink>
                 </v-col>
-                <v-divider class="border-opacity-25 my-3" vertical></v-divider>
                 <v-col cols="2">
                   都道府県:
                 </v-col>
@@ -78,7 +71,6 @@
                 </v-col>
                 <v-col cols="3"></v-col>
               </v-row>
-              <v-divider class="border-opacity-25"></v-divider>
             </v-col>
             <v-col cols="12" class="mb-n6">
               <v-row>
@@ -88,7 +80,6 @@
                 <v-col cols="3">
                   {{ data[3].value }}
                 </v-col>
-                <v-divider class="border-opacity-25 my-3" vertical></v-divider>
                 <v-col cols="2">
                   業種:
                 </v-col>
@@ -96,7 +87,6 @@
                   {{ data[4].value }}
                 </v-col>
               </v-row>
-              <v-divider class="border-opacity-25"></v-divider>
             </v-col>
             <v-col cols="12" class="mb-n6">
               <v-row>
@@ -106,7 +96,6 @@
                 <v-col cols="3">
                   {{ data[2].value }} 百万円
                 </v-col>
-                <v-divider class="border-opacity-25 my-3" vertical></v-divider>
                 <v-col cols="2">
                   営業種目:
                 </v-col>
@@ -114,7 +103,6 @@
                   {{ data[6].value }}
                 </v-col>
               </v-row>
-              <v-divider class="border-opacity-25"></v-divider>
             </v-col>
             <v-col cols="12" class="mb-n6">
               <v-row>
@@ -124,12 +112,10 @@
                 <v-col cols="3">
                   {{ data[7].value }}
                 </v-col>
-                <v-divider class="border-opacity-25 my-3" vertical></v-divider>
                 <v-col cols="7">
                   <v-spacer></v-spacer>
                 </v-col>
               </v-row>
-              <v-divider class="border-opacity-25"></v-divider>
             </v-col>
             <v-col cols="12" class="mb-n6">
               <v-row>
@@ -139,12 +125,10 @@
                 <v-col cols="3">
                   {{ data[8].value }}
                 </v-col>
-                <v-divider class="border-opacity-25 my-3" vertical></v-divider>
                 <v-col cols="7">
                   <v-spacer></v-spacer>
                 </v-col>
               </v-row>
-              <v-divider class="border-opacity-25"></v-divider>
             </v-col>
             <v-col cols="12">
               <v-row>
@@ -154,7 +138,6 @@
                 <v-col cols="3">
                   <span id="comment">{{ data[9].value }}</span>
                 </v-col>
-                <v-divider class="border-opacity-25 my-3" vertical></v-divider>
                 <v-col cols="7">
                   <v-spacer></v-spacer>
                 </v-col>
@@ -171,9 +154,10 @@
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-const route = useRoute()
-const router = useRouter()
-const matchingHistoryId = route.query
+const route = useRoute();
+const router = useRouter();
+const matchingHistoryId = route.query;
+const { $api } = useNuxtApp();
 
 // 前画面からのデータ受け取り
 props: ['sellCompany', 'processDate']
@@ -198,15 +182,8 @@ const sellCompany = ref(sellCompanyData)
 const processDate = ref('2021/09/01 12:00:00')
 
 // マッチング結果取得APIの呼び出し
-// const { data: matchingResultData, error: matchingResultError } =
-//   await useFetch('エンドポイントのURL',
-//     {
-//       baseURL: `${process.env.API_URL}/matchingResult/`,
-//       query: { matching_history_id: matchingHistoryId }
-//     })
-// if (matchingResultError) {
-//   throw matchingResultError
-// }
+const { data: matchingResultData, error: matchingResultError } =
+  await $api.approach.getMatchingResult(matchingHistoryId)
 
 
 // モック
@@ -218,15 +195,8 @@ const buyCompanyId: number[] = ref(matchingResult["candidates_company_id"])
 const buyNeedsId: number[] = ref(matchingResult["buyneeds_id"])
 
 // 買い手企業情報取得APIの呼び出し(発送企業一覧画面と共通処理にしたい)
-// const { data: buyCompanyData, error: getCompanyError } =
-//   await useFetch("エンドポイントのURL",
-//     {
-//       baseURL: `${process.env.API_URL}`,
-//       query: { "id": buyCompanyId.join(',') }
-//     })
-// if (getCompanyError) {
-//   throw getCompanyError
-// }
+const { data: buyCompanyData, error: getCompanyError } =
+  await $api.jmssPortal.getCompanies(buyCompanyId)
 
 // モック
 const { data: buyCompanyData } =
@@ -235,14 +205,8 @@ const { data: buyCompanyData } =
 const buyCompanys: any = ref(buyCompanyData.value)
 
 // 買いニーズ情報取得APIの呼び出し
-// const { data: buyNeedsData, error: getBuyneedsError } =
-//   await useFetch("エンドポイントのURL", {
-//     baseURL: `${process.env.API_URL}`,
-//     query: { "id": buyNeedsId }
-//   })
-// if (getBuyneedsError) {
-//   throw getBuyneedsError
-// }
+const { data: buyNeedsData, error: getBuyneedsError } =
+  await $api.jmssPortal.getBuyNeeds(buyNeedsId)
 
 // モック
 const { data: buyNeedsData } =
@@ -294,10 +258,8 @@ for (let i = 0; i < buyCompanys.value.length; i++) {
 const clickCompanyName = (companyId: number): void => {
   const url = config.public.jmssPortalbaseURL + '/company/' + companyId;
   window.open(url)
-  })
-
-  window.open(companyUrl.href, "_blank")
 }
+
 const clickCloseButton = (): void => {
   window.close()
 }

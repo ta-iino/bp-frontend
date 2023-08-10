@@ -36,6 +36,7 @@ export default defineNuxtConfig({
           }
       },
   },
+
   ssr: false,
   plugins: ['~/plugins/vuetify.ts', '~/plugins/api.ts'],
 });

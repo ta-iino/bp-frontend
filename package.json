@@ -18,6 +18,7 @@
     "@mdi/font": "^7.2.96",
     "@vuepic/vue-datepicker": "^5.4.0",
     "sass": "^1.64.0",
+    "vue3-cookies": "^1.0.6",
     "vue-router": "^4.2.4",
     "vue-sticky": "^3.3.4",
     "vuetify": "^3.3.9"

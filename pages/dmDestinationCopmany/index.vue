@@ -49,10 +49,8 @@
     <v-container class="pt-0 mb-4">
       <v-row>
         <v-data-table :headers="headers" :items="companyList" :height="528" :items-per-page="-1" fixed-header>
-          <template v-slot:item.masterId="{ item }">
+          <template v-slot:item.id="{ item }">
             <span class="link" @click="clickCompanyId(item.raw.masterId)">{{ item.raw.masterId }}</span>
-          </template>
-          <template v-slot:item.matchingResult="{ item }">
             <v-btn width="120" small class="mr-2 ui-matching-btn" @click="matchingResult(item.raw.masterId)"
               color="light-blue-darken-4" border="0">マッチング結果</v-btn>
           </template>
@@ -75,13 +73,13 @@ import '@mdi/font/css/materialdesignicons.css'
 const route = useRoute();
 const router = useRouter();
 const dmListId = route.query;
-import { $api } from useNuxtApp();
+const { $api } = useNuxtApp();
 
 /**
  * マッチングプルダウンリスト
  */
 // mock用
-// const { data: processingDateListData } = await useFetch('/api/processingDateList');
+// const { data: matchingHistoryList } = await useFetch('/api/processingDateList');
 
 // DM送付先企業リスト取得API（backend）
 // refreshを取得しておき、ニーズマッチング実行時に使用する。
@@ -89,9 +87,9 @@ import { $api } from useNuxtApp();
 const companyIdList: number[] = [];
 const getSendCompanyListData = async(selectedBuyneedsHistoryId: Number): Promise<any> => {
   const QUERY = selectedBuyneedsHistoryId;
-  const { data: sendCompanyHistoryListData, error } = await $api.approach.getBuyneedsMatchingResult(QUERY);
+  const { data: sendCompanyHistoryListData } = await $api.approach.getBuyneedsMatchingResult(QUERY);
 
-  const sendCompanyIdList: number[] = ref((sendCompanyHistoryListData.value).filter((sendCompanyHistoryListData: any) => 
+  const sendCompanyIdList: number[] = ref(ref(sendCompanyHistoryListData.value).filter((sendCompanyHistoryListData: any) => 
     sendCompanyHistoryListData.companyId.map((sendCompanyHistoryListData: any) => sendCompanyHistoryListData.value)));
   companyIdList.values = sendCompanyIdList.values;
 }
@@ -100,18 +98,20 @@ const getSendCompanyListData = async(selectedBuyneedsHistoryId: Number): Promise
 // マッチング処理日時リスト取得API（backend）
 
 //TODO 買いニーズマッチング履歴取得APIからfront側でmap形式のリストを作るよう修正。
-const { data : processingDateListData, error } = await $api.approach.getSendCompanyHistory([String(dmListId)]);
+const { data : matchingHistoryListData } = await $api.approach.getSendCompanyHistory([String(dmListId)]);
 
-const processingDateList: any = ref((processingDateListData.value)
-  .filter((processingDateListData: any) => processingDateListData.id && processingDateListData.processed_datetime)
-  .map((processingDateListData: any) => ({ id: processingDateListData.id, processingDate: processingDateListData.processed_datetime }))
+const matchingHistoryList = ref(matchingHistoryListData.value);
+
+const processingDateList: any = ref((matchingHistoryList.value)
+  .filter((matchingHistoryList: any) => matchingHistoryList.id && matchingHistoryList.processed_datetime)
+  .map((matchingHistoryList: any) => ({ id: matchingHistoryList.id, processingDate: matchingHistoryList.processed_datetime }))
 );
 
 // 最新のマッチング処理日時をAPIに渡す
 const selectedBuyneedsHistoryId: Number = ref(processingDateList.value[0].id);
 getSendCompanyListData(selectedBuyneedsHistoryId);
 
-// const processingDateList: any = ref(processingDateListData.value);
+// const processingDateList: any = ref(matchingHistoryList.value);
 // // 選択されたプルダウンのデータ格納用
 // 
 
@@ -121,32 +121,38 @@ getSendCompanyListData(selectedBuyneedsHistoryId);
  * 
  */
 
-// mock用
+const { data : dmListData } = await $api.approach.getDMList([String(dmListId)]);
+const approachId: number = dmListData.value[0].approachId;
 
-// const { data : dmListsData }  = await useFetch('/api/approachLists');
-const { data: dmListsData } = await useFetch('/api/sample')
-const dmLists: any = ref(dmListsData.value);
-const dmList: any = ref(dmLists.value[0]);
+const { data : approachListsData } = await $api.jmssPortal.getApproachLists([String(approachId)]);
+const approachData :any = ref(approachListsData.value);
+
+// // mock用
+
+// // const { data : dmListsData }  = await useFetch('/api/approachLists');
+// props: ["dmListsData"]
+// const dmLists: any = ref(dmListsData.value);
+// const dmList: any = ref(dmLists.value[0]);
 
 //TODO 本データ取得はDMリスト一覧画面から引っ張る。
 // ⇒共通処理化して処理が重複しないように気を付ける。
 
 const items: any = [
-  { title: '担当チーム：', value: dmList.value.chargeOfTeam },
-  { title: '担当コンサルタント：', value: dmList.value.chargeOfConsultant },
-  { title: 'リスト名：', value: dmList.value.listName },
-  { title: 'アプローチ区分：', value: dmList.value.approachPurpose },
-  { title: '業種：', value: dmList.value.companyIndustry },
-  { title: '地域：', value: dmList.value.companyRegion },
-  { title: '売上：', value: dmList.value.companySales },
-  { title: '送付社数：', value: dmList.value.sendCompanyCount },
-  { title: '利用業者名：', value: dmList.value.useCompanyName },
-  { title: '備考：', value: dmList.value.remarks },
+  { title: '担当チーム：', value: approachData.value.request_team.value },
+  { title: '担当コンサルタント：', value: approachData.value.request_users },
+  { title: 'リスト名：', value: approachData.value.name },
+  { title: 'アプローチ区分：', value: approachData.value.purpose },
+  { title: '業種：', value: approachData.value.jmss_industries.value },
+  { title: '地域：', value: approachData.value.areas},
+  { title: '売上：', value: approachData.value.sales_ranges },
+  { title: '送付社数：', value: matchingHistoryList.value[0].send_company_count },
+  { title: '利用業者名：', value: approachData.value.notification_users },
+  { title: '備考：', value: approachData.value.remarks },
   { title: '', value: '' }, // 画面レイアウト上空欄を作るため
   { title: '', value: '' }, // 画面レイアウト上空欄を作るため
-  { title: '送付日：', value: dmList.value.sendMailDate },
-  { title: '登録日：', value: dmList.value.created_at },
-  { title: '状況：', value: dmList.value.matchingStatus },
+  { title: '送付日：', value: approachData.value.dm_date },
+  { title: '登録日：', value: approachData.value.created_at },
+  { title: '状況：', value: matchingHistoryList.value[0].matching_status },
 ];
 
 /**
@@ -175,14 +181,13 @@ const items: any = [
 // const { data: destinationCompanyListData } = await useFetch('api/sample2');
 
 // 企業マスタ取得用API(社内ポータル)
-const companyList: any = ref();
+const companyList: any[] = [];
 const getCompanyData = async(companyIdList: number[], searchCompanyName: string, page: number, totalPage: number): Promise<any> => {
   const QUERY = {'id': companyIdList, 'name': searchCompanyName};
   const PARAMS = {'page': page, 'totalPage': totalPage};
-  const { data: destinationCompanyListData, error } = await $api.jmssPortal.getCompanies(QUERY, PARAMS
-  );
-  const destinationCompanyList: any = ref(destinationCompanyListData.value);
-  companyList.value = destinationCompanyList.value;
+  const { data: destinationCompanyListData } = await $api.jmssPortal.getCompanies(QUERY, PARAMS);
+  const destinationCompanyList: any[] = ref(destinationCompanyListData.value);
+  companyList.values = destinationCompanyList.values;
 }
 
 
@@ -212,7 +217,7 @@ const search: Ref<string> = ref('');
 
 const searchCompany = () => {
   const searchCompanyName = search.value;
-  getCompanyData(companyIdList, searchCompanyName, 1, 1);
+  getCompanyData(companyIdList, searchCompanyName, page, totalPage);
   search.value = '';
   };
 

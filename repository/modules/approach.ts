@@ -4,18 +4,12 @@ import BaseApiFactory from "../factory";
 export class ApproachModule extends BaseApiFactory {
   private urls: any = {
     getDmList: `/api/get_dm_list`,
-    getSendCompanyHisotry: `/api/send_comapny_history`,
+    getSendCompanyHistory: `/api/send_comapny_history`,
+    getBuyneedsMatchingHistory: `/api/buyneeds_matching_history`,
     getBuyneedsMatchingResultCsv: `/api/buyneeds_matching_result_csv`,
     getBuyneedsMatchingResult: `/api/buyneeds_matching_result`,
     startBuyneedsMatching: `/api//buyneeds_matching_start`,
   };
-  // private urls: {[key: string]: string} = {
-  //   "getDmList": `/api/dm_list`,
-  //   "getSendCompanyHistory": `/api/send_company_history`,
-  //   "getBuyneedsMatchingResultCsv": `/api/buyneeds_matching_result_csv`,
-  //   "getBuyneedsMatchingResult": `/api/buyneeds_matching_result`,
-  //   "startBuyneedsMatching": `/api/buyneeds_matching_start`,
-  // };
   private baseURL;
   private options: any = {};
   constructor(baseURL: string) {
@@ -29,7 +23,7 @@ export class ApproachModule extends BaseApiFactory {
    * @param searchCondition
    * @returns DMリストのリスト
    */
-  async getDmList(approachListIds: string[], searchCondition?: any) {
+  async getDmList(approachListIds?: number[], searchCondition?: any) {
     this.options.params = {
       approach_list_ids: approachListIds,
       search_condition: searchCondition,
@@ -42,17 +36,33 @@ export class ApproachModule extends BaseApiFactory {
    * @param buyneedsMatchingHistoryId
    * @returns 発送企業履歴リスト
    */
-  async getSendCompanyHisotry(buyneedsMatchingHistoryId: Number) {
+  async getSendCompanyHistory(buyneedsMatchingHistoryId: Number) {
     // パスパラメータで飛ばしてもよさそう。
-    this.options.body = {
+    this.options.params = {
       buyneeds_matching_history_id: buyneedsMatchingHistoryId,
     };
     return this.call(
-      this.urls.getSendCompanyHisotry,
+      this.urls.getSendCompanyHistory,
       this.baseURL,
       this.options
     );
   }
+
+  /**
+   * 買いニーズマッチング履歴取得API
+   * @param approachListId
+   * @returns 買いニーズマッチング履歴リスト
+   */
+  async getBuyneedsMatchingHistory(approachListId: Number) {
+    this.options.params = {
+      approach_list_id: approachListId,
+    };
+    return this.call(
+      this.urls.getBuyneedsMatchingHistory,
+      this.baseURL,
+      this.options
+    );
+  }  
 
   /**
    * 買いニーズマッチング結果CSV取得API
@@ -60,7 +70,7 @@ export class ApproachModule extends BaseApiFactory {
    * @returns 買いニーズマッチング結果CSVファイル
    */
   async getBuyneedsMatchingResultCsv(buyneedsMatchingHistoryId: Number) {
-    this.options.body = {
+    this.options.params = {
       buyneeds_matching_history_id: buyneedsMatchingHistoryId,
     };
     return this.call(
@@ -76,7 +86,7 @@ export class ApproachModule extends BaseApiFactory {
    * @returns 買いニーズマッチング結果JSON形式
    */
   async getBuyneedsMatchingResult(sendCompanyHistoryId: Number) {
-    this.options.body = {
+    this.options.params = {
       send_company_history_id: sendCompanyHistoryId,
     };
     return this.call(

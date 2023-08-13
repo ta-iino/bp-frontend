@@ -1,15 +1,18 @@
 // エンドポイントが増えてきたら分割する
+// TODO 社内ポータルの受け取り方によって変数の型定義変更の可能性あり
+
 import BaseApiFactory from '../factory';
 import { useCookies } from "vue3-cookies";
 
 class JmssPortalModule extends BaseApiFactory {
   private urls: any = {
     getAccessToken: `/api/jmss_portal_auth`,
-    getApproachList: `/api/v1/approach_lists`,
-    getApproachCompanyList: (approachListId: string) => `/api/v1/approach_lists/${approachListId}`,
+    getApproachLists: `/api/v1/approach_lists`,
+    getApproachCompanyList: (approachListId: number) => `/api/v1/approach_lists/${approachListId}`,
     getBuyneeds: `/api/v1/buyers`,
     getUsers: `/api/v1/users`,
     getCompanies: `/api/v1/companies`,
+    getTeams:`/api/v1/teams`,
   }
   private baseURL;
   private approachBaseURL;
@@ -27,7 +30,7 @@ class JmssPortalModule extends BaseApiFactory {
    * @param limit 
    * @returns アプローチリスト
    */
-  async getApproachList(approachListId: string, searchParams: any, limit: Number) {
+  async getApproachLists(approachListId?: number[], searchParams?: any, page?: number, limit?: Number) {
     this.options.params = {
       id: approachListId,
       method: 1,
@@ -37,9 +40,10 @@ class JmssPortalModule extends BaseApiFactory {
       type: searchParams.approachPurpose,
       created_at_min: searchParams.registrationDateFrom,
       created_at_max: searchParams.registrationDateTo,
+      page: page,
       limit: limit
     };
-    return this.call(this.urls.getApproachList, this.baseURL, this.options);
+    return this.call(this.urls.getApproachLists, this.baseURL, this.options);
   }
 
   // 
@@ -48,7 +52,7 @@ class JmssPortalModule extends BaseApiFactory {
    * @param approachListId 
    * @returns アプローチリスト企業
    */
-  getApproachCompanyList(approachListId: string) {
+  getApproachCompanyList(approachListId: number) {
     return this.call(this.urls.getApproachCompanyList(approachListId), this.baseURL);
   }  
 
@@ -58,9 +62,9 @@ class JmssPortalModule extends BaseApiFactory {
    * @param buyneedsId 
    * @returns 
    */
-  getBuyneeds(buyneedsId: string) {
+  getBuyneeds(buyneedsIds?: number[], page?: number, limit?: number) {
     this.options.params = {
-      id: buyneedsId,
+      id: buyneedsIds,
       // source_type: sourceType,
       // company_industry_id: companyIndustryId,
       // company_pref_id: companyPrefId,
@@ -69,25 +73,60 @@ class JmssPortalModule extends BaseApiFactory {
       // company_sales_min: companySalesMin,
       // company_sales_max: companySalesMax,
       // remarks: remarks,
-      // limit: limit
+      page: page,
+      limit: limit
     }
     return this.call(this.urls.getBuyneeds, this.baseURL, this.options);
   }
 
-  // ユーザ取得API
-  getUsersById(userIds: string[]) {
+  /**
+   * ユーザ取得API
+   * @param userIds 
+   * @param page 
+   * @param limit 
+   * @returns 
+   */
+  getUsersById(userIds?: number[], page?: number, limit?: number) {
     this.options.params = {
       id: userIds,
+      page: page,
+      limit: limit      
     }
     return this.call(this.urls.getUsers, this.baseURL, this.options);
   }
   
-  // 企業マスタ取得用API
-  getComanies(companyIdList: number[]) {
+  /**
+   * 企業マスタ取得API
+   * @param companyIds 
+   * @param name 
+   * @param page 
+   * @param limit 
+   * @returns 
+   */
+  getCompanies(companyIds?: number[], name?: string, page?: number, limit?: number) {
     this.options.params = {
-      id: companyIdList
+      id: companyIds,
+      name: name,
+      page: page,
+      limit: limit
     };
     return this.call(this.urls.getCompanies, this.baseURL, this.options);
+  }
+
+  /**
+   * チーム取得API
+   * @param department_id
+   * @param page 
+   * @param limit 
+   * @returns 
+   */
+  getTeams(department_id?: number[], page?: number, limit?: number) {
+    this.options.params = {
+      department_id: department_id,
+      page: page,
+      limit: limit
+    };
+    return this.call(this.urls.getTeams, this.baseURL, this.options);
   }
 
   // 社内ポータルで使用するため一旦こちらに入れている。

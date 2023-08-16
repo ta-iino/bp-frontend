@@ -13,6 +13,8 @@
           <v-select
             v-model="searchParams.chargeOfTeam"
             label="チーム"
+            item-text="name"
+            item-value="id"
             :items="pulldownChargeOfTeam"
             clearable
           ></v-select>
@@ -21,6 +23,8 @@
           <v-select
             v-model="searchParams.chargeOfConsultant"
             label="担当コンサルタント"
+            item-text="name"
+            item-value="id"
             :items="pulldownChargeOfConsultant"
             clearable
           ></v-select>
@@ -38,6 +42,8 @@
           <v-select
             v-model="searchParams.approachPurpose"
             label="アプローチ区分"
+            item-text="name"
+            item-value="id"
             :items="pulldownApproachPurpose"
             clearable
           ></v-select>
@@ -199,24 +205,55 @@ const allApproachListIds: number[] = (dmLists.value).map((dmList: any)  => dmLis
  * TODO アプローチリスト取得APIにはコードで渡さないといけない。
  * ⇒なので、key=id, value=nameのjson型のリストにする。searchParamsに入れる値はkeyのコードにする
  */
-// 重複削除のためSetオブジェクトを生成
-let pulldownChargeOfTeam: any = new Set()
-let pulldownChargeOfConsultant: any = new Set()
-let pulldownApproachPurpose: any = new Set()
+let pulldownChargeOfTeamArray: any = new Array()
+let pulldownChargeOfConsultantArray: any = new Array()
+let pulldownApproachPurposeArray: any = new Array()
 
-// チームのプルダウンリストを生成
-for(let i =0; i < allTeams.length; i++) {
+// チームのプルダウンに必要なリストを取得
+for(let i = 0; i < allTeams.length; i++) {
   if(allTeams[i].parent_id !== 0) {
-    pulldownChargeOfTeam.add(allTeams[i].name)
+    pulldownChargeOfTeamArray.push({ "id": allTeams[i].id, "name": allTeams[i].name })
   }
 }
-// 担当コンサルタントのプルダウンリストを作成
+// 担当コンサルタントのプルダウンに必要なリストを取得
 for(let i = 0; i < allUsers.length; i++) {
-  pulldownChargeOfConsultant.add(allUsers[i].name)
+  pulldownChargeOfConsultantArray.push({ "id" : allUsers[i].id, "name" : allUsers[i].name })
 }
-// アプローチ区分のプルダウンを作成
+// アプローチ区分のプルダウンに必要なリストを取得
 for(let i = 0; i < dmLists.length; i++) {
-  pulldownApproachPurpose.add(dmLists[i].type)
+  switch(dmLists[i].type) {
+    case '売り打診':
+      pulldownApproachPurposeArray.push({ "id" : 1, "name" : dmLists[i].type })
+      break;
+    case '買い打診':
+      pulldownApproachPurposeArray.push({ "id" : 2, "name" : dmLists[i].type })
+      break;
+    case '提携打診':
+      pulldownApproachPurposeArray.push({ "id" : 3, "name" : dmLists[i].type })
+      break;
+    case 'その他':
+      pulldownApproachPurposeArray.push({ "id" : 4, "name" : dmLists[i].type })
+      break;
+  }
+}
+
+// 各プルダウンを作成
+let pulldownChargeOfTeam = removeDuplicate(pulldownChargeOfTeamArray)
+let pulldownChargeOfConsultant = removeDuplicate(pulldownChargeOfConsultantArray)
+let pulldownApproachPurpose = removeDuplicate(pulldownApproachPurposeArray)
+
+// 重複を削除するメソッドを定義する
+function removeDuplicate(dataArray: any) {
+  const seenNames = new Set();
+  const uniqueArray = [];
+
+  for(const item of dataArray) {
+    if(!seenNames.has(item.name)) {
+      seenNames.add(item.name);
+      uniqueArray.push(item);
+    }
+  }
+  return uniqueArray;
 }
 
 /**

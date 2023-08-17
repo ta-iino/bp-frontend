@@ -3,12 +3,12 @@ import BaseApiFactory from "../factory";
 
 export class ApproachModule extends BaseApiFactory {
   private urls: any = {
-    getDmList: `/api/get_dm_list`,
-    getSendCompanyHistory: `/api/send_comapny_history`,
-    getBuyneedsMatchingHistory: `/api/buyneeds_matching_history`,
-    getBuyneedsMatchingResultCsv: `/api/buyneeds_matching_result_csv`,
-    getBuyneedsMatchingResult: `/api/buyneeds_matching_result`,
-    startBuyneedsMatching: `/api//buyneeds_matching_start`,
+    getDmList: `/approach/api/dm_list/get`,
+    getSendCompanyHistory: `/approach/api/send_comapny_history`,
+    getBuyneedsMatchingHistory: `/approach/api/buyneeds_matching_history`,
+    getBuyneedsMatchingResultCsv: `/approach/api/buyneeds_matching_result_csv`,
+    getBuyneedsMatchingResult: `/approach/api/buyneeds_matching_result`,
+    startBuyneedsMatching: `/approach/api/buyneeds_matching_start`,
   };
   private baseURL;
   private options: any = {};

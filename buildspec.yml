@@ -1,7 +1,7 @@
 version: 0.2
 env:
   parameter-store:
-    APPROACH_BASE_URL:
+    BASE_URL:
     JMSS_PORTAL_BASE_URL:
     S3_BUCKET:
     CF_DISTRIBUTION:

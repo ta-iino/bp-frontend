@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   runtimeConfig: {
       public: {
-          approachBaseURL:process.env.APPROACH_BASE_URL,
+          baseURL:process.env.BASE_URL,
           jmssPortalbaseURL:process.env.JMSS_PORTAL_BASE_URL,
       }
   },

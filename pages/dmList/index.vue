@@ -13,7 +13,7 @@
           <v-select
             v-model="searchParams.chargeOfTeam"
             label="チーム"
-            item-text="name"
+            item-title="name"
             item-value="id"
             :items="pulldownChargeOfTeam"
             clearable
@@ -23,7 +23,7 @@
           <v-select
             v-model="searchParams.chargeOfConsultant"
             label="担当コンサルタント"
-            item-text="name"
+            item-title="name"
             item-value="id"
             :items="pulldownChargeOfConsultant"
             clearable
@@ -42,7 +42,7 @@
           <v-select
             v-model="searchParams.approachPurpose"
             label="アプローチ区分"
-            item-text="name"
+            item-title="name"
             item-value="id"
             :items="pulldownApproachPurpose"
             clearable
@@ -108,10 +108,12 @@
           <span class="link" @click="clickListName(item.raw.id)">{{ item.raw.name }}</span>
         </template>        
         <template v-slot:[`item.requestTeam`]="{ item }">
-          {{ getValueObject(Object.values(item.raw.requestTeam)) }}
+          <!--{{ getValueObject(Object.values(item.raw.requestTeam)) }}-->
+          {{ confirmationData(item.raw.requestTeam) }}
         </template>
         <template v-slot:[`item.jmssIndustries`]="{ item }">
-          {{ getValueObject(Object.values(item.raw.jmssIndustries)) }}
+          <!--{{ getValueObject(Object.values(item.raw.jmssIndustries)) }}-->
+          {{ confirmationData(item.raw.jmssIndustries) }}
         </template>
         <template v-slot:[`item.matchingStatus`]="{ item }">
           {{ getTableDmListData(item.raw.id, 'matchingStatus') }}
@@ -129,7 +131,7 @@
               cols="12"
               v-model="page"
               :length="totalPage"
-              :input="onChangePage(page)"
+              @input="onChangePage(page)"
               :total-visible="22"
             ></v-pagination>
           </div>
@@ -171,23 +173,59 @@ const searchParams: Ref<any> = ref(
   }
 )
 const approachLists: Ref<any> = ref();
+
+/**
+ * 取得したオブジェクトがnullまたはundefinedだった場合の回避処理
+ * @param リストに表示するデータ
+ */
+const confirmationData = (objectData: any) => {
+  if (objectData === null || objectData === undefined) {
+    return ""
+  }
+  return getValueObject(Object.values(objectData))
+}
+  
+
 /**
  * 全てのチームリスト
  */
-const {data: allTeamsData}: any = await $api.jmssPortal.getTeams();
+// const {data: allTeamsData}: any = await $api.jmssPortal.getTeams();
+// const allTeams: any = ref(allTeamsData);
+// UT用モック（すべてのチームリスト）
+const { data: allTeamsData} = await useFetch('/api/depTeam')
 const allTeams: any = ref(allTeamsData);
 /**
  * 全てのユーザリスト
  */
-const {data: allUsersData} = await $api.jmssPortal.getUsersById(undefined, page.value, perPage.value);
+// const {data: allUsersData} = await $api.jmssPortal.getUsersById(undefined, page.value, perPage.value);
+// const allUsers: any = ref(allUsersData.value);
+// UT用モック（すべてのユーザリスト）
+const { data: allUsersData} = await useFetch('/api/user')
 const allUsers: any = ref(allUsersData.value);
-
 /**
  * DMリストテーブルに格納されている全てのアプローチリストIDリスト
  */
-const {data: dmListsData} = await $api.approach.getDmList()
+// const {data: dmListsData} = await $api.approach.getDmList()
+// const dmLists: any = ref(dmListsData.value)
+// TODO 要修正。DMリスト取得APIはrefInpl(Object)で戻ってくるので、取得方法を修正する。
+//  また、companyIdではなくapproachListIdに変更する。
+// const allApproachListIds: number[] = (dmLists.value).map((dmList: any)  => dmList.dmList.companyId);
+// UT用モック（DMリストテーブルに格納されている全てのアプローチリストIDリスト）
+const {data: dmListsData} = await useFetch('/api/dmList')
 const dmLists: any = ref(dmListsData.value)
-const allApproachListIds: number[] = (dmLists.value).map((dmList: any)  => dmList.dmList.companyId);
+// fix DMリスト取得APIはrefInpl(Object)で戻ってくるので、取得方法を修正した。
+//  また、companyIdではなくapproachListIdに変更した。
+const allApproachListIds: number[] = (dmLists.value.dmLists).map((dmList: any)  => dmList.dmList.approachListId);
+
+/**
+ * 全てのアプローチリスト
+ */
+// const { data: approachListData} = await $api.jmssPortal.getApproachLists(allApproachListIds, searchParams, page.value, perPage.value);
+// const approachListsResponse: any = ref(approachListData.value);
+// UT用モック（全てのアプローチリスト）
+const { data: approachListData} = await useFetch('/api/approachLists')
+const approachListsResponse: any = ref(approachListData.value);
+
 /**
  * モック
  */
@@ -210,29 +248,31 @@ let pulldownChargeOfConsultantArray: any = new Array()
 let pulldownApproachPurposeArray: any = new Array()
 
 // チームのプルダウンに必要なリストを取得
-for(let i = 0; i < allTeams.length; i++) {
-  if(allTeams[i].parent_id !== 0) {
-    pulldownChargeOfTeamArray.push({ "id": allTeams[i].id, "name": allTeams[i].name })
+for(let i = 0; i < allTeams.value.length; i++) {
+  if(allTeams.value[i].parent_id !== 0) {
+    pulldownChargeOfTeamArray.push({ "id": allTeams.value[i].id, "name": allTeams.value[i].name })
   }
 }
 // 担当コンサルタントのプルダウンに必要なリストを取得
-for(let i = 0; i < allUsers.length; i++) {
-  pulldownChargeOfConsultantArray.push({ "id" : allUsers[i].id, "name" : allUsers[i].name })
+for(let i = 0; i < allUsers.value.length; i++) {
+  pulldownChargeOfConsultantArray.push({ "id" : allUsers.value[i].id, "name" : allUsers.value[i].name })
 }
 // アプローチ区分のプルダウンに必要なリストを取得
-for(let i = 0; i < dmLists.length; i++) {
-  switch(dmLists[i].type) {
+// TODO 取得するデータ元が間違ってるので要修正。
+// 「dmLists」はtype持ってない。すべてのアプローチリストから取得したい。
+for(let i = 0; i < approachListsResponse.value.data.length; i++) {
+  switch(approachListsResponse.value.data[i].type) {
     case '売り打診':
-      pulldownApproachPurposeArray.push({ "id" : 1, "name" : dmLists[i].type })
+      pulldownApproachPurposeArray.push({ "id" : 1, "name" : approachListsResponse.value.data[i].type })
       break;
     case '買い打診':
-      pulldownApproachPurposeArray.push({ "id" : 2, "name" : dmLists[i].type })
+      pulldownApproachPurposeArray.push({ "id" : 2, "name" : approachListsResponse.value.data[i].type })
       break;
     case '提携打診':
-      pulldownApproachPurposeArray.push({ "id" : 3, "name" : dmLists[i].type })
+      pulldownApproachPurposeArray.push({ "id" : 3, "name" : approachListsResponse.value.data[i].type })
       break;
     case 'その他':
-      pulldownApproachPurposeArray.push({ "id" : 4, "name" : dmLists[i].type })
+      pulldownApproachPurposeArray.push({ "id" : 4, "name" : approachListsResponse.value.data[i].type })
       break;
   }
 }
@@ -263,18 +303,23 @@ function removeDuplicate(dataArray: any) {
 const getApproachListDatas = async (searchParams?: any): Promise<void> => {
 
   // 社内ポータルからのアプローチリスト取得
-  const { data: approachListData} = await $api.jmssPortal.getApproachLists(allApproachListIds, searchParams, page.value, perPage.value);
+  // const { data: approachListData} = await $api.jmssPortal.getApproachLists(allApproachListIds, searchParams, page.value, perPage.value);
+  // const approachListsResponse: any = ref(approachListData.value);
+  // UT用モック（アプローチリスト取得API）
+  const { data: approachListData} = await useFetch('/api/approachLists')
   const approachListsResponse: any = ref(approachListData.value);
+  
   // 合計ページ(total÷1ページ当たりの表示数)をtotalPageに格納する
   totalPage.value = (approachListsResponse.value.total / perPage.value);
   // 取得したデータのキーをキャメルケースに変換する
   const tmpData = camelcaseKeys(approachListsResponse.value.data, { deep: true });
-
   // 一覧表示データを登録日が新しい順にソートする
   approachLists.value = tmpData.sort(function(a: any, b: any) {
     return (a.createdAt < b.createdAt) ? 1 : -1;  
   });
 }
+
+getApproachListDatas()
 
 // // ユーザー取得APIに渡すuserIDのリストを生成する
 // const userIds: number[] = (
@@ -306,10 +351,9 @@ const headers = ref(
  * @param targetKey // ターゲットとなる項目のキー
  */
 const getTableDmListData = (approachListId:any, targetKey:any): any => {
-  let result = dmLists.value.filter((dmListData: any) => approachListId == dmListData.dmList.approachListId)[0]
+  let result = (dmLists.value.dmLists).filter((dmListData: any) => approachListId == dmListData.dmList.approachListId)[0]
   if(result) {
     if(targetKey == 'matchingStatus') {
-      // TODO utilとかtypeフォルダ作ってメソッド呼出にしたい
       if(result[targetKey] == 1) {
         return 'マッチング中'
       }else {
@@ -326,7 +370,7 @@ const getTableDmListData = (approachListId:any, targetKey:any): any => {
  * @param targetKey // ターゲットとなる項目のキー
  */
  const getTableUserData = (userId:any, targetKey:any): any => {
-  let result = allUsers.filter((user: any) => userId[0] == user.id)[0]
+  let result = allUsers.value.filter((user: any) => userId[0] == user.id)[0]
   if(result) {
     return result[targetKey]
   }
@@ -343,10 +387,10 @@ const searchButton = (): void => {
 
 /**
  * ページネーションで違うページ押下時の処理
- * @param tagetPage クリックしたページネーションの番号
+ * @param targetPage クリックしたページネーションの番号
  */
- const onChangePage = (tagetPage: number): void => {
-  page.value = tagetPage
+ const onChangePage = (targetPage: number): void => {
+  page.value = targetPage
   getApproachListDatas(searchParams);
 }
 

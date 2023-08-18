@@ -5,7 +5,7 @@ export default defineEventHandler(() => {
             "id": 15,
             "code": "consul-ap-team",
             "group": "consul-succession-group",
-            "name": "アライアンス・パートナーT",
+            "name": "Aチーム",
             "short_name": "AP",
             "parent_id": 26,
             "department_id": 2
@@ -14,7 +14,7 @@ export default defineEventHandler(() => {
             "id": 14,
             "code": "consul-is-team",
             "group": "consul-plan-group",
-            "name": "インサイドセールスT",
+            "name": "Bチーム",
             "short_name": "IS",
             "parent_id": 27,
             "department_id": 2
@@ -23,7 +23,7 @@ export default defineEventHandler(() => {
             "id": 17,
             "code": "consul-direct-team",
             "group": "consul-succession-group",
-            "name": "ダイレクトT",
+            "name": "Cチーム",
             "short_name": "ダイレクト",
             "parent_id": 32,
             "department_id": 2
@@ -32,7 +32,7 @@ export default defineEventHandler(() => {
             "id": 22,
             "code": "consul-healthcare-team",
             "group": "consul-specific-group",
-            "name": "ヘルスケアT",
+            "name": "Bチーム",
             "short_name": "ヘルスケア",
             "parent_id": 29,
             "department_id": 2
@@ -41,7 +41,7 @@ export default defineEventHandler(() => {
             "id": 20,
             "code": "consul-bs-team",
             "group": "consul-bs-group",
-            "name": "事業戦略T",
+            "name": "Aチーム",
             "short_name": "BS",
             "parent_id": 27,
             "department_id": 2
@@ -74,33 +74,6 @@ export default defineEventHandler(() => {
             "department_id": 2
         },
         {
-            "id": 23,
-            "code": "consul-hotel-team",
-            "group": "consul-specific-group",
-            "name": "介護T",
-            "short_name": "介護",
-            "parent_id": 29,
-            "department_id": 2
-        },
-        {
-            "id": 18,
-            "code": "consul-nagoya-team",
-            "group": "consul-succession-group",
-            "name": "名古屋T",
-            "short_name": "名古屋",
-            "parent_id": 32,
-            "department_id": 2
-        },
-        {
-            "id": 19,
-            "code": "consul-osaka-team",
-            "group": "consul-succession-group",
-            "name": "大阪T",
-            "short_name": "大阪",
-            "parent_id": 32,
-            "department_id": 2
-        },
-        {
             "id": 24,
             "code": "consul-support-group",
             "group": "",
@@ -109,24 +82,6 @@ export default defineEventHandler(() => {
             "parent_id": 0,
             "department_id": 2
         },
-        {
-            "id": 29,
-            "code": "consul-specific-group",
-            "group": "",
-            "name": "業種特化部",
-            "short_name": "業種特化",
-            "parent_id": 0,
-            "department_id": 2
-        },
-        {
-            "id": 16,
-            "code": "consul-financial-team",
-            "group": "consul-succession-group",
-            "name": "金融法人T",
-            "short_name": "金融法人",
-            "parent_id": 26,
-            "department_id": 2
-        }
     ]
 
     return data

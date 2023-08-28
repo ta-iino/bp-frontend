@@ -5,28 +5,42 @@
       <v-row id="sticky" class="my-n6">
         <v-row>
           <v-col cols="16" class="px-0 my-3">
-            <VCardTitle class="ml-3 mr-9" style="background-color: #81d4fa;">買いニーズマッチング結果</VCardTitle>
+            <VCardTitle class="ml-3 mr-9" style="background-color: #81d4fa;">
+              買いニーズマッチング結果
+            </VCardTitle>
           </v-col>
         </v-row>
         <v-sheet color="white" elevation="1" height="172" class="mr-6">
           <v-card-title style="background-color: #b3e5fc;" class="header-back">
-            <h4 class="mt-n2 ml-n2">DM発送先企業</h4>
+            <h4 class="mt-n2 ml-n2">
+              DM発送先企業
+            </h4>
           </v-card-title>
           <v-row class="px-16 mb-6 mt-2">
-            <v-col cols="4" v-for="(item) in items" :key="item.title">
+            <v-col v-for="(item) in items" :key="item.title" cols="4">
               <v-row v-if="item.title === '企業名:'">
-                <v-col class="px-10 py-0">{{ item.title }}</v-col>
-                <v-col class="pl-4 py-0 link" @click="clickCompanyName(item.value.id)">{{ item.value.value }}</v-col>
+                <v-col class="px-10 py-0">
+                  {{ item.title }}
+                </v-col>
+                <v-col class="pl-4 py-0 link" @click="clickCompanyName(item.value.id)">
+                  {{ item.value.value }}
+                </v-col>
               </v-row>
               <v-row v-else>
-                <v-col class="px-10 py-0">{{ item.title }}</v-col>
-                <v-col class="px-10 py-0">{{ item.value }} {{ item.bottom }}</v-col>
+                <v-col class="px-10 py-0">
+                  {{ item.title }}
+                </v-col>
+                <v-col class="px-10 py-0">
+                  {{ item.value }} {{ item.bottom }}
+                </v-col>
               </v-row>
             </v-col>
           </v-row>
           <v-row justify="center" class="mt-n6">
             <!-- DM送付先画面で別タブで開かれたら閉じれるはず -->
-            <v-btn color="light-blue-darken-4" class="mb-4" border="0" @click="clickCloseButton()">閉じる</v-btn>
+            <v-btn color="light-blue-darken-4" class="mb-4" border="0" @click="clickCloseButton()">
+              閉じる
+            </v-btn>
           </v-row>
         </v-sheet>
       </v-row>
@@ -42,21 +56,34 @@
           <h3>処理日時</h3>
           <span class="mx-10">{{ processDate }}</span>
         </v-row>
-        <v-sheet v-for="(buyneeds, i) in buyneedsList" :key="i" cols="16" class="mx-6 my-2" elevation="1" height=auto>
+        <v-sheet
+          v-for="(buyneeds, i) in buyneedsList"
+          :key="i"
+          cols="16"
+          class="mx-6 my-2"
+          elevation="1"
+          height="auto"
+        >
           <v-card-title style="background-color: #e1f5fe;" class="header-back">
-            <h4 class="mt-n2 ml-n2">買手第{{ i + 1 }}候補</h4>
+            <h4 class="mt-n2 ml-n2">
+              買手第{{ i + 1 }}候補
+            </h4>
           </v-card-title>
           <v-row>
             <v-col cols="12" class="mb-n6">
               <v-row>
-                <v-col cols="1"></v-col>
-                <v-col cols="2">企業:</v-col>
+                <v-col cols="1" />
+                <v-col cols="2">
+                  企業:
+                </v-col>
                 <v-col cols="3">
                   <span class="link" @click="clickCompanyName(getValueObject(Object.keys(buyneeds.company)))">
                     {{ getTargetBuyComapnyData(buyneeds, 'name') }}
                   </span>
                 </v-col>
-                <v-col cols="2">都道府県:</v-col>
+                <v-col cols="2">
+                  都道府県:
+                </v-col>
                 <v-col cols="3">
                   {{ getTargetBuyComapnyData(buyneeds, 'pref') }}
                 </v-col>
@@ -64,21 +91,33 @@
             </v-col>
             <v-col cols="12" class="mb-n6">
               <v-row>
-                <v-col cols="1"></v-col>
-                <v-col cols="2">買収実績:</v-col>
-                <v-col cols="3">{{ buyneeds.accuracy }}</v-col>
-                <v-col cols="2">業種:</v-col>
-                <v-col cols="3">{{ getCompanyIndutryNames(buyneeds) }}</v-col>
+                <v-col cols="1" />
+                <v-col cols="2">
+                  買収実績:
+                </v-col>
+                <v-col cols="3">
+                  {{ buyneeds.accuracy }}
+                </v-col>
+                <v-col cols="2">
+                  業種:
+                </v-col>
+                <v-col cols="3">
+                  {{ getCompanyIndutryNames(buyneeds) }}
+                </v-col>
               </v-row>
             </v-col>
             <v-col cols="12" class="mb-n6">
               <v-row>
-                <v-col cols="1"></v-col>
-                <v-col cols="2">売上高:</v-col>
+                <v-col cols="1" />
+                <v-col cols="2">
+                  売上高:
+                </v-col>
                 <v-col cols="3">
                   {{ getTargetBuyComapnyData(buyneeds, 'sales') }} 百万円
                 </v-col>
-                <v-col cols="2">営業種目:</v-col>
+                <v-col cols="2">
+                  営業種目:
+                </v-col>
                 <v-col cols="3">
                   {{ getTargetBuyComapnyData(buyneeds, 'tsr')['営業種目'] }}
                 </v-col>
@@ -86,23 +125,35 @@
             </v-col>
             <v-col cols="12" class="mb-n6">
               <v-row>
-                <v-col cols="1"></v-col>
-                <v-col cols="2">買収希望エリア:</v-col>
-                <v-col cols="3">{{ getValueObject(Object.values(buyneeds.prefs)) }}</v-col>
+                <v-col cols="1" />
+                <v-col cols="2">
+                  買収希望エリア:
+                </v-col>
+                <v-col cols="3">
+                  {{ getValueObject(Object.values(buyneeds.prefs)) }}
+                </v-col>
               </v-row>
             </v-col>
             <v-col cols="12" class="mb-n6">
               <v-row>
-                <v-col cols="1"></v-col>
-                <v-col cols="2">買収希望業種:</v-col>
-                <v-col cols="3">{{ getValueObject(Object.values(buyneeds.industries)) }}</v-col>
+                <v-col cols="1" />
+                <v-col cols="2">
+                  買収希望業種:
+                </v-col>
+                <v-col cols="3">
+                  {{ getValueObject(Object.values(buyneeds.industries)) }}
+                </v-col>
               </v-row>
             </v-col>
             <v-col cols="12">
               <v-row>
-                <v-col cols="1"></v-col>
-                <v-col cols="2">希望コメント:</v-col>
-                <v-col cols="3"><span id="comment">{{ buyneeds.remarks }}</span></v-col>
+                <v-col cols="1" />
+                <v-col cols="2">
+                  希望コメント:
+                </v-col>
+                <v-col cols="3">
+                  <span id="comment">{{ buyneeds.remarks }}</span>
+                </v-col>
               </v-row>
             </v-col>
           </v-row>
@@ -113,18 +164,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 /**
  * 初期値設定
  */
-const route = useRoute();
-const { $api } = useNuxtApp();
-const config = useRuntimeConfig();
-const sellCompanyId = Number(route.params.id);
-const sendCompanyHistoryId = Number(route.query.sendCompanyHistoryId);
-const processDate = String(route.query);
+const route = useRoute()
+const { $api } = useNuxtApp()
+const config = useRuntimeConfig()
+const sellCompanyId = Number(route.params.id)
+const sendCompanyHistoryId = Number(route.query.sendCompanyHistoryId)
+const processDate = String(route.query)
 
 /**
  * モック
@@ -151,12 +202,10 @@ const processDate = String(route.query);
 // const { data: buyCompanyList } = await useFetch('api/buyCompany')
 
 // 買いニーズ情報
-// const { data: buyNeedsList } =　await useFetch('api/buyNeeds')
+// const { data: buyNeedsList } = await useFetch('api/buyNeeds')
 /**
  * /モック終了
  */
-
-
 
 /**
  * ヘッダ部のデータ作成
@@ -165,28 +214,28 @@ const processDate = String(route.query);
 // const { data: sellCompanyData } = await $api.jmssPortal.getCompanies([sellCompanyId])
 // const sellCompany: any = ref(sellCompanyData.value)
 // UT用モック
-const { data: sellCompanyData } = await useFetch('/api/companies');
+const { data: sellCompanyData } = await useFetch('/api/companies')
 const sellCompany: any = ref(sellCompanyData.value)
 // 表示タイトルとバリューの作成
 const items: any = [
   // fix リンク押下時に企業IDを渡したかったので修正した
-  { title: '企業名:', value: {id: sellCompany.value.data[0].id, value: sellCompany.value.data[0].name} },
+  { title: '企業名:', value: { id: sellCompany.value.data[0].id, value: sellCompany.value.data[0].name } },
   { title: '業種１:', value: Object.values(sellCompany.value.data[0].industry)[0] },
-  { title: '売上:', value: sellCompany.value.data[0].sales, bottom: "百万円" },
+  { title: '売上:', value: sellCompany.value.data[0].sales, bottom: '百万円' },
   { title: '所在地:', value: sellCompany.value.data[0].address },
   { title: '業種２:', value: Object.values(sellCompany.value.data[0].industry)[1] },
-  { title: '営業利益:', value: sellCompany.value.data[0].profit, bottom: "百万円" },
+  { title: '営業利益:', value: sellCompany.value.data[0].profit, bottom: '百万円' },
   { title: '代表者名:', value: sellCompany.value.data[0].representative_name },
   { title: '業種３:', value: Object.values(sellCompany.value.data[0].industry)[2] },
-  { title: '従業員数:', value: sellCompany.value.data[0].employees, bottom: "名" },
+  { title: '従業員数:', value: sellCompany.value.data[0].employees, bottom: '名' },
   { title: '代表者年齢:', value: getCeoAge(sellCompany.value.data[0].tsr['生年月日']) },
-  { title: '営業種目:', value: sellCompany.value.data[0].tsr['営業種目'] },
+  { title: '営業種目:', value: sellCompany.value.data[0].tsr['営業種目'] }
 ]
 
 // /**
 //  * ボディ部のデータ作成
 //  */
-// // マッチング結果取得APIの呼び出し
+// マッチング結果取得APIの呼び出し
 // const { data: buyneedsMatchingResultData } = (
 //   await $api.approach.getBuyneedsMatchingResult(sendCompanyHistoryId)
 // )
@@ -194,15 +243,15 @@ const items: any = [
 
 // // 買い手企業情報取得APIの呼び出し
 // const buyCompanyIds: number[] = ref(
-//   buyneedsMatchingResult.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId)
-// );
+//   buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId)
+// )
 // const { data: buyCompanyData } = await $api.jmssPortal.getCompanies(buyCompanyIds)
 // const buyCompanyList: any = ref(buyCompanyData.value)
 
 // // 買いニーズ情報取得APIの呼び出し
 // const buyneedsIds: number[] = ref(
-//   buyneedsMatchingResult.map((item: { buyneeds_id: number; }) => item.buyneeds_id)
-// );
+//   buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { buyneeds_id: number; }) => item.buyneeds_id)
+// )
 // const { data: buyneedsData } = await $api.jmssPortal.getBuyneeds(buyneedsIds)
 // const buyneedsList: any = ref(buyneedsData.value)
 
@@ -218,7 +267,7 @@ const buyneedsMatchingResult: any = ref(buyneedsMatchingResultData.value)
 const buyCompanyIds: number[] = ref(
   // fix 元のコードのままだとmapが呼び出せなかったので修正
   buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId)
-);
+)
 const { data: buyCompanyData } = await useFetch('/api/copmanyMasterList')
 const buyCompanyList: any = ref(buyCompanyData.value)
 
@@ -226,7 +275,7 @@ const buyCompanyList: any = ref(buyCompanyData.value)
 const buyneedsIds: number[] = ref(
   // fix 元のコードのままだとmapが呼び出せなかったので修正
   buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { buyneeds_id: number; }) => item.buyneeds_id)
-);
+)
 const { data: buyneedsData } = await useFetch('/api/buyNeeds')
 const tmpBuyneedsList: any = ref(buyneedsData.value)
 const buyneedsList: any = ref(tmpBuyneedsList.value.data)
@@ -238,33 +287,33 @@ const buyneedsList: any = ref(tmpBuyneedsList.value.data)
  */
 const getTargetBuyComapnyData = (buyneeds:any, targetKey:any): any => {
   // fix 元のコードのままだとmapが呼び出せなかったので修正
-  let result: any = buyCompanyList.value.data.filter((buyCompany: any) => Object.keys(buyneeds.company)[0] == buyCompany.id)[0]
-  if(result !== undefined) {
+  const result: any = buyCompanyList.value.data.filter((buyCompany: any) => Object.keys(buyneeds.company)[0] === buyCompany.id)[0]
+  if (result !== undefined) {
     return result[targetKey]
   }
-  return ""
+  return ''
 }
 
 /**
  * 買手企業の業種表示用(複数処理が必要なためmethods化した)
- * @param buyneeds 
+ * @param buyneeds
  */
 // fix getCompanyIndustryNameArrayは昔の名残のため削除した。null回避のためif文を追加。
 const getCompanyIndutryNames = (buyneeds: any): string => {
   const industry: string = getTargetBuyComapnyData(buyneeds, 'industry')
-  if(industry) {
+  if (industry) {
     const industryNames: string = getValueObject(Object.values(industry))
     return industryNames
-  } 
-  return ""
+  }
+  return ''
 }
 
 /**
  * 会社名押下時の処理
- * @param companyId 
+ * @param companyId
  */
 const clickCompanyName = (companyId: number): void => {
-  const url = config.public.jmssPortalbaseURL + '/company/' + companyId;
+  const url = config.public.jmssPortalbaseURL + '/company/' + companyId
   window.open(url)
 }
 
@@ -275,8 +324,6 @@ const clickCloseButton = (): void => {
   window.close()
 }
 </script>
-
-
 
 <style>
 #comment {

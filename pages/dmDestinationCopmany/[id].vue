@@ -48,7 +48,14 @@
             </v-btn>
           </div>
           <div class="px-2">
-            <v-btn class="v-btn" depressed color="light-blue-darken-4" border="0" @click="downloadCsv()">
+            <v-btn
+              class="v-btn"
+              depressed
+              color="light-blue-darken-4"
+              border="0"
+              :disabled="activeBtn"
+              @click="downloadCsv()"
+            >
               ダウンロード
             </v-btn>
           </div>
@@ -279,7 +286,7 @@ const getCompanyData = async (searchCompanyName?: string): Promise<any> => {
     return (a.id > b.id) ? 1 : -1
   })
   // 合計ページ(total÷1ページ当たりの表示数)をtotalPageに格納する
-  totalPage.value = (companies.value.total / perPage.value)
+  totalPage.value = Math.ceil(companies.value.total / perPage.value)
 }
 // ヘッダ
 const destinationCompanyHeaders: any = [
@@ -433,11 +440,13 @@ const onChangePage = (tagetPage: number): void => {
 }
 
 /**
- *  ニーズマッチングボタンの活性/非活性制御
- *  // 最新のマッチングステータスがマッチング中だった場合は非活性（true）
+ *  ニーズマッチングボタン、ダウンロードボタンの活性/非活性制御
+ *  マッチングステータスがマッチング中だった場合は非活性（true）
  */
 const activeBtn = computed((): boolean => {
-  if (matchingHistories.value.buyneedsMatchingHistories[0].matchingStatus === 1) {
+  const result = (matchingHistories.value.buyneedsMatchingHistories)
+    .filter((buyneedsMatchingHistoriy: any) => buyneedsMatchingHistoriy.id === selectedBuyneedsHistoryId.value)
+  if (result[0].matchingStatus === 1) {
     // マッチング中（ステータスが「1（マッチング中）」）の場合は非活性
     return true
   }

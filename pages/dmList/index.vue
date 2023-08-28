@@ -256,17 +256,11 @@ for (let i = 0; i < allTeams.value.length; i++) {
 for (let i = 0; i < allUsers.value.length; i++) {
   pulldownChargeOfConsultantArray.push({ id: allUsers.value[i].id, name: allUsers.value[i].name })
 }
-// アプローチ区分のプルダウンに必要なリストを取得
-// TODO 取得するデータ元が間違ってるので要修正。
-// 「dmLists」はtype持ってない。すべてのアプローチリストから取得したい。
-for (let i = 0; i < approachListsResponse.value.data.length; i++) {
-  getApproachTypeCode(approachListsResponse.value.data[i].type, pulldownApproachPurposeArray)
-}
 
 // 各プルダウンを作成
 const pulldownChargeOfTeam = removeDuplicate(pulldownChargeOfTeamArray)
 const pulldownChargeOfConsultant = removeDuplicate(pulldownChargeOfConsultantArray)
-const pulldownApproachPurpose = removeDuplicate(pulldownApproachPurposeArray)
+const pulldownApproachPurpose = getApproachTypeCode(pulldownApproachPurposeArray)
 
 // 重複を削除するメソッドを定義する
 function removeDuplicate (dataArray: any) {
@@ -294,8 +288,8 @@ const getApproachListDatas = async (searchParams?: any): Promise<void> => {
   const { data: approachListData } = await useFetch('/api/approachLists')
   const approachListsResponse: any = ref(approachListData.value)
 
-  // 合計ページ(total÷1ページ当たりの表示数)をtotalPageに格納する
-  totalPage.value = (approachListsResponse.value.total / perPage.value)
+  // 合計ページ(total÷1ページ当たりの表示数)をtotalPageに格納する（切り上げ）
+  totalPage.value = Math.ceil(approachListsResponse.value.total / perPage.value)
   // 取得したデータのキーをキャメルケースに変換する
   const tmpData = camelcaseKeys(approachListsResponse.value.data, { deep: true })
   // 一覧表示データを登録日が新しい順にソートする

@@ -40,21 +40,12 @@ export const getMatchngStatusStr = (codeValue: any): any => {
 /**
  *  アプローチ区分の文字列に紐づくコードを設定する処理
  */
-export const getApproachTypeCode = (approachType: any, array: any) => {
-  switch (approachType) {
-    case '売り打診':
-      array.push({ id: 1, name: approachType })
-      break
-    case '買い打診':
-      array.push({ id: 2, name: approachType })
-      break
-    case '提携打診':
-      array.push({ id: 3, name: approachType })
-      break
-    case 'その他':
-      array.push({ id: 4, name: approachType })
-      break
-  }
+export const getApproachTypeCode = (array: any) => {
+  array.push({ id: 1, name: '売り打診' })
+  array.push({ id: 2, name: '買い打診' })
+  array.push({ id: 3, name: '提携打診' })
+  array.push({ id: 99, name: 'その他' })
+
   return array
 }
 

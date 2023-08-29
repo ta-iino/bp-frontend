@@ -2,19 +2,18 @@
  * 各APIのベースファクトリ(必要なものがあれば随時追加する。)
  */
 class BaseApiFactory {
-  async call(url: string, baseURL: string, options?: any) {
-    const {data, error} = await useFetch(
+  async call (url: string, baseURL: string, options?: any) {
+    const { data, error } = await useFetch(
       url, {
-        baseURL:  baseURL,
+        baseURL: baseURL,
         method: options.method,
         headers: options.headers,
         body: options.body,
-        params: options.params,
+        params: options.params
       }
-    );
-    return {data, error};
+    )
+    return { data, error }
   }
-
 }
 
-export default BaseApiFactory;
+export default BaseApiFactory

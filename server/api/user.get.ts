@@ -23,7 +23,7 @@ export default defineEventHandler(() => {
         is_experienced : 1,
         last_name : "武元",
         last_name_kana : "たけもと",
-        name : "テスト　太郎",
+        name : "Aコンサルタント",
         position_id : 0,
         role : {
             chikyu_id : "5ea17123f49aba0001c7b46e",
@@ -71,7 +71,7 @@ export default defineEventHandler(() => {
         is_experienced : 1,
         last_name : "武元",
         last_name_kana : "たけもと",
-        name : "テスト　次郎",
+        name : "Bコンサルタント",
         position_id : 0,
         role : {
             chikyu_id : "5ea17123f49aba0001c7b46e",
@@ -119,7 +119,7 @@ export default defineEventHandler(() => {
         is_experienced : 1,
         last_name : "武元",
         last_name_kana : "たけもと",
-        name : "テスト　三郎",
+        name : "Cコンサルタント",
         position_id : 0,
         role : {
             chikyu_id : "5ea17123f49aba0001c7b46e",
@@ -167,7 +167,7 @@ export default defineEventHandler(() => {
         is_experienced : 1,
         last_name : "武元",
         last_name_kana : "たけもと",
-        name : "テスト　四郎",
+        name : "Dコンサルタント",
         position_id : 0,
         role : {
             chikyu_id : "5ea17123f49aba0001c7b46e",

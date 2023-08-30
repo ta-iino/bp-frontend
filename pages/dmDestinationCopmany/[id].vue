@@ -66,9 +66,14 @@
           </div>
         </v-col>
         <v-col cols="4" class="pt-4 pl-10">
-          <v-form @submit.prevent="searchCompany()">
-            <v-text-field v-model="searchCompanyName" label="企業名検索" append-inner-icon="mdi-magnify" />
-          </v-form>
+          <v-text-field v-model="searchCompanyName" label="企業名検索" />
+        </v-col>
+        <v-col class="d-flex justify-end mt-n8">
+          <v-btn class="ui-btn" depressed color="light-blue-darken-3" @click="searchCompany()">
+              <v-icon dark size="large">
+                mdi-magnify
+              </v-icon>
+            </v-btn>
         </v-col>
       </v-row>
     </v-container>

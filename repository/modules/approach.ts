@@ -15,6 +15,7 @@ export class ApproachModule extends BaseApiFactory {
   private options: any = {}
   constructor (baseURL: string) {
     super()
+    console.log(baseURL)
     this.baseURL = baseURL
   }
 
@@ -55,6 +56,7 @@ export class ApproachModule extends BaseApiFactory {
    * @returns 買いニーズマッチング履歴リスト
    */
   async getBuyneedsMatchingHistory (approachListId: Number) {
+    console.log("getBuyneedsMatchingHistory")
     this.options.params = {
       approach_list_id: approachListId
     }

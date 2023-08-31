@@ -153,6 +153,7 @@ const config = useRuntimeConfig()
 const page: Ref<number> = ref(1)
 const perPage: Ref<number> = ref(50)
 const approachListId = Number(route.params.id)
+console.log(approachListId)
 const searchCompanyName: Ref<string> = ref('')
 const totalPage: Ref<number> = ref(0)
 // 発送企業データ(社内ポータル接続)
@@ -184,8 +185,9 @@ const sendCompanyIds: any = []
  * マッチング処理日時リスト作成
  */
 // マッチング履歴リスト取得
-// const { data: matchingHistoriesData } = await $api.approach.getBuyneedsMatchingHistory(approachListId)
-// const matchingHistories: any = ref(matchingHistoriesData.value)
+const { data: matchingHistoriesData } = await $api.approach.getBuyneedsMatchingHistory(approachListId)
+console.log(matchingHistoriesData)
+const matchingHistories: any = ref(matchingHistoriesData.value)
 // const dmListId: number = ref(matchingHistories)
 // // json形式のリスト{id: 買いニーズマッチング履歴テーブルID, processingDate: マッチング処理日時}を作成
 // const processingDateList: any = ref(
@@ -195,10 +197,12 @@ const sendCompanyIds: any = []
 // // 最新のマッチング処理日時をAPIに渡す
 // const selectedBuyneedsHistoryId: number = ref(processingDateList.value[0].id);
 // UT用データ
-const { data: matchingHistoriesData } = await useFetch('/api/buyneedsMatchingHistory')
-const matchingHistories: any = ref(matchingHistoriesData.value)
+// const { data: matchingHistoriesData } = await useFetch('/api/buyneedsMatchingHistory')
+// const matchingHistories: any = ref(matchingHistoriesData.value)
 // fix マッチング履歴取得APIの戻り値のdmListIdを取得
 const dmListId: number = ref(matchingHistories.value.dmListId)
+console.log(matchingHistories.value.buyneedsMatchingHistories)
+console.log(dmListId)
 // json形式のリスト{id: 買いニーズマッチング履歴テーブルID, processingDate: マッチング処理日時}を作成
 const processingDateList: any = ref(
   // fix filterは配列に対して使える。元のコードのままだとエラーになるため修正した。
@@ -211,11 +215,11 @@ const selectedBuyneedsHistoryId: number = ref(processingDateList.value[0].id)
 /**
  * ヘッダ部
  */
-// const { data: approachListsData } = await $api.jmssPortal.getApproachLists([approachListId])
-// const approachData :any = ref(approachListsData.value)
-// UT用モック
-const { data: approachListsData } = await useFetch('/api/approachLists')
+const { data: approachListsData } = await $api.jmssPortal.getApproachLists([approachListId])
 const approachData :any = ref(approachListsData.value)
+// UT用モック
+// const { data: approachListsData } = await useFetch('/api/approachLists')
+// const approachData :any = ref(approachListsData.value)
 // fix 元のソースだとitemsは取得できない。修正済。
 const items: any = [
   { title: '担当チーム：', value: Object.values(approachData.value.data[0].request_team)[0] },
@@ -256,11 +260,11 @@ const getBodyData = async (): Promise<any> => {
 // fix computedを削除（呼ばれない問題が発生したため）
 const getSendCompanyIds = async () => {
   // 発送企業履歴リスト取得
-  // const { data: sendCompanyHistoriesData } = await $api.approach.getSendCompanyHistory(selectedBuyneedsHistoryId)
-  // sendCompanyHistories.value = ref(sendCompanyHistoriesData.value)
-  // UT用モック
-  const { data: sendCompanyHistoriesData } = await useFetch('/api/sendComapnyHistory')
+  const { data: sendCompanyHistoriesData } = await $api.approach.getSendCompanyHistory(selectedBuyneedsHistoryId)
   sendCompanyHistories.value = ref(sendCompanyHistoriesData.value)
+  // UT用モック
+  // const { data: sendCompanyHistoriesData } = await useFetch('/api/sendComapnyHistory')
+  // sendCompanyHistories.value = ref(sendCompanyHistoriesData.value)
   // 発送企業履歴リストから会社IDの配列を作成する
   // fix 戻り値が文字列の配列になっているので、APIの戻り値を変更するか、文字列→数値への変更が必要。→戻り値を数値に変更してもらえるように依頼済。
   sendCompanyIds.value = (sendCompanyHistories.value.value.sendCompanyHistories).map((sendCompanyHistory: any) => sendCompanyHistory.companyId)
@@ -271,13 +275,12 @@ const getSendCompanyIds = async () => {
  * @param searchCompanyName
  */
 const getCompanyData = async (searchCompanyName?: string): Promise<any> => {
-  // const { data: companiesData } = (
-  //   await $api.jmssPortal.getCompanies(sendCompanyIds.value, searchCompanyName, page.value, perPage.value)
-  // )
-  // const companies: any = ref(companiesData.value)
-  // UT用モック
-  const { data: companiesData } = await useFetch('/api/companies')
+  const { data: companiesData } = (
+    await $api.jmssPortal.getCompanies(sendCompanyIds.value, searchCompanyName, page.value, perPage.value))
   const companies: any = ref(companiesData.value)
+  // UT用モック
+  // const { data: companiesData } = await useFetch('/api/companies')
+  // const companies: any = ref(companiesData.value)
   // 戻り値のdataを表示リストに格納する
   // fix ヘッダのkeyと企業取得APIの戻り値の項目名が合ってないので表示できない。スネークからキャメルに変更する処理が必要。→変更処理追加
   const tmpData = camelcaseKeys(companies.value.data, { deep: true })

@@ -255,10 +255,10 @@ const getBodyData = async (): Promise<any> => {
 // fix computedを削除（呼ばれない問題が発生したため）
 const getSendCompanyIds = async () => {
   // 発送企業履歴リスト取得
-  const { data: sendCompanyHistoriesData } = await $api.approach.getSendCompanyHistory(selectedBuyneedsHistoryId)
+  // const { data: sendCompanyHistoriesData } = await $api.approach.getSendCompanyHistory(selectedBuyneedsHistoryId)
   // sendCompanyHistories.value = ref(sendCompanyHistoriesData.value)
   // UT用モック
-  // const { data: sendCompanyHistoriesData } = await useFetch('/api/sendComapnyHistory')
+  const { data: sendCompanyHistoriesData } = await useFetch('/api/sendComapnyHistory')
   sendCompanyHistories.value = ref(sendCompanyHistoriesData.value)
   // 発送企業履歴リストから会社IDの配列を作成する
   // fix 戻り値が文字列の配列になっているので、APIの戻り値を変更するか、文字列→数値への変更が必要。→戻り値を数値に変更してもらえるように依頼済。
@@ -392,6 +392,7 @@ const downloadCsv = async (): Promise<void> => {
  * @param companyId
  */
 const showMatchingResult = (companyId: number): void => {
+  console.log('マッチング結果ボタン押下')
 // // 引数の会社IDに紐づく発送企業歴IDを取得する
   // const targetSendCompanyHistory = (
   //   (sendCompanyHistories.value).filter((sendCompanyHistory: any) =>

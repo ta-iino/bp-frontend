@@ -392,7 +392,6 @@ const downloadCsv = async (): Promise<void> => {
  * @param companyId
  */
 const showMatchingResult = (companyId: number): void => {
-  console.log('マッチング結果ボタン押下')
 // // 引数の会社IDに紐づく発送企業歴IDを取得する
   // const targetSendCompanyHistory = (
   //   (sendCompanyHistories.value).filter((sendCompanyHistory: any) =>

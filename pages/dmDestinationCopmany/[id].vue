@@ -24,13 +24,12 @@
         <v-col cols="3" class="px-0">
           <v-select
             v-model="selectedBuyneedsHistoryId"
-            clearable
             label="マッチング処理日時"
             filled
             :items="processingDateList"
             item-value="id"
             item-title="processingDate"
-            @change="getBodyData()"
+            @update:modelValue="getBodyData"
           />
         </v-col>
         <v-col cols="1" class="px-0" />
@@ -206,7 +205,7 @@ const processingDateList: any = ref(
     .map((matchingHistories: any) => ({ id: matchingHistories.id, processingDate: matchingHistories.processedDatetime }))
 )
 // 最新のマッチング処理日時をAPIに渡す
-const selectedBuyneedsHistoryId: number = ref(processingDateList.value[0].id)
+const selectedBuyneedsHistoryId = ref(processingDateList.value[0].id)
 
 /**
  * ヘッダ部
@@ -256,10 +255,10 @@ const getBodyData = async (): Promise<any> => {
 // fix computedを削除（呼ばれない問題が発生したため）
 const getSendCompanyIds = async () => {
   // 発送企業履歴リスト取得
-  // const { data: sendCompanyHistoriesData } = await $api.approach.getSendCompanyHistory(selectedBuyneedsHistoryId)
+  const { data: sendCompanyHistoriesData } = await $api.approach.getSendCompanyHistory(selectedBuyneedsHistoryId)
   // sendCompanyHistories.value = ref(sendCompanyHistoriesData.value)
   // UT用モック
-  const { data: sendCompanyHistoriesData } = await useFetch('/api/sendComapnyHistory')
+  // const { data: sendCompanyHistoriesData } = await useFetch('/api/sendComapnyHistory')
   sendCompanyHistories.value = ref(sendCompanyHistoriesData.value)
   // 発送企業履歴リストから会社IDの配列を作成する
   // fix 戻り値が文字列の配列になっているので、APIの戻り値を変更するか、文字列→数値への変更が必要。→戻り値を数値に変更してもらえるように依頼済。
@@ -393,22 +392,29 @@ const downloadCsv = async (): Promise<void> => {
  * @param companyId
  */
 const showMatchingResult = (companyId: number): void => {
+// // 引数の会社IDに紐づく発送企業歴IDを取得する
+  // const targetSendCompanyHistory = (
+  //   (sendCompanyHistories.value).filter((sendCompanyHistory: any) =>
+  //     Object.keys(sendCompanyHistory.companyId)[0] === String(companyId))[0]
+  // )
   // 引数の会社IDに紐づく発送企業歴IDを取得する
   const targetSendCompanyHistory = (
-    (sendCompanyHistories.value).filter((sendCompanyHistory: any) =>
-      Object.keys(sendCompanyHistory.companyId)[0] === String(companyId))[0]
+    (sendCompanyHistories.value.value.sendCompanyHistories).filter((sendCompanyHistory: any) =>
+      sendCompanyHistory.companyId === String(companyId))
   )
   // 選択されている処理日時を取得
-  const targetProcessDate = (
-    processingDateList.value.filter((processingDate: any) =>
-      Object.keys(processingDate.id)[0] === String(selectedBuyneedsHistoryId))[0]
-  )
+  // const targetProcessDate = (
+  //   processingDateList.value.filter((processingDate: any) =>
+  //     Object.keys(processingDate.id)[0] === String(selectedBuyneedsHistoryId))[0]
+  // )
+  const targetProcessDate = 
+    (processingDateList.value).filter((processingDate: any) => processingDate.id === selectedBuyneedsHistoryId.value)
   // マッチング履歴画面へ遷移する
   const matchResultUrl = router.resolve({
     path: `/buyneedsMatchResult/${companyId}`,
     query: {
-      'sendCompanyHistoryId': targetSendCompanyHistory.id,
-      'processDate': targetProcessDate.processingDate
+      'sendCompanyHistoryId': targetSendCompanyHistory[0].id,
+      'processDate': targetProcessDate[0].processingDate
     }
   })
   window.open(matchResultUrl.href, '_blank')

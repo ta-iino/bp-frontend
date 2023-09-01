@@ -313,7 +313,7 @@ const getCompanyIndutryNames = (buyneeds: any): string => {
  * @param companyId
  */
 const clickCompanyName = (companyId: number): void => {
-  const url = config.public.jmssPortalbaseURL + '/company/' + companyId
+  const url = config.public.jmssPortalBaseURL + '/company/' + companyId
   window.open(url)
 }
 

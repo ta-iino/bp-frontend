@@ -9,8 +9,8 @@ interface ApiInstance {
 export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig()
   const modules: ApiInstance = {
-    approach: new ApproachModule(config.public.approachBaseURL),
-    jmssPortal: new JmssPortalModule(config.public.jmssPortalbaseURL, config.public.approachBaseURL)
+    approach: new ApproachModule(config.public.baseURL),
+    jmssPortal: new JmssPortalModule(config.public.jmssPortalBaseURL, config.public.baseURL)
   }
   return {
     provide: {

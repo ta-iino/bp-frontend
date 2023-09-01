@@ -422,7 +422,7 @@ const showMatchingResult = (companyId: number): void => {
  * @param companyId
  */
 const clickCompanyId = (companyId: number): void => {
-  const url = config.public.jmssPortalbaseURL + '/company/' + companyId
+  const url = config.public.jmssPortalBaseURL + '/company/' + companyId
   window.open(url)
 }
 

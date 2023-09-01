@@ -1,5 +1,6 @@
 // エンドポイントが増えてきたら分割する
 import BaseApiFactory from '../factory'
+import { useCookies } from 'vue3-cookies'
 
 export class ApproachModule extends BaseApiFactory {
   private urls: any = {
@@ -8,7 +9,8 @@ export class ApproachModule extends BaseApiFactory {
     getBuyneedsMatchingHistory: '/approach/api/buyneeds_matching_history/',
     getBuyneedsMatchingResultCsv: '/approach/api/buyneeds_matching_result_csv/',
     getBuyneedsMatchingResult: '/approach/api/buyneeds_matching_result/',
-    startBuyneedsMatching: '/approach/api//buyneeds_matching_start/'
+    startBuyneedsMatching: '/approach/api//buyneeds_matching_start/',
+    getJmssPortalAccessToken: '/approach/api/create_jmss_portal_access_token',
   }
 
   private baseURL
@@ -113,6 +115,22 @@ export class ApproachModule extends BaseApiFactory {
       this.baseURL,
       this.options
     )
+  }
+  
+  /**
+   * 社内ポータル接続用アクセストークン取得メソッド
+   * @returns 社内ポータル接続用アクセストークン
+   */
+  async getJmssPortalAccessToken (): Promise<string> {
+    const cookies = useCookies()
+    // cookieが存在しない場合、アクセストークンの発行を行う
+    if (!cookies.cookies.isKey('jmss_portal_access_token')) {
+      // アクセストークン取得用API
+      // APIキーをフロントで持たないためにBackendからアクセスする。
+      const {data: data}: any = await this.call(this.urls.getJmssPortalAccessToken, this.baseURL, this.options)
+      cookies.cookies.set('jmss_portal_access_token', data.value.accessToken, data.value.expiresIn)
+    }
+    return cookies.cookies.get('jmss_portal_access_token')
   }
 }
 

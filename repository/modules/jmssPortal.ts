@@ -31,18 +31,23 @@ class JmssPortalModule extends BaseApiFactory {
    * @param limit
    * @returns アプローチリスト
    */
-  async getApproachLists (approachListId?: number[], searchParams?: any, page?: number, limit?: Number) {
+  async getApproachLists (approachListId?: number, searchParams?: any, page?: number, limit?: Number) {
+    console.log(approachListId)
+    console.log(searchParams)
+    console.log(page)
+    console.log(limit)
     this.options.params = {
       id: approachListId,
-      method: 1,
-      team_id: searchParams.chargeOfTeam,
-      user_id: searchParams.chargeOfConsultant,
-      name: searchParams.listName,
-      type: searchParams.approachPurpose,
-      created_at_min: searchParams.registrationDateFrom,
-      created_at_max: searchParams.registrationDateTo,
+      // method: 1,
+      team_id: searchParams?.chargeOfTeam,
+      user_id: searchParams?.chargeOfConsultant,
+      name: searchParams?.listName,
+      type: searchParams?.approachPurpose,
+      created_at_min: searchParams?.registrationDateFrom,
+      created_at_max: searchParams?.registrationDateTo,
       page: page,
-      limit: limit
+      limit: limit,
+      key: 'Zpi5G7ugxYUHGL7MiAKpYmN5MDjLSiV8fUQY2jJD7DkuCESzKrJAzQW8uazJEM6h'
     }
     return this.call(this.urls.getApproachLists, this.jmssPortalBaseURL, this.options)
   }
@@ -90,7 +95,8 @@ class JmssPortalModule extends BaseApiFactory {
     this.options.params = {
       id: userIds,
       page: page,
-      limit: limit
+      limit: limit,
+      key: 'Zpi5G7ugxYUHGL7MiAKpYmN5MDjLSiV8fUQY2jJD7DkuCESzKrJAzQW8uazJEM6h'
     }
     return this.call(this.urls.getUsers, this.jmssPortalBaseURL, this.options)
   }
@@ -108,7 +114,8 @@ class JmssPortalModule extends BaseApiFactory {
       id: companyIds,
       name: name,
       page: page,
-      limit: limit
+      limit: limit,
+      key: 'Zpi5G7ugxYUHGL7MiAKpYmN5MDjLSiV8fUQY2jJD7DkuCESzKrJAzQW8uazJEM6h'
     }
     return this.call(this.urls.getCompanies, this.jmssPortalBaseURL, this.options)
   }
@@ -124,7 +131,8 @@ class JmssPortalModule extends BaseApiFactory {
     this.options.params = {
       department_id: department_id,
       page: page,
-      limit: limit
+      limit: limit,
+      key: 'Zpi5G7ugxYUHGL7MiAKpYmN5MDjLSiV8fUQY2jJD7DkuCESzKrJAzQW8uazJEM6h'
     }
     return this.call(this.urls.getTeams, this.jmssPortalBaseURL, this.options)
   }

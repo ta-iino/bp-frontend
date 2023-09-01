@@ -4,11 +4,11 @@ import BaseApiFactory from '../factory'
 export class ApproachModule extends BaseApiFactory {
   private urls: any = {
     getDmList: '/approach/api/get_dm_list/',
-    getSendCompanyHistory: '/approach/api/send_comapny_history/',
+    getSendCompanyHistory: '/approach/api/send_company_history/',
     getBuyneedsMatchingHistory: '/approach/api/buyneeds_matching_history/',
     getBuyneedsMatchingResultCsv: '/approach/api/buyneeds_matching_result_csv/',
     getBuyneedsMatchingResult: '/approach/api/buyneeds_matching_result/',
-    startBuyneedsMatching: '/approach/api/buyneeds_matching_start/'
+    startBuyneedsMatching: '/approach/api//buyneeds_matching_start/'
   }
 
   private baseURL

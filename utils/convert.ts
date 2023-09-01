@@ -14,6 +14,9 @@ export const getCompanyIndustryNameArray = (indutries: string): string[] => {
  * オブジェクトのvalueを配列で取り出し、表示する
  */
 export const getValueObject = (arrayValue: any): string => {
+  if(!arrayValue) {
+    return arrayValue
+ }
   const joinObject = arrayValue.join(',')
   return joinObject
 }
@@ -76,4 +79,16 @@ export const getCeoAge = (ceoBirthday: any) => {
     }
     return age
   }
+}
+
+/**
+ * 取得したオブジェクトがnullまたはundefinedだった場合の回避処理
+ * @param リストに表示するデータ
+ */
+export const confirmationData = (objectData: any) => {
+  if (objectData === null || objectData === undefined) {
+    return ''
+  }
+  return getValueObject(Object.values(objectData))
+  
 }

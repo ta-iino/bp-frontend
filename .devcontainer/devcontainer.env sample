@@ -1,0 +1,3 @@
+BASE_URL=
+#社内ポータルはローカルからも開発環境へ飛ばす
+JMSS_PORTAL_BASE_URL=

@@ -127,7 +127,7 @@ export class ApproachModule extends BaseApiFactory {
     if (!cookies.cookies.isKey('jmss_portal_access_token')) {
       // アクセストークン取得用API
       // APIキーをフロントで持たないためにBackendからアクセスする。
-      const {data: data}: any = await this.call(this.urls.getJmssPortalAccessToken, this.baseURL, this.options)
+      const data: any = await this.call(this.urls.getJmssPortalAccessToken, this.baseURL, this.options)
       cookies.cookies.set('jmss_portal_access_token', data.value.accessToken, data.value.expiresIn)
     }
     return cookies.cookies.get('jmss_portal_access_token')

@@ -3,19 +3,18 @@ import BaseApiFactory from '../factory'
 
 export class ApproachModule extends BaseApiFactory {
   private urls: any = {
-    getDmList: '/api/get_dm_list',
-    getSendCompanyHistory: '/api/send_comapny_history',
-    getBuyneedsMatchingHistory: '/api/buyneeds_matching_history',
-    getBuyneedsMatchingResultCsv: '/api/buyneeds_matching_result_csv',
-    getBuyneedsMatchingResult: '/api/buyneeds_matching_result',
-    startBuyneedsMatching: '/api//buyneeds_matching_start'
+    getDmList: '/approach/api/get_dm_list',
+    getSendCompanyHistory: '/approach/api/send_comapny_history',
+    getBuyneedsMatchingHistory: '/approach/api/buyneeds_matching_history',
+    getBuyneedsMatchingResultCsv: '/approach/api/buyneeds_matching_result_csv',
+    getBuyneedsMatchingResult: '/approach/api/buyneeds_matching_result',
+    startBuyneedsMatching: '/approach/api//buyneeds_matching_start'
   }
 
   private baseURL
   private options: any = {}
   constructor (baseURL: string) {
     super()
-    console.log(baseURL)
     this.baseURL = baseURL
   }
 
@@ -56,7 +55,6 @@ export class ApproachModule extends BaseApiFactory {
    * @returns 買いニーズマッチング履歴リスト
    */
   async getBuyneedsMatchingHistory (approachListId: Number) {
-    console.log("getBuyneedsMatchingHistory")
     this.options.params = {
       approach_list_id: approachListId
     }

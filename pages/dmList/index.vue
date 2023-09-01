@@ -176,24 +176,14 @@ const searchParams: Ref<any> = ref(
 )
 const approachLists: Ref<any> = ref()
 
-/**
- * 取得したオブジェクトがnullまたはundefinedだった場合の回避処理
- * @param リストに表示するデータ
- */
-const confirmationData = (objectData: any) => {
-  if (objectData === null || objectData === undefined) {
-    return ''
-  }
-  return getValueObject(Object.values(objectData))
-}
 
 /**
  * 全てのチームリスト
  */
-// const {data: allTeamsData }: any = await $api.jmssPortal.getTeams()
+const {data: allTeamsData }: any = await $api.jmssPortal.getTeams()
 // const allTeams: any = ref(allTeamsData)
 // UT用モック（すべてのチームリスト）
-const { data: allTeamsData } = await useFetch('/api/depTeam')
+// const { data: allTeamsData } = await useFetch('/api/depTeam')
 const allTeams: any = ref(allTeamsData)
 /**
  * 全てのユーザリスト
@@ -206,11 +196,11 @@ const allUsers: any = ref(allUsersData.value)
 /**
  * DMリストテーブルに格納されている全てのアプローチリストIDリスト
  */
-// const { data: dmListsData } = await $api.approach.getDmList()
+const { data: dmListsData } = await $api.approach.getDmList()
 // const dmLists: any = ref(dmListsData.value)
 // const allApproachListIds: number[] = (dmLists.value).map((dmList: any) => dmList.dmList.companyId)
 // UT用モック（DMリストテーブルに格納されている全てのアプローチリストIDリスト）
-const { data: dmListsData } = await useFetch('/api/dmList')
+// const { data: dmListsData } = await useFetch('/api/dmList')
 const dmLists: any = ref(dmListsData.value)
 // fix DMリスト取得APIはrefInpl(Object)で戻ってくるので、取得方法を修正した。
 //  また、companyIdではなくapproachListIdに変更した。

@@ -3,6 +3,8 @@
  */
 class BaseApiFactory {
   async call (url: string, baseURL: string, options?: any) {
+    console.log(url)
+    console.log(baseURL)
     const { data, error } = await useFetch(
       url, {
         baseURL: baseURL,

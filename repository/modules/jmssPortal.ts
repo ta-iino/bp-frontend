@@ -31,16 +31,20 @@ class JmssPortalModule extends BaseApiFactory {
    * @param limit
    * @returns アプローチリスト
    */
-  async getApproachLists (approachListId?: number[], searchParams?: any, page?: number, limit?: Number) {
+  async getApproachLists (approachListId?: number, searchParams?: any, page?: number, limit?: Number) {
+    console.log(approachListId)
+    console.log(searchParams)
+    console.log(page)
+    console.log(limit)
     this.options.params = {
       id: approachListId,
-      method: 1,
-      team_id: searchParams.chargeOfTeam,
-      user_id: searchParams.chargeOfConsultant,
-      name: searchParams.listName,
-      type: searchParams.approachPurpose,
-      created_at_min: searchParams.registrationDateFrom,
-      created_at_max: searchParams.registrationDateTo,
+      // method: 1,
+      team_id: searchParams?.chargeOfTeam,
+      user_id: searchParams?.chargeOfConsultant,
+      name: searchParams?.listName,
+      type: searchParams?.approachPurpose,
+      created_at_min: searchParams?.registrationDateFrom,
+      created_at_max: searchParams?.registrationDateTo,
       page: page,
       limit: limit
     }

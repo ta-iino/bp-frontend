@@ -105,7 +105,7 @@
           {{ getTsrData(item.raw.id, '営業種目') }}
         </template>
         <template #[`item.representativeAge`]="{ item }">
-          {{ getCeoAge(item.raw.tsr['生年月日']) }}
+          {{ getCeoAge(getTsrData(item.raw.id, '生年月日')) }}
         </template>
         <template #[`item.numberOfEmployee`]="{ item }">
           {{ getTsrData(item.raw.id, '従業員数') }}
@@ -157,7 +157,6 @@ const config = useRuntimeConfig()
 const page: Ref<number> = ref(1)
 const perPage: Ref<number> = ref(50)
 const approachListId = Number(route.params.id)
-console.log(approachListId)
 const searchCompanyName: Ref<string> = ref('')
 const totalPage: Ref<number> = ref(0)
 // 発送企業データ(社内ポータル接続)
@@ -190,7 +189,6 @@ const sendCompanyIds: any = []
  */
 // マッチング履歴リスト取得
 const { data: matchingHistoriesData } = await $api.approach.getBuyneedsMatchingHistory(approachListId)
-console.log(matchingHistoriesData)
 const matchingHistories: any = ref(matchingHistoriesData.value)
 // const dmListId: number = ref(matchingHistories)
 // // json形式のリスト{id: 買いニーズマッチング履歴テーブルID, processingDate: マッチング処理日時}を作成
@@ -205,8 +203,6 @@ const matchingHistories: any = ref(matchingHistoriesData.value)
 // const matchingHistories: any = ref(matchingHistoriesData.value)
 // fix マッチング履歴取得APIの戻り値のdmListIdを取得
 const dmListId: number = ref(matchingHistories.value.dmListId)
-console.log(matchingHistories.value.buyneedsMatchingHistories)
-console.log(dmListId)
 // json形式のリスト{id: 買いニーズマッチング履歴テーブルID, processingDate: マッチング処理日時}を作成
 const processingDateList: any = ref(
   // fix filterは配列に対して使える。元のコードのままだとエラーになるため修正した。
@@ -219,32 +215,33 @@ const selectedBuyneedsHistoryId = ref(processingDateList.value[0].id)
 /**
  * ヘッダ部
  */
-const { data: approachListsData } = await $api.jmssPortal.getApproachLists([approachListId])
+const approachListIds: number = approachListId
+const { data: approachListsData } = await $api.jmssPortal.getApproachLists(approachListId)
 const approachData :any = ref(approachListsData.value)
 // UT用モック
 // const { data: approachListsData } = await useFetch('/api/approachLists')
 // const approachData :any = ref(approachListsData.value)
 // fix 元のソースだとitemsは取得できない。修正済。
 const items: any = [
-  { title: '担当チーム：', value: Object.values(approachData.value.data[0].request_team)[0] },
-  { title: '担当コンサルタント：', value: Object.values(approachData.value.data[0].request_users)[0] },
-  { title: 'リスト名：', value: approachData.value.data[0].name },
+  { title: '担当チーム：', value: confirmationData(approachData.value.data[0].request_team)[0] },
+  { title: '担当コンサルタント：', value: confirmationData(approachData.value.data[0].request_users)[0] },
+  { title: 'リスト名：', value: confirmationData(approachData.value.data[0].name) },
   // fix アプローチリストのtypeがアプローチ区分なので修正。purpose→type
-  { title: 'アプローチ区分：', value: approachData.value.data[0].type },
-  { title: '業種：', value: getValueObject(Object.values(approachData.value.data[0].jmss_industries)) },
-  { title: '地域：', value: approachData.value.data[0].areas[0] },
-  { title: '売上：', value: approachData.value.data[0].sales_ranges[0] },
-  { title: '発送社数：', value: matchingHistories.value.buyneedsMatchingHistories[0].sendCompanyCount },
-  { title: '利用業者名：', value: approachData.value.data[0].notification_users },
+  { title: 'アプローチ区分：', value: confirmationData(approachData.value.data[0].type) },
+  { title: '業種：', value: getValueObject(confirmationData(approachData.value.data[0].jmss_industries)) },
+  { title: '地域：', value: confirmationData(approachData.value.data[0].areas)[0] },
+  { title: '売上：', value: confirmationData(approachData.value.data[0].sales_ranges)[0] },
+  { title: '発送社数：', value: confirmationData(matchingHistories.value.buyneedsMatchingHistories[0].sendCompanyCount) },
+  { title: '利用業者名：', value: confirmationData(approachData.value.data[0].notification_users) },
   // fix remarksからnoteに変更
-  { title: '備考：', value: approachData.value.data[0].note },
+  { title: '備考：', value: confirmationData(approachData.value.data[0].note) },
   { title: '', value: '' }, // 画面レイアウト上空欄を作るため
   { title: '', value: '' }, // 画面レイアウト上空欄を作るため
-  { title: '発送日：', value: approachData.value.data[0].dm_date },
-  { title: '登録日：', value: formatDate(approachData.value.data[0].created_at) },
+  { title: '登録日：', value: formatDate(confirmationData(approachData.value.data[0].created_at)) },
   // fix マッチングステータスのidを文字列表示にする必要あり。convert.tsにメソッド追加済。
-  { title: '状況：', value: getMatchngStatusStr(matchingHistories.value.buyneedsMatchingHistories[0].matchingStatus) }
+  { title: '状況：', value: getMatchngStatusStr(confirmationData(matchingHistories.value.buyneedsMatchingHistories[0].matchingStatus)) }
 ]
+
 
 /**
  * ボディ部
@@ -325,6 +322,9 @@ getBodyData()
 const getTsrData = (id: any, targetKey: any) => {
   // 一覧表示用のデータからidをキーにtsr情報を取得して、targetKeyを添え字にしたvalueを取得する
   const result = (destinationCompanies.value).filter((destinationCompanyData: any) => id === destinationCompanyData.id)[0]
+  if (id || targetKey === null || id || targetKey === undefined) {
+    return ''
+  }
   if (result) {
     return result.tsr[targetKey]
   }
@@ -338,6 +338,9 @@ const getTsrData = (id: any, targetKey: any) => {
  */
 const getIndustry = (id: any, index: any) => {
   const result = (destinationCompanies.value).filter((destinationCompanyData: any) => id === destinationCompanyData.id)[0]
+  if (id || index === null || id || index === undefined) {
+    return ''
+  }
   const key = Object.keys(result.industry)[index]
   if (key) {
     return result.industry[key]
@@ -349,6 +352,9 @@ const getIndustry = (id: any, index: any) => {
  * @param zip: 一覧表示データの郵便番号
  */
 const putHyphen = (zip: any) => {
+  if (zip === null || zip === undefined) {
+    return ''
+  }
   const startNum = zip.substring(0, 3)
   const endNum = zip.substring(3, 7)
   const newZip = startNum + '-' + endNum

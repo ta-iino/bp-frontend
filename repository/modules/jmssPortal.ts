@@ -15,13 +15,13 @@ class JmssPortalModule extends BaseApiFactory {
     getTeams: '/api/v1/teams'
   }
 
+  private jmssPortalBaseURL
   private baseURL
-  private approachBaseURL
   private options: any = { headers: { 'Authorization': `Bearer ${this.authJmssPortalToken()}` } }
-  constructor (baseURL: string, approachBaseURL: string) {
+  constructor (jmssPortalBaseURL: string, baseURL: string) {
     super()
+    this.jmssPortalBaseURL = jmssPortalBaseURL
     this.baseURL = baseURL
-    this.approachBaseURL = approachBaseURL
   }
 
   /**
@@ -44,7 +44,7 @@ class JmssPortalModule extends BaseApiFactory {
       page: page,
       limit: limit
     }
-    return this.call(this.urls.getApproachLists, this.baseURL, this.options)
+    return this.call(this.urls.getApproachLists, this.jmssPortalBaseURL, this.options)
   }
 
   /**
@@ -53,7 +53,7 @@ class JmssPortalModule extends BaseApiFactory {
    * @returns アプローチリスト企業
    */
   getApproachCompanyList (approachListId: number) {
-    return this.call(this.urls.getApproachCompanyList(approachListId), this.baseURL)
+    return this.call(this.urls.getApproachCompanyList(approachListId), this.jmssPortalBaseURL)
   }
 
   // 買いニーズ取得API
@@ -76,7 +76,7 @@ class JmssPortalModule extends BaseApiFactory {
       page: page,
       limit: limit
     }
-    return this.call(this.urls.getBuyneeds, this.baseURL, this.options)
+    return this.call(this.urls.getBuyneeds, this.jmssPortalBaseURL, this.options)
   }
 
   /**
@@ -92,7 +92,7 @@ class JmssPortalModule extends BaseApiFactory {
       page: page,
       limit: limit
     }
-    return this.call(this.urls.getUsers, this.baseURL, this.options)
+    return this.call(this.urls.getUsers, this.jmssPortalBaseURL, this.options)
   }
 
   /**
@@ -110,7 +110,7 @@ class JmssPortalModule extends BaseApiFactory {
       page: page,
       limit: limit
     }
-    return this.call(this.urls.getCompanies, this.baseURL, this.options)
+    return this.call(this.urls.getCompanies, this.jmssPortalBaseURL, this.options)
   }
 
   /**
@@ -126,12 +126,14 @@ class JmssPortalModule extends BaseApiFactory {
       page: page,
       limit: limit
     }
-    return this.call(this.urls.getTeams, this.baseURL, this.options)
+    return this.call(this.urls.getTeams, this.jmssPortalBaseURL, this.options)
   }
 
+  //TODO approach.tsに持っていく。constructorからbaseURLを除きtokenを入れるように変更する
   // 社内ポータルで使用するため一旦こちらに入れている。
   // 社内ポータル接続用アクセストークン取得メソッド
   async authJmssPortalToken () {
+    console.log("authJmssPortalToken")
     const cookies = useCookies()
     // cookieが存在しない場合、アクセストークンの発行を行う
     if (!cookies.cookies.isKey('jmss_portal_access_token')) {
@@ -139,7 +141,7 @@ class JmssPortalModule extends BaseApiFactory {
       // APIキーをフロントで持たないためにBackendからアクセスする。
       const data: any = await useFetch(
         this.urls.getAccessToken, {
-          baseURL: this.approachBaseURL
+          baseURL: this.baseURL
         }
       )
       // TODO access_tokenの値をエンコードする必要あり？

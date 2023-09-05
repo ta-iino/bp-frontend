@@ -1,20 +1,16 @@
 import ApproachModule from '~/repository/modules/approach'
 import JmssPortalModule from '~/repository/modules/jmssPortal'
 
-interface ApiInstance {
-    approach: ApproachModule;
-    jmssPortal: JmssPortalModule;
-}
-
-export default defineNuxtPlugin((nuxtApp) => {
+export default defineNuxtPlugin(async (nuxtApp) => {
   const config = useRuntimeConfig()
-  const modules: ApiInstance = {
-    approach: new ApproachModule(config.public.baseURL),
-    jmssPortal: new JmssPortalModule(config.public.jmssPortalBaseURL, config.public.baseURL)
-  }
+  const approach: ApproachModule = new ApproachModule(config.public.baseURL)
+  const jmssPortal: JmssPortalModule = new JmssPortalModule(
+    config.public.jmssPortalBaseURL, await approach.getJmssPortalAccessToken()
+  )
   return {
     provide: {
-      api: modules
+      approach: approach,
+      jmssPortal: jmssPortal
     }
   }
 })

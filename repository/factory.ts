@@ -14,7 +14,14 @@ class BaseApiFactory {
         params: options.params
       }
     )
-    return { data, error }
+    // API通信時のエラーハンドリング
+    if(error.value) {
+      throw createError({
+        statusCode: error.value.statusCode,
+        statusMessage: error.value.statusMessage,
+      });
+    }
+    return data
   }
 }
 

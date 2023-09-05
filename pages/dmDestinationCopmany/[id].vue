@@ -152,7 +152,7 @@ import camelcaseKeys from 'camelcase-keys'
  */
 const route = useRoute()
 const router = useRouter()
-const { $api } = useNuxtApp()
+const { $approach, $jmssPortal } = useNuxtApp()
 const config = useRuntimeConfig()
 const page: Ref<number> = ref(1)
 const perPage: Ref<number> = ref(50)
@@ -188,7 +188,7 @@ const sendCompanyIds: any = []
  * マッチング処理日時リスト作成
  */
 // マッチング履歴リスト取得
-const { data: matchingHistoriesData } = await $api.approach.getBuyneedsMatchingHistory(approachListId)
+const { data: matchingHistoriesData } = await $approach.getBuyneedsMatchingHistory(approachListId)
 const matchingHistories: any = ref(matchingHistoriesData.value)
 // const dmListId: number = ref(matchingHistories)
 // // json形式のリスト{id: 買いニーズマッチング履歴テーブルID, processingDate: マッチング処理日時}を作成
@@ -216,7 +216,7 @@ const selectedBuyneedsHistoryId = ref(processingDateList.value[0].id)
  * ヘッダ部
  */
 const approachListIds: number = approachListId
-const { data: approachListsData } = await $api.jmssPortal.getApproachLists(approachListId)
+const { data: approachListsData } = await $jmssPortal.getApproachLists(approachListId)
 const approachData :any = ref(approachListsData.value)
 // UT用モック
 // const { data: approachListsData } = await useFetch('/api/approachLists')
@@ -261,7 +261,7 @@ const getBodyData = async (): Promise<any> => {
 // fix computedを削除（呼ばれない問題が発生したため）
 const getSendCompanyIds = async () => {
   // 発送企業履歴リスト取得
-  const { data: sendCompanyHistoriesData } = await $api.approach.getSendCompanyHistory(selectedBuyneedsHistoryId)
+  const { data: sendCompanyHistoriesData } = await $approach.getSendCompanyHistory(selectedBuyneedsHistoryId)
   sendCompanyHistories.value = ref(sendCompanyHistoriesData.value)
   // UT用モック
   // const { data: sendCompanyHistoriesData } = await useFetch('/api/sendComapnyHistory')
@@ -277,7 +277,7 @@ const getSendCompanyIds = async () => {
  */
 const getCompanyData = async (searchCompanyName?: string): Promise<any> => {
   const { data: companiesData } = (
-    await $api.jmssPortal.getCompanies(sendCompanyIds.value, searchCompanyName, page.value, perPage.value))
+    await $jmssPortal.getCompanies(sendCompanyIds.value, searchCompanyName, page.value, perPage.value))
   const companies: any = ref(companiesData.value)
   // UT用モック
   // const { data: companiesData } = await useFetch('/api/companies')
@@ -374,7 +374,7 @@ const searchCompany = () => {
  */
 const matchingStart = async (): Promise<void> => {
   // マッチング処理開始APIの呼び出し
-  await $api.approach.startBuyneedsMatching(dmListId)
+  await $approach.startBuyneedsMatching(dmListId)
   // データ作成及びジョブ送信が完了したら(エラーが起こらなければ)再表示処理を行う
   router.push({
     path: `/dmDestinationCopmany/${approachListId}}`
@@ -386,7 +386,7 @@ const matchingStart = async (): Promise<void> => {
  */
 const downloadCsv = async (): Promise<void> => {
   // 買いニーズマッチング結果CSV取得APIの呼び出し
-  const { data: downloadListData } = await $api.approach.getBuyneedsMatchingResultCsv(selectedBuyneedsHistoryId)
+  const { data: downloadListData } = await $approach.getBuyneedsMatchingResultCsv(selectedBuyneedsHistoryId)
   const downloadList: any = ref(downloadListData.value)
 
   // ファイルをBlob形式で取得

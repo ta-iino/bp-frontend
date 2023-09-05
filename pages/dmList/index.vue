@@ -176,22 +176,12 @@ const searchParams: Ref<any> = ref(
 )
 const approachLists: Ref<any> = ref()
 
-/**
- * 取得したオブジェクトがnullまたはundefinedだった場合の回避処理
- * @param リストに表示するデータ
- */
-const confirmationData = (objectData: any) => {
-  if (objectData === null || objectData === undefined) {
-    return ''
-  }
-  return getValueObject(Object.values(objectData))
-}
 
 /**
  * 全てのチームリスト
  */
-const {data: allTeamsData }: any = await $api.jmssPortal.getTeams()
-const allTeams: any = ref(allTeamsData)
+const allTeams: any = await $jmssPortal.getTeams()
+// const allTeams: any = ref(allTeamsData)
 // UT用モック（すべてのチームリスト）
 // const { data: allTeamsData } = await useFetch('/api/depTeam')
 // const allTeams: any = ref(allTeamsData)

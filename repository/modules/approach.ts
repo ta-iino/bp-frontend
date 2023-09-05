@@ -13,11 +13,12 @@ export class ApproachModule extends BaseApiFactory {
     getJmssPortalAccessToken: '/approach/api/create_jmss_portal_access_token/',
   }
 
-  private baseURL
+  private baseURL: string
   private options: any = {}
   constructor (baseURL: string) {
     super()
     this.baseURL = baseURL
+    this.options.credentials = 'include'
   }
 
   /**
@@ -28,6 +29,7 @@ export class ApproachModule extends BaseApiFactory {
    */
   async getDmList (approachListIds?: number[], searchCondition?: any) {
     this.options.params = {
+      current_url: window.location.href,
       approach_list_ids: approachListIds,
       search_condition: searchCondition
     }
@@ -42,6 +44,7 @@ export class ApproachModule extends BaseApiFactory {
   async getSendCompanyHistory (buyneedsMatchingHistoryId: Number) {
     // パスパラメータで飛ばしてもよさそう。
     this.options.params = {
+      current_url: window.location.href,
       buyneeds_matching_history_id: buyneedsMatchingHistoryId
     }
     return this.call(
@@ -58,6 +61,7 @@ export class ApproachModule extends BaseApiFactory {
    */
   async getBuyneedsMatchingHistory (approachListId: Number) {
     this.options.params = {
+      current_url: window.location.href,
       approach_list_id: approachListId
     }
     return this.call(
@@ -74,7 +78,7 @@ export class ApproachModule extends BaseApiFactory {
    */
   async getBuyneedsMatchingResultCsv (buyneedsMatchingHistoryId: Number) {
     this.options.params = {
-      buyneeds_matching_history_id: buyneedsMatchingHistoryId
+            buyneeds_matching_history_id: buyneedsMatchingHistoryId
     }
     return this.call(
       this.urls.getBuyneedsMatchingResultCsv,
@@ -91,6 +95,7 @@ export class ApproachModule extends BaseApiFactory {
   async getBuyneedsMatchingResult (sendCompanyHistoryId: Number) {
     
     this.options.params = {
+      current_url: window.location.href,
       send_company_history_id: sendCompanyHistoryId
     }
     console.log(sendCompanyHistoryId)
@@ -129,6 +134,9 @@ export class ApproachModule extends BaseApiFactory {
     if (!cookies.cookies.isKey('jmss_portal_access_token')) {
       // アクセストークン取得用API
       // APIキーをフロントで持たないためにBackendからアクセスする。
+      this.options.params = {
+        current_url: window.location.href,
+      }
       const data: any = await this.call(this.urls.getJmssPortalAccessToken, this.baseURL, this.options)
       cookies.cookies.set('jmss_portal_access_token', data.value.accessToken, data.value.expiresIn)
     }

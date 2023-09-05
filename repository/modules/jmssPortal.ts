@@ -19,6 +19,7 @@ class JmssPortalModule extends BaseApiFactory {
     super()
     this.jmssPortalBaseURL = jmssPortalBaseURL
     this.options = { headers: { 'Authorization': `Bearer ${accessToken}` } }
+    this.options.credentials = 'omit'
   }
 
   /**

@@ -10,7 +10,7 @@ export class ApproachModule extends BaseApiFactory {
     getBuyneedsMatchingResultCsv: '/approach/api/buyneeds_matching_result_csv/',
     getBuyneedsMatchingResult: '/approach/api/buyneeds_matching_result/',
     startBuyneedsMatching: '/approach/api//buyneeds_matching_start/',
-    getJmssPortalAccessToken: '/approach/api/create_jmss_portal_access_token',
+    getJmssPortalAccessToken: '/approach/api/create_jmss_portal_access_token/',
   }
 
   private baseURL
@@ -89,9 +89,11 @@ export class ApproachModule extends BaseApiFactory {
    * @returns 買いニーズマッチング結果JSON形式
    */
   async getBuyneedsMatchingResult (sendCompanyHistoryId: Number) {
+    
     this.options.params = {
       send_company_history_id: sendCompanyHistoryId
     }
+    console.log(sendCompanyHistoryId)
     return this.call(
       this.urls.getBuyneedsMatchingResult,
       this.baseURL,

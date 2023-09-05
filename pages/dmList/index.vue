@@ -159,7 +159,7 @@ import camelcaseKeys from 'camelcase-keys'
  * 初期値設定
  */
 const router = useRouter()
-const { $api } = useNuxtApp()
+const { $approach, $jmssPortal } = useNuxtApp()
 const page: Ref<number> = ref(1)
 const perPage: Ref<number> = ref(50)
 const totalPage: Ref<number> = ref(0)
@@ -176,6 +176,8 @@ const searchParams: Ref<any> = ref(
 )
 const approachLists: Ref<any> = ref()
 
+<<<<<<< HEAD
+
 
 /**
  * 全てのチームリスト
@@ -188,32 +190,40 @@ const allTeams: any = await $jmssPortal.getTeams()
 /**
  * 全てのユーザリスト
  */
-// const { data: allUsersData } = await $api.jmssPortal.getUsersById(undefined, page.value, perPage.value)
+const allUsers: any= await $jmssPortal.getUsersById(undefined, page.value, perPage.value)
 // const allUsers: any = ref(allUsersData.value)
 // UT用モック（すべてのユーザリスト）
-const { data: allUsersData } = await useFetch('/api/user')
-const allUsers: any = ref(allUsersData.value)
+// const { data: allUsersData } = await useFetch('/api/user')
+// const allUsers: any = ref(allUsersData.value)
 /**
  * DMリストテーブルに格納されている全てのアプローチリストIDリスト
  */
+<<<<<<< HEAD
+const dmLists: any = await $approach.getDmList()
+=======
 const { data: dmListsData } = await $api.approach.getDmList()
+>>>>>>> 7e4c5f43bb39081c7ba6fa612ffdf88d7dae86f2
 // const dmLists: any = ref(dmListsData.value)
 // const allApproachListIds: number[] = (dmLists.value).map((dmList: any) => dmList.dmList.companyId)
 // UT用モック（DMリストテーブルに格納されている全てのアプローチリストIDリスト）
 // const { data: dmListsData } = await useFetch('/api/dmList')
+<<<<<<< HEAD
+// const dmLists: any = ref(dmListsData.value)
+=======
 const dmLists: any = ref(dmListsData.value)
+>>>>>>> 7e4c5f43bb39081c7ba6fa612ffdf88d7dae86f2
 // fix DMリスト取得APIはrefInpl(Object)で戻ってくるので、取得方法を修正した。
 //  また、companyIdではなくapproachListIdに変更した。
-const allApproachListIds: number[] = (dmLists.value.dmLists).map((dmList: any) => dmList.dmList.approachListId)
+const allApproachListIds: number[] = (dmLists.value.dmLists).map((dmList: any) => dmList.approachListId)
 
 /**
  * 全てのアプローチリスト
  */
-// const { data: approachListData } = await $api.jmssPortal.getApproachLists(allApproachListIds, searchParams, page.value, perPage.value)
+const approachListsResponse: any = await $jmssPortal.getApproachLists(allApproachListIds, searchParams, page.value, perPage.value)
 // const approachListsResponse: any = ref(approachListData.value)
 // UT用モック（全てのアプローチリスト）
-const { data: approachListData } = await useFetch('/api/approachLists')
-const approachListsResponse: any = ref(approachListData.value)
+// const { data: approachListData } = await useFetch('/api/approachLists')
+// const approachListsResponse: any = ref(approachListData.value)
 
 /**
  * モック
@@ -237,7 +247,7 @@ const pulldownChargeOfConsultantArray: any = []
 const pulldownApproachPurposeArray: any = []
 
 // チームのプルダウンに必要なリストを取得
-for (let i = 0; i < allTeams.value.length; i++) {
+for (let i = 0; i < allTeams.length; i++) {
   if (allTeams.value[i].parent_id !== 0) {
     pulldownChargeOfTeamArray.push({ id: allTeams.value[i].id, name: allTeams.value[i].name })
   }
@@ -272,11 +282,12 @@ function removeDuplicate (dataArray: any) {
  */
 const getApproachListDatas = async (searchParams?: any): Promise<void> => {
   // 社内ポータルからのアプローチリスト取得
-  // const { data: approachListData } = await $api.jmssPortal.getApproachLists(allApproachListIds, searchParams, page.value, perPage.value)
+  const approachListsResponse: any = await $jmssPortal.getApproachLists(allApproachListIds, searchParams, page.value, perPage.value)
+  console.log(approachListsResponse)
   // const approachListsResponse: any = ref(approachListData.value)
   // UT用モック（アプローチリスト取得API）
-  const { data: approachListData } = await useFetch('/api/approachLists')
-  const approachListsResponse: any = ref(approachListData.value)
+  // const { data: approachListData } = await useFetch('/api/approachLists')
+  // const approachListsResponse: any = ref(approachListData.value)
 
   // 合計ページ(total÷1ページ当たりの表示数)をtotalPageに格納する（切り上げ）
   totalPage.value = Math.ceil(approachListsResponse.value.total / perPage.value)
@@ -286,6 +297,7 @@ const getApproachListDatas = async (searchParams?: any): Promise<void> => {
   approachLists.value = tmpData.sort(function (a: any, b: any) {
     return (a.createdAt < b.createdAt) ? 1 : -1
   })
+  console.log(approachLists)
 }
 
 getApproachListDatas()
@@ -320,7 +332,7 @@ const headers = ref(
  * @param targetKey // ターゲットとなる項目のキー
  */
 const getTableDmListData = (approachListId:any, targetKey:any): any => {
-  const result = (dmLists.value.dmLists).filter((dmListData: any) => approachListId === dmListData.dmList.approachListId)[0]
+  const result = (dmLists.value.dmLists).filter((dmListData: any) => approachListId === dmListData.approachListId)[0]
   if (result) {
     if (targetKey === 'matchingStatus') {
       return getMatchngStatusStr(result[targetKey])
@@ -335,7 +347,7 @@ const getTableDmListData = (approachListId:any, targetKey:any): any => {
  * @param targetKey // ターゲットとなる項目のキー
  */
 const getTableUserData = (userId:any, targetKey:any): any => {
-  const result = allUsers.value.filter((user: any) => userId[0] === user.id)[0]
+  const result = allUsers.value.filter((user: any) => userId[0] === user.id)
   if (result) {
     return result[targetKey]
   }

@@ -188,8 +188,9 @@ const sendCompanyIds: any = []
  * マッチング処理日時リスト作成
  */
 // マッチング履歴リスト取得
-const { data: matchingHistoriesData } = await $approach.getBuyneedsMatchingHistory(approachListId)
-const matchingHistories: any = ref(matchingHistoriesData.value)
+
+const matchingHistories: any = await $approach.getBuyneedsMatchingHistory(approachListId)
+
 // const dmListId: number = ref(matchingHistories)
 // // json形式のリスト{id: 買いニーズマッチング履歴テーブルID, processingDate: マッチング処理日時}を作成
 // const processingDateList: any = ref(
@@ -216,8 +217,7 @@ const selectedBuyneedsHistoryId = ref(processingDateList.value[0].id)
  * ヘッダ部
  */
 const approachListIds: number = approachListId
-const { data: approachListsData } = await $jmssPortal.getApproachLists(approachListId)
-const approachData :any = ref(approachListsData.value)
+const approachData: any = await $jmssPortal.getApproachLists(approachListId)
 // UT用モック
 // const { data: approachListsData } = await useFetch('/api/approachLists')
 // const approachData :any = ref(approachListsData.value)
@@ -261,14 +261,13 @@ const getBodyData = async (): Promise<any> => {
 // fix computedを削除（呼ばれない問題が発生したため）
 const getSendCompanyIds = async () => {
   // 発送企業履歴リスト取得
-  const { data: sendCompanyHistoriesData } = await $approach.getSendCompanyHistory(selectedBuyneedsHistoryId)
-  sendCompanyHistories.value = ref(sendCompanyHistoriesData.value)
+  const sendCompanyHistories: any = await $approach.getSendCompanyHistory(selectedBuyneedsHistoryId)
   // UT用モック
   // const { data: sendCompanyHistoriesData } = await useFetch('/api/sendComapnyHistory')
   // sendCompanyHistories.value = ref(sendCompanyHistoriesData.value)
   // 発送企業履歴リストから会社IDの配列を作成する
   // fix 戻り値が文字列の配列になっているので、APIの戻り値を変更するか、文字列→数値への変更が必要。→戻り値を数値に変更してもらえるように依頼済。
-  sendCompanyIds.value = (sendCompanyHistories.value.value.sendCompanyHistories).map((sendCompanyHistory: any) => sendCompanyHistory.companyId)
+  sendCompanyIds.value = (sendCompanyHistories.value.sendCompanyHistories).map((sendCompanyHistory: any) => sendCompanyHistory.companyId)
 }
 
 /**
@@ -276,9 +275,15 @@ const getSendCompanyIds = async () => {
  * @param searchCompanyName
  */
 const getCompanyData = async (searchCompanyName?: string): Promise<any> => {
+<<<<<<< HEAD
+  const companies: any = (
+    await $jmssPortal.getCompanies(sendCompanyIds.value, searchCompanyName, page.value, perPage.value))
+  // const companies: any = ref(companiesData.value)
+=======
   const { data: companiesData } = (
     await $jmssPortal.getCompanies(sendCompanyIds.value, searchCompanyName, page.value, perPage.value))
   const companies: any = ref(companiesData.value)
+>>>>>>> 7e4c5f43bb39081c7ba6fa612ffdf88d7dae86f2
   // UT用モック
   // const { data: companiesData } = await useFetch('/api/companies')
   // const companies: any = ref(companiesData.value)
@@ -322,6 +327,10 @@ getBodyData()
 const getTsrData = (id: any, targetKey: any) => {
   // 一覧表示用のデータからidをキーにtsr情報を取得して、targetKeyを添え字にしたvalueを取得する
   const result = (destinationCompanies.value).filter((destinationCompanyData: any) => id === destinationCompanyData.id)[0]
+<<<<<<< HEAD
+  console.log(result)
+=======
+>>>>>>> 7e4c5f43bb39081c7ba6fa612ffdf88d7dae86f2
   if (id || targetKey === null || id || targetKey === undefined) {
     return ''
   }
@@ -386,8 +395,7 @@ const matchingStart = async (): Promise<void> => {
  */
 const downloadCsv = async (): Promise<void> => {
   // 買いニーズマッチング結果CSV取得APIの呼び出し
-  const { data: downloadListData } = await $approach.getBuyneedsMatchingResultCsv(selectedBuyneedsHistoryId)
-  const downloadList: any = ref(downloadListData.value)
+  const downloadList: any = await $approach.getBuyneedsMatchingResultCsv(selectedBuyneedsHistoryId)
 
   // ファイルをBlob形式で取得
   const blobData = new Blob(downloadList.value.csv)

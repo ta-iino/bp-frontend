@@ -40,7 +40,6 @@ class JmssPortalModule extends BaseApiFactory {
       created_at_max: searchParams?.registrationDateTo,
       page: page,
       limit: limit,
-      key: 'Zpi5G7ugxYUHGL7MiAKpYmN5MDjLSiV8fUQY2jJD7DkuCESzKrJAzQW8uazJEM6h'
     }
     return this.call(this.urls.getApproachLists, this.jmssPortalBaseURL, this.options)
   }
@@ -89,7 +88,6 @@ class JmssPortalModule extends BaseApiFactory {
       id: userIds,
       page: page,
       limit: limit,
-      key: 'Zpi5G7ugxYUHGL7MiAKpYmN5MDjLSiV8fUQY2jJD7DkuCESzKrJAzQW8uazJEM6h'
     }
     return this.call(this.urls.getUsers, this.jmssPortalBaseURL, this.options)
   }
@@ -108,9 +106,9 @@ class JmssPortalModule extends BaseApiFactory {
       name: name,
       page: page,
       limit: limit,
-      key: 'Zpi5G7ugxYUHGL7MiAKpYmN5MDjLSiV8fUQY2jJD7DkuCESzKrJAzQW8uazJEM6h'
     }
     return this.call(this.urls.getCompanies, this.jmssPortalBaseURL, this.options)
+    
   }
 
   /**
@@ -125,7 +123,6 @@ class JmssPortalModule extends BaseApiFactory {
       department_id: department_id,
       page: page,
       limit: limit,
-      key: 'Zpi5G7ugxYUHGL7MiAKpYmN5MDjLSiV8fUQY2jJD7DkuCESzKrJAzQW8uazJEM6h'
     }
     return this.call(this.urls.getTeams, this.jmssPortalBaseURL, this.options)
   }

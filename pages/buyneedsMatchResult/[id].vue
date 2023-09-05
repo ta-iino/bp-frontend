@@ -44,20 +44,20 @@
           </v-row>
         </v-sheet>
       </v-row>
-      <!-- そのままではヘッダーの下に潜ってしまうので無理やりスペースを作る -->
+          <!-- そのままではヘッダーの下に潜ってしまうので無理やりスペースを作る
       <v-row class="my-16 comment">
         <br>
         <br>
         <br>
         <br>
-      </v-row>
+      </v-row> -->
       <v-row class="mt-16 mr-8">
         <v-row class="mr-n16 pt-1" justify="end">
           <h3>処理日時</h3>
           <span class="mx-10">{{ processDate }}</span>
         </v-row>
         <v-sheet
-          v-for="(buyneeds, i) in buyneedsList"
+          v-for="(buyneeds, i) in buyneedsList.data"
           :key="i"
           cols="16"
           class="mx-6 my-2"
@@ -78,7 +78,7 @@
                 </v-col>
                 <v-col cols="3">
                   <span class="link" @click="clickCompanyName(getValueObject(Object.keys(buyneeds.company)))">
-                    {{ getTargetBuyComapnyData(buyneeds, 'name') }}
+                    {{ getTargetBuyComapnyData(buyneeds, "name") }}
                   </span>
                 </v-col>
                 <v-col cols="2">
@@ -171,11 +171,12 @@ import { useRoute } from 'vue-router'
  * 初期値設定
  */
 const route = useRoute()
-const { $api } = useNuxtApp()
+const { $approach, $jmssPortal } = useNuxtApp()
 const config = useRuntimeConfig()
 const sellCompanyId = Number(route.params.id)
-const sendCompanyHistoryId = Number(route.query.sendCompanyHistoryId)
+const sendCompanyHistoryId = 4
 const processDate = String(route.query)
+
 
 /**
  * モック
@@ -211,48 +212,68 @@ const processDate = String(route.query)
  * ヘッダ部のデータ作成
  */
 // 売手企業情報取得APIの呼び出し
-// const { data: sellCompanyData } = await $api.jmssPortal.getCompanies([sellCompanyId])
+const sellCompany: any = await $jmssPortal.getCompanies([sellCompanyId])
 // const sellCompany: any = ref(sellCompanyData.value)
 // UT用モック
-const { data: sellCompanyData } = await useFetch('/api/companies')
-const sellCompany: any = ref(sellCompanyData.value)
+// const { data: sellCompanyData } = await useFetch('/api/companies')
+// const sellCompany: any = ref(sellCompanyData.value)
 // 表示タイトルとバリューの作成
 const items: any = [
   // fix リンク押下時に企業IDを渡したかったので修正した
-  { title: '企業名:', value: { id: sellCompany.value.data[0].id, value: sellCompany.value.data[0].name } },
-  { title: '業種１:', value: Object.values(sellCompany.value.data[0].industry)[0] },
+  { title: '企業名:', value: confirmationData({ id: sellCompany.value.data[0].id, value: sellCompany.value.data[0].name } )},
+  { title: '業種１:', value: confirmationData(sellCompany.value.data[0].industry)[0] },
   { title: '売上:', value: sellCompany.value.data[0].sales, bottom: '百万円' },
   { title: '所在地:', value: sellCompany.value.data[0].address },
-  { title: '業種２:', value: Object.values(sellCompany.value.data[0].industry)[1] },
+  { title: '業種２:', value: confirmationData(sellCompany.value.data[0].industry)[1] },
   { title: '営業利益:', value: sellCompany.value.data[0].profit, bottom: '百万円' },
   { title: '代表者名:', value: sellCompany.value.data[0].representative_name },
-  { title: '業種３:', value: Object.values(sellCompany.value.data[0].industry)[2] },
+  { title: '業種３:', value: confirmationData(sellCompany.value.data[0].industry)[2] },
   { title: '従業員数:', value: sellCompany.value.data[0].employees, bottom: '名' },
   { title: '代表者年齢:', value: getCeoAge(sellCompany.value.data[0].tsr['生年月日']) },
   { title: '営業種目:', value: sellCompany.value.data[0].tsr['営業種目'] }
 ]
 
+
+// /**
+//  *  tsr内のvalueを取得する処理
+//  * @param id: 一覧表示データのマスタID
+//  * @param targetKey: ターゲットとなるtsr情報のキー値
+//  */
+//  const getTsrData = (targetKey: any) => {
+//   // 一覧表示用のデータからidをキーにtsr情報を取得して、targetKeyを添え字にしたvalueを取得する
+//   const result = (sellCompany.value).filter((destinationCompanyData: any) => id === destinationCompanyData.id)[0]
+//   if (id || targetKey === null || id || targetKey === undefined) {
+//     return ''
+//   }
+//   if (result) {
+//     return result.tsr[targetKey]
+//   }
+//   return ''
+// }
 // /**
 //  * ボディ部のデータ作成
 //  */
 // マッチング結果取得APIの呼び出し
-// const { data: buyneedsMatchingResultData } = (
-//   await $api.approach.getBuyneedsMatchingResult(sendCompanyHistoryId)
-// )
+const buyneedsMatchingResult: any = (await $approach.getBuyneedsMatchingResult(sendCompanyHistoryId))
 // const buyneedsMatchingResult: any = ref(buyneedsMatchingResultData.value)
 
 // // 買い手企業情報取得APIの呼び出し
-// const buyCompanyIds: number[] = ref(
-//   buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId)
-// )
-// const { data: buyCompanyData } = await $api.jmssPortal.getCompanies(buyCompanyIds)
+const buyCompanyIds: number[] = ref(
+  buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId)
+)
+console.log(buyneedsMatchingResult)
+console.log(buyCompanyIds)
+const buyCompanyList: any = await $jmssPortal.getCompanies(buyCompanyIds)
 // const buyCompanyList: any = ref(buyCompanyData.value)
 
 // // 買いニーズ情報取得APIの呼び出し
-// const buyneedsIds: number[] = ref(
-//   buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { buyneeds_id: number; }) => item.buyneeds_id)
-// )
-// const { data: buyneedsData } = await $api.jmssPortal.getBuyneeds(buyneedsIds)
+const buyneedsIds: number[] = ref(
+  buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { buyneedsId: number; }) => item.buyneedsId)
+)
+console.log(buyneedsMatchingResult)
+console.log(buyneedsIds)
+const buyneedsList: any = await $jmssPortal.getBuyneeds(buyneedsIds)
+console.log(buyneedsList)
 // const buyneedsList: any = ref(buyneedsData.value)
 
 /**
@@ -260,25 +281,25 @@ const items: any = [
  * ボディ部のデータ作成
  */
 // マッチング結果取得APIの呼び出し
-const { data: buyneedsMatchingResultData } = await useFetch('/api/matchingResult')
-const buyneedsMatchingResult: any = ref(buyneedsMatchingResultData.value)
+// const { data: buyneedsMatchingResultData } = await useFetch('/api/matchingResult')
+// const buyneedsMatchingResult: any = ref(buyneedsMatchingResultData.value)
 
 // 買い手企業情報取得APIの呼び出し
-const buyCompanyIds: number[] = ref(
-  // fix 元のコードのままだとmapが呼び出せなかったので修正
-  buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId)
-)
-const { data: buyCompanyData } = await useFetch('/api/copmanyMasterList')
-const buyCompanyList: any = ref(buyCompanyData.value)
+// const buyCompanyIds: number[] = ref(
+//   // fix 元のコードのままだとmapが呼び出せなかったので修正
+//   buyneedsMatchingResult.buyneedsMatchingResults.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId)
+// )
+// const buyCompanyList: any= await useFetch('/api/copmanyMasterList')
+// // const buyCompanyList: any = ref(buyCompanyData.value)
 
-// 買いニーズ情報取得APIの呼び出し
-const buyneedsIds: number[] = ref(
-  // fix 元のコードのままだとmapが呼び出せなかったので修正
-  buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { buyneeds_id: number; }) => item.buyneeds_id)
-)
-const { data: buyneedsData } = await useFetch('/api/buyNeeds')
-const tmpBuyneedsList: any = ref(buyneedsData.value)
-const buyneedsList: any = ref(tmpBuyneedsList.value.data)
+// // 買いニーズ情報取得APIの呼び出し
+// const buyneedsIds: number[] = ref(
+//   // fix 元のコードのままだとmapが呼び出せなかったので修正
+//   buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { buyneeds_id: number; }) => item.buyneeds_id)
+// )
+// const buyneedsList: any = await useFetch('/api/buyNeeds')
+// // const tmpBuyneedsList: any = ref(buyneedsData.value)
+// // const buyneedsList: any = ref(tmpBuyneedsList.value.data)
 
 /**
  * 買いニーズに紐づく買手企業から特定データを取得する
@@ -287,6 +308,7 @@ const buyneedsList: any = ref(tmpBuyneedsList.value.data)
  */
 const getTargetBuyComapnyData = (buyneeds:any, targetKey:any): any => {
   // fix 元のコードのままだとmapが呼び出せなかったので修正
+  console.log(buyneeds)
   const result: any = buyCompanyList.value.data.filter((buyCompany: any) => Object.keys(buyneeds.company)[0] === buyCompany.id)[0]
   if (result !== undefined) {
     return result[targetKey]
@@ -333,7 +355,6 @@ const clickCloseButton = (): void => {
 #sticky {
   position: fixed;
   z-index: 1;
-  width: 1200px;
   background-color: white;
 }
 

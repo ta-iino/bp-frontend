@@ -39,13 +39,15 @@ export class ApproachModule extends BaseApiFactory {
   /**
    * 発送企業履歴取得API
    * @param buyneedsMatchingHistoryId
+   * @param sendCompanyHistoryId
    * @returns 発送企業履歴リスト
    */
-  async getSendCompanyHistory (buyneedsMatchingHistoryId: Number) {
+  async getSendCompanyHistory (buyneedsMatchingHistoryId?: Number, sendCompanyHistoryId?: string) {
     // パスパラメータで飛ばしてもよさそう。
     this.options.params = {
-      current_url: window.location.href,
-      buyneeds_matching_history_id: buyneedsMatchingHistoryId
+      buyneeds_matching_history_id: buyneedsMatchingHistoryId,
+      send_company_history_id: sendCompanyHistoryId,
+      current_url: window.location.href
     }
     return this.call(
       this.urls.getSendCompanyHistory,
@@ -59,7 +61,7 @@ export class ApproachModule extends BaseApiFactory {
    * @param approachListId
    * @returns 買いニーズマッチング履歴リスト
    */
-  async getBuyneedsMatchingHistory (approachListId: Number) {
+  async getBuyneedsMatchingHistory (approachListId: string) {
     this.options.params = {
       current_url: window.location.href,
       approach_list_id: approachListId
@@ -92,7 +94,7 @@ export class ApproachModule extends BaseApiFactory {
    * @param sendCompanyHistoryId
    * @returns 買いニーズマッチング結果JSON形式
    */
-  async getBuyneedsMatchingResult (sendCompanyHistoryId: Number) {
+  async getBuyneedsMatchingResult (sendCompanyHistoryId: String) {
     
     this.options.params = {
       current_url: window.location.href,

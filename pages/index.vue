@@ -124,7 +124,7 @@
             {{ getTableDmListData(item.raw.id, 'sendCompanyCount') }}
           </template>
           <template #[`item.chargeOfConsultant`]="{ item }">
-            {{ getTableUserData(Object.keys(item.raw.createdBy), 'name') }}
+            {{ confirmationData(item.raw.requestUsers), 'name' }}
           </template>
           <!-- ページネーション ここから -->
           <template #bottom>
@@ -175,79 +175,23 @@ const searchParams: Ref<any> = ref(
   }
 )
 const approachLists: Ref<any> = ref()
-
-<<<<<<< HEAD
-
-
 /**
- * 全てのチームリスト
+ * 全てのチーム、ユーザ、DMリストテーブルに登録されているアプローチIDリスト
  */
 const allTeams: any = await $jmssPortal.getTeams()
-// const allTeams: any = ref(allTeamsData)
-// UT用モック（すべてのチームリスト）
-// const { data: allTeamsData } = await useFetch('/api/depTeam')
-// const allTeams: any = ref(allTeamsData)
-/**
- * 全てのユーザリスト
- */
 const allUsers: any= await $jmssPortal.getUsersById(undefined, page.value, perPage.value)
-// const allUsers: any = ref(allUsersData.value)
-// UT用モック（すべてのユーザリスト）
-// const { data: allUsersData } = await useFetch('/api/user')
-// const allUsers: any = ref(allUsersData.value)
-/**
- * DMリストテーブルに格納されている全てのアプローチリストIDリスト
- */
-<<<<<<< HEAD
 const dmLists: any = await $approach.getDmList()
-=======
-const { data: dmListsData } = await $api.approach.getDmList()
->>>>>>> 7e4c5f43bb39081c7ba6fa612ffdf88d7dae86f2
-// const dmLists: any = ref(dmListsData.value)
-// const allApproachListIds: number[] = (dmLists.value).map((dmList: any) => dmList.dmList.companyId)
-// UT用モック（DMリストテーブルに格納されている全てのアプローチリストIDリスト）
-// const { data: dmListsData } = await useFetch('/api/dmList')
-<<<<<<< HEAD
-// const dmLists: any = ref(dmListsData.value)
-=======
-const dmLists: any = ref(dmListsData.value)
->>>>>>> 7e4c5f43bb39081c7ba6fa612ffdf88d7dae86f2
-// fix DMリスト取得APIはrefInpl(Object)で戻ってくるので、取得方法を修正した。
-//  また、companyIdではなくapproachListIdに変更した。
 const allApproachListIds: number[] = (dmLists.value.dmLists).map((dmList: any) => dmList.approachListId)
 
 /**
- * 全てのアプローチリスト
- */
-const approachListsResponse: any = await $jmssPortal.getApproachLists(allApproachListIds, searchParams, page.value, perPage.value)
-// const approachListsResponse: any = ref(approachListData.value)
-// UT用モック（全てのアプローチリスト）
-// const { data: approachListData } = await useFetch('/api/approachLists')
-// const approachListsResponse: any = ref(approachListData.value)
-
-/**
- * モック
- */
-// DMリスト取得API呼出
-// const { data: dmListList} = await useFetch('/api/dmList')
-// ユーザー取得API呼出
-// const { data: user} = await useFetch('/api/user')
-// アプローチリスト
-// const { data: approachList} = await useFetch('/api/approachLists')
-// チーム
-// const { data: tmpDepTeam} = await useFetch('/api/depTeam')
-
-/**
  * プルダウンリスト生成
- * TODO アプローチリスト取得APIにはコードで渡さないといけない。
- * ⇒なので、key=id, value=nameのjson型のリストにする。searchParamsに入れる値はkeyのコードにする
  */
 const pulldownChargeOfTeamArray: any = []
 const pulldownChargeOfConsultantArray: any = []
 const pulldownApproachPurposeArray: any = []
 
 // チームのプルダウンに必要なリストを取得
-for (let i = 0; i < allTeams.length; i++) {
+for (let i = 0; i < allTeams.value.length; i++) {
   if (allTeams.value[i].parent_id !== 0) {
     pulldownChargeOfTeamArray.push({ id: allTeams.value[i].id, name: allTeams.value[i].name })
   }
@@ -280,14 +224,9 @@ function removeDuplicate (dataArray: any) {
  * 一覧表示用データ取得処理(アプローチリスト取得API)
  * @param searchParams
  */
-const getApproachListDatas = async (searchParams?: any): Promise<void> => {
+const getApproachListsData = async (searchParams?: any): Promise<void> => {
   // 社内ポータルからのアプローチリスト取得
-  const approachListsResponse: any = await $jmssPortal.getApproachLists(allApproachListIds, searchParams, page.value, perPage.value)
-  console.log(approachListsResponse)
-  // const approachListsResponse: any = ref(approachListData.value)
-  // UT用モック（アプローチリスト取得API）
-  // const { data: approachListData } = await useFetch('/api/approachLists')
-  // const approachListsResponse: any = ref(approachListData.value)
+  const approachListsResponse: any = await $jmssPortal.getApproachLists(allApproachListIds.join(), searchParams?.value, page.value, perPage.value)
 
   // 合計ページ(total÷1ページ当たりの表示数)をtotalPageに格納する（切り上げ）
   totalPage.value = Math.ceil(approachListsResponse.value.total / perPage.value)
@@ -297,15 +236,10 @@ const getApproachListDatas = async (searchParams?: any): Promise<void> => {
   approachLists.value = tmpData.sort(function (a: any, b: any) {
     return (a.createdAt < b.createdAt) ? 1 : -1
   })
-  console.log(approachLists)
 }
 
-getApproachListDatas()
-
-// // ユーザー取得APIに渡すuserIDのリストを生成する
-// const userIds: number[] = (
-//   (approachLists.value).map((approachList: any)  => Object.keys(approachList.createdBy))
-// );
+// 初期表示用に呼び出し
+getApproachListsData()
 
 // ヘッダ
 const headers = ref(
@@ -342,24 +276,12 @@ const getTableDmListData = (approachListId:any, targetKey:any): any => {
 }
 
 /**
- * 一覧のユーザーIDをキーにユーザーリストを検索する。
- * @param userId // ユーザーID
- * @param targetKey // ターゲットとなる項目のキー
- */
-const getTableUserData = (userId:any, targetKey:any): any => {
-  const result = allUsers.value.filter((user: any) => userId[0] === user.id)
-  if (result) {
-    return result[targetKey]
-  }
-}
-
-/**
  * 検索ボタン押下時処理
 */
 const searchButton = (): void => {
   page.value = 1
   // 一覧に表示するアプローチリストのデータを取得する
-  getApproachListDatas(searchParams)
+  getApproachListsData(searchParams)
 }
 
 /**
@@ -368,7 +290,7 @@ const searchButton = (): void => {
  */
 const onChangePage = (targetPage: number): void => {
   page.value = targetPage
-  getApproachListDatas(searchParams)
+  getApproachListsData(searchParams)
 }
 
 /**

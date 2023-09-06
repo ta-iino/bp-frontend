@@ -22,8 +22,8 @@
                 <v-col class="px-10 py-0">
                   {{ item.title }}
                 </v-col>
-                <v-col class="pl-4 py-0 link" @click="clickCompanyName(item.value.id)">
-                  {{ item.value.value }}
+                <v-col class="pl-4 py-0 link" @click="clickCompanyName()">
+                  {{ item.value }}
                 </v-col>
               </v-row>
               <v-row v-else>
@@ -44,13 +44,13 @@
           </v-row>
         </v-sheet>
       </v-row>
-          <!-- そのままではヘッダーの下に潜ってしまうので無理やりスペースを作る
+          <!-- そのままではヘッダーの下に潜ってしまうので無理やりスペースを作る -->
       <v-row class="my-16 comment">
         <br>
         <br>
         <br>
         <br>
-      </v-row> -->
+      </v-row>
       <v-row class="mt-16 mr-8">
         <v-row class="mr-n16 pt-1" justify="end">
           <h3>処理日時</h3>
@@ -77,7 +77,7 @@
                   企業:
                 </v-col>
                 <v-col cols="3">
-                  <span class="link" @click="clickCompanyName(getValueObject(Object.keys(buyneeds.company)))">
+                  <span class="link" @click="clickCompanyName(getTargetBuyComapnyData(buyneeds, 'id'))">
                     {{ getTargetBuyComapnyData(buyneeds, "name") }}
                   </span>
                 </v-col>
@@ -141,7 +141,7 @@
                   買収希望業種:
                 </v-col>
                 <v-col cols="3">
-                  {{ getValueObject(Object.values(buyneeds.industries)) }}
+                  {{ confirmationData(buyneeds.industries) }}
                 </v-col>
               </v-row>
             </v-col>
@@ -173,133 +173,44 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const { $approach, $jmssPortal } = useNuxtApp()
 const config = useRuntimeConfig()
-const sellCompanyId = Number(route.params.id)
-const sendCompanyHistoryId = 4
-const processDate = String(route.query)
-
-
-/**
- * モック
- */
-// 発送企業情報
-// const sellCompany = {
-//   id: 1,
-//   name: '株式会社テスト',
-//   address: '東京都渋谷区',
-//   representativeName: 'テスト太郎',
-//   representativeAge: 50,
-//   industry1: 'IT',
-//   industry2: 'ソフトウェア',
-//   industry3: 'システム開発',
-//   items: 'システム開発',
-//   sales: 100,
-//   income: 30,
-//   employees: 100
-// }
-// マッチング結果テーブル情報
-// const { data: buyneedsMatchingResultData } = await useFetch('api/matchingResult')
-
-// 買手企業情報
-// const { data: buyCompanyList } = await useFetch('api/buyCompany')
-
-// 買いニーズ情報
-// const { data: buyNeedsList } = await useFetch('api/buyNeeds')
-/**
- * /モック終了
- */
+const sendCompanyHistoryId: string = String(route.params.id)
+const processDate: string = String(route.query)
 
 /**
  * ヘッダ部のデータ作成
  */
+const sellCompanyHistory: any = await $approach.getSendCompanyHistory(undefined, sendCompanyHistoryId)
+const sellCompanyId: number = sellCompanyHistory.value.sendCompanyHistories[0].companyId
 // 売手企業情報取得APIの呼び出し
-const sellCompany: any = await $jmssPortal.getCompanies([sellCompanyId])
-// const sellCompany: any = ref(sellCompanyData.value)
-// UT用モック
-// const { data: sellCompanyData } = await useFetch('/api/companies')
-// const sellCompany: any = ref(sellCompanyData.value)
+const sellCompany: any = await $jmssPortal.getCompanies(String(sellCompanyId))
 // 表示タイトルとバリューの作成
 const items: any = [
-  // fix リンク押下時に企業IDを渡したかったので修正した
-  { title: '企業名:', value: confirmationData({ id: sellCompany.value.data[0].id, value: sellCompany.value.data[0].name } )},
-  { title: '業種１:', value: confirmationData(sellCompany.value.data[0].industry)[0] },
+  { title: '企業名:', value: sellCompany.value.data[0].name},
+  // { title: '業種１:', value: confirmationData(sellCompany.value.data[0].industries) },
   { title: '売上:', value: sellCompany.value.data[0].sales, bottom: '百万円' },
   { title: '所在地:', value: sellCompany.value.data[0].address },
-  { title: '業種２:', value: confirmationData(sellCompany.value.data[0].industry)[1] },
+  // { title: '業種２:', value: confirmationData(sellCompany.value.data[0].industries) },
   { title: '営業利益:', value: sellCompany.value.data[0].profit, bottom: '百万円' },
   { title: '代表者名:', value: sellCompany.value.data[0].representative_name },
-  { title: '業種３:', value: confirmationData(sellCompany.value.data[0].industry)[2] },
+  // { title: '業種３:', value: confirmationData(sellCompany.value.data[0].industries) },
   { title: '従業員数:', value: sellCompany.value.data[0].employees, bottom: '名' },
   { title: '代表者年齢:', value: getCeoAge(sellCompany.value.data[0].tsr['生年月日']) },
   { title: '営業種目:', value: sellCompany.value.data[0].tsr['営業種目'] }
 ]
 
-
 // /**
-//  *  tsr内のvalueを取得する処理
-//  * @param id: 一覧表示データのマスタID
-//  * @param targetKey: ターゲットとなるtsr情報のキー値
-//  */
-//  const getTsrData = (targetKey: any) => {
-//   // 一覧表示用のデータからidをキーにtsr情報を取得して、targetKeyを添え字にしたvalueを取得する
-//   const result = (sellCompany.value).filter((destinationCompanyData: any) => id === destinationCompanyData.id)[0]
-//   if (id || targetKey === null || id || targetKey === undefined) {
-//     return ''
-//   }
-//   if (result) {
-//     return result.tsr[targetKey]
-//   }
-//   return ''
-// }
-// /**
-//  * ボディ部のデータ作成
+//  * ボディ部のデータ作成.
 //  */
 // マッチング結果取得APIの呼び出し
-const buyneedsMatchingResult: any = (await $approach.getBuyneedsMatchingResult(sendCompanyHistoryId))
-// const buyneedsMatchingResult: any = ref(buyneedsMatchingResultData.value)
+const buyneedsMatchingResult: any = await $approach.getBuyneedsMatchingResult(sendCompanyHistoryId)
 
 // // 買い手企業情報取得APIの呼び出し
-const buyCompanyIds: number[] = ref(
-  buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId)
-)
-console.log(buyneedsMatchingResult)
-console.log(buyCompanyIds)
-const buyCompanyList: any = await $jmssPortal.getCompanies(buyCompanyIds)
-// const buyCompanyList: any = ref(buyCompanyData.value)
+const buyCompanyIds: number[] = buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId)
+const buyCompanyList: any = await $jmssPortal.getCompanies(buyCompanyIds.join())
 
 // // 買いニーズ情報取得APIの呼び出し
-const buyneedsIds: number[] = ref(
-  buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { buyneedsId: number; }) => item.buyneedsId)
-)
-console.log(buyneedsMatchingResult)
-console.log(buyneedsIds)
-const buyneedsList: any = await $jmssPortal.getBuyneeds(buyneedsIds)
-console.log(buyneedsList)
-// const buyneedsList: any = ref(buyneedsData.value)
-
-/**
- * UT用モック
- * ボディ部のデータ作成
- */
-// マッチング結果取得APIの呼び出し
-// const { data: buyneedsMatchingResultData } = await useFetch('/api/matchingResult')
-// const buyneedsMatchingResult: any = ref(buyneedsMatchingResultData.value)
-
-// 買い手企業情報取得APIの呼び出し
-// const buyCompanyIds: number[] = ref(
-//   // fix 元のコードのままだとmapが呼び出せなかったので修正
-//   buyneedsMatchingResult.buyneedsMatchingResults.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId)
-// )
-// const buyCompanyList: any= await useFetch('/api/copmanyMasterList')
-// // const buyCompanyList: any = ref(buyCompanyData.value)
-
-// // 買いニーズ情報取得APIの呼び出し
-// const buyneedsIds: number[] = ref(
-//   // fix 元のコードのままだとmapが呼び出せなかったので修正
-//   buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { buyneeds_id: number; }) => item.buyneeds_id)
-// )
-// const buyneedsList: any = await useFetch('/api/buyNeeds')
-// // const tmpBuyneedsList: any = ref(buyneedsData.value)
-// // const buyneedsList: any = ref(tmpBuyneedsList.value.data)
+const buyneedsIds: number[] = buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { buyneedsId: number; }) => item.buyneedsId)
+const buyneedsList: any = await $jmssPortal.getBuyneeds(buyneedsIds.join())
 
 /**
  * 買いニーズに紐づく買手企業から特定データを取得する
@@ -307,10 +218,8 @@ console.log(buyneedsList)
  * @param targetKey
  */
 const getTargetBuyComapnyData = (buyneeds:any, targetKey:any): any => {
-  // fix 元のコードのままだとmapが呼び出せなかったので修正
-  console.log(buyneeds)
-  const result: any = buyCompanyList.value.data.filter((buyCompany: any) => Object.keys(buyneeds.company)[0] === buyCompany.id)[0]
-  if (result !== undefined) {
+  const result: any = buyCompanyList.value.data.filter((buyCompany: any) => Object.keys(buyneeds.company)[0] === String(buyCompany.id))[0]
+  if (result || result !== undefined) {
     return result[targetKey]
   }
   return ''
@@ -320,21 +229,29 @@ const getTargetBuyComapnyData = (buyneeds:any, targetKey:any): any => {
  * 買手企業の業種表示用(複数処理が必要なためmethods化した)
  * @param buyneeds
  */
-// fix getCompanyIndustryNameArrayは昔の名残のため削除した。null回避のためif文を追加。
 const getCompanyIndutryNames = (buyneeds: any): string => {
   const industry: string = getTargetBuyComapnyData(buyneeds, 'industry')
-  if (industry) {
-    const industryNames: string = getValueObject(Object.values(industry))
-    return industryNames
+  const industryNames: string = confirmationData(industry)
+  return industryNames
+}
+/**
+ *  tsr内のvalueを取得する処理
+ * @param id: 一覧表示データのマスタID
+ * @param targetKey: ターゲットとなるtsr情報のキー値
+ */
+ const getTsrData = (id: any, targetKey: any) => {
+  // 一覧表示用のデータからidをキーにtsr情報を取得して、targetKeyを添え字にしたvalueを取得する
+  const result = (destinationCompanies.value).filter((destinationCompanyData: any) => id === destinationCompanyData.id)[0]
+  if (result && result.tsr) {
+    return result.tsr[targetKey]
   }
   return ''
 }
-
 /**
  * 会社名押下時の処理
- * @param companyId
+ * @param companyId 引数に値が渡されなければ売手企業IDを渡す
  */
-const clickCompanyName = (companyId: number): void => {
+const clickCompanyName = (companyId: number=sellCompanyId): void => {
   const url = config.public.jmssPortalBaseURL + '/company/' + companyId
   window.open(url)
 }

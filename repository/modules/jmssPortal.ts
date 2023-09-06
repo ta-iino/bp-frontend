@@ -29,7 +29,7 @@ class JmssPortalModule extends BaseApiFactory {
    * @param limit
    * @returns アプローチリスト
    */
-  async getApproachLists (approachListId?: number, searchParams?: any, page?: number, limit?: Number) {
+  async getApproachLists (approachListId?: string, searchParams?: any, page?: number, limit?: Number) {
     this.options.params = {
       id: approachListId,
       // method: 1,
@@ -60,7 +60,7 @@ class JmssPortalModule extends BaseApiFactory {
    * @param buyneedsId
    * @returns
    */
-  getBuyneeds (buyneedsIds?: number[], page?: number, limit?: number) {
+  getBuyneeds (buyneedsIds?: string, page?: number, limit?: number) {
     this.options.params = {
       id: buyneedsIds,
       // source_type: sourceType,
@@ -101,7 +101,7 @@ class JmssPortalModule extends BaseApiFactory {
    * @param limit
    * @returns
    */
-  getCompanies (companyIds?: number[], name?: string, page?: number, limit?: number) {
+  getCompanies (companyIds?: string, name?: string, page?: number, limit?: number) {
     this.options.params = {
       id: companyIds,
       name: name,

@@ -156,118 +156,67 @@ const { $approach, $jmssPortal } = useNuxtApp()
 const config = useRuntimeConfig()
 const page: Ref<number> = ref(1)
 const perPage: Ref<number> = ref(50)
-const approachListId = Number(route.params.id)
+const approachListId: string = String(route.params.id)
 const searchCompanyName: Ref<string> = ref('')
 const totalPage: Ref<number> = ref(0)
 // 発送企業データ(社内ポータル接続)
 const destinationCompanies: Ref<any> = ref()
 // 発送企業履歴データ（バックエンド接続）
 const sendCompanyHistories: Ref<any> = ref()
-// fix 企業取得APIには数字の配列を渡すので変更した。
 const sendCompanyIds: any = []
-
-/**
- * モック
- */
-
-// マッチングプルダウンリスト
-// const { data: matchingHistoryList } = await useFetch('/api/processingDateList');
-
-// DMリスト
-// // const { data : dmListsData }  = await useFetch('/api/approachLists');
-// props: ["dmListsData"]
-// const dmLists: any = ref(dmListsData.value);
-// const dmList: any = ref(dmLists.value[0]);
-
-// 発送企業履歴一覧
-// const { data : destinationCompanyData }  = await useFetch('api/sample2')
-// const { data: sendCompanyHistoryListData } = await useFetch('api/dmDestinationCopmanyList');
-// const { data : destinationCompanyListData }  = await useFetch('api/copmanyMasterList');
 
 /**
  * マッチング処理日時リスト作成
  */
-// マッチング履歴リスト取得
-
 const matchingHistories: any = await $approach.getBuyneedsMatchingHistory(approachListId)
-
-// const dmListId: number = ref(matchingHistories)
-// // json形式のリスト{id: 買いニーズマッチング履歴テーブルID, processingDate: マッチング処理日時}を作成
-// const processingDateList: any = ref(
-//   (matchingHistories.value).filter((matchingHistories: any) => matchingHistories.id && matchingHistories.processed_datetime)
-//     .map((matchingHistories: any) => ({ id: matchingHistories.id, processingDate: matchingHistories.processed_datetime }))
-// )
-// // 最新のマッチング処理日時をAPIに渡す
-// const selectedBuyneedsHistoryId: number = ref(processingDateList.value[0].id);
-// UT用データ
-// const { data: matchingHistoriesData } = await useFetch('/api/buyneedsMatchingHistory')
-// const matchingHistories: any = ref(matchingHistoriesData.value)
-// fix マッチング履歴取得APIの戻り値のdmListIdを取得
 const dmListId: number = ref(matchingHistories.value.dmListId)
 // json形式のリスト{id: 買いニーズマッチング履歴テーブルID, processingDate: マッチング処理日時}を作成
 const processingDateList: any = ref(
-  // fix filterは配列に対して使える。元のコードのままだとエラーになるため修正した。
   (matchingHistories.value.buyneedsMatchingHistories).filter((matchingHistories: any) => matchingHistories.id && matchingHistories.processedDatetime)
-    .map((matchingHistories: any) => ({ id: matchingHistories.id, processingDate: matchingHistories.processedDatetime }))
+  .map((matchingHistories: any) => ({ id: matchingHistories.id, processingDate: matchingHistories.processedDatetime }))
 )
 // 最新のマッチング処理日時をAPIに渡す
-const selectedBuyneedsHistoryId = ref(processingDateList.value[0].id)
+const selectedBuyneedsHistoryId: Ref<number> = ref(processingDateList.value[0].id)
 
 /**
  * ヘッダ部
  */
-const approachListIds: number = approachListId
-const approachData: any = await $jmssPortal.getApproachLists(approachListId)
-// UT用モック
-// const { data: approachListsData } = await useFetch('/api/approachLists')
-// const approachData :any = ref(approachListsData.value)
-// fix 元のソースだとitemsは取得できない。修正済。
+const approachListData: any = await $jmssPortal.getApproachLists(approachListId)
+// 取得したデータのキーをキャメルケースに変換する
+const approachListCamelData = camelcaseKeys(approachListData.value.data[0], { deep: true })
 const items: any = [
-  { title: '担当チーム：', value: confirmationData(approachData.value.data[0].request_team)[0] },
-  { title: '担当コンサルタント：', value: confirmationData(approachData.value.data[0].request_users)[0] },
-  { title: 'リスト名：', value: confirmationData(approachData.value.data[0].name) },
-  // fix アプローチリストのtypeがアプローチ区分なので修正。purpose→type
-  { title: 'アプローチ区分：', value: confirmationData(approachData.value.data[0].type) },
-  { title: '業種：', value: getValueObject(confirmationData(approachData.value.data[0].jmss_industries)) },
-  { title: '地域：', value: confirmationData(approachData.value.data[0].areas)[0] },
-  { title: '売上：', value: confirmationData(approachData.value.data[0].sales_ranges)[0] },
-  { title: '発送社数：', value: confirmationData(matchingHistories.value.buyneedsMatchingHistories[0].sendCompanyCount) },
-  { title: '利用業者名：', value: confirmationData(approachData.value.data[0].notification_users) },
-  // fix remarksからnoteに変更
-  { title: '備考：', value: confirmationData(approachData.value.data[0].note) },
+  { title: '担当チーム：', value: confirmationData(approachListCamelData.requestTeam) },
+  { title: '担当コンサルタント：', value: confirmationData(approachListCamelData.requestUsers) },
+  { title: 'リスト名：', value: approachListCamelData.name },
+  { title: 'アプローチ区分：', value: approachListCamelData.type },
+  { title: '業種：', value: confirmationData(approachListCamelData.jmssIndustries) },
+  { title: '地域：', value: confirmationData(approachListCamelData.areas) },
+  { title: '売上：', value: confirmationData(approachListCamelData.salesRanges) },
+  { title: '発送社数：', value: matchingHistories.value.buyneedsMatchingHistories[0].sendCompanyCount },
+  { title: '利用業者名：', value: approachListCamelData.venderName },
+  { title: '備考：', value: approachListCamelData.note },
   { title: '', value: '' }, // 画面レイアウト上空欄を作るため
   { title: '', value: '' }, // 画面レイアウト上空欄を作るため
-  { title: '登録日：', value: formatDate(confirmationData(approachData.value.data[0].created_at)) },
-  // fix マッチングステータスのidを文字列表示にする必要あり。convert.tsにメソッド追加済。
-  { title: '状況：', value: getMatchngStatusStr(confirmationData(matchingHistories.value.buyneedsMatchingHistories[0].matchingStatus)) }
+  { title: '登録日：', value: formatDate(approachListCamelData.createdAt) },
+  { title: '状況：', value: getMatchngStatusStr(matchingHistories.value.buyneedsMatchingHistories[0].matchingStatus) }
 ]
 
-
-/**
- * ボディ部
- */
 /**
  * ボディ部のデータ取得メソッド
  */
-// fix getSendCompanyIdsが呼ばれない問題が発生したため呼び出し方を修正。
 const getBodyData = async (): Promise<any> => {
-  getSendCompanyIds()
-  getCompanyData()
+  await getSendCompanyIds();
+  await getCompanyData();
 }
 
 /**
  * 発送対象企業の企業マスタID群を取得する
  */
-// fix computedを削除（呼ばれない問題が発生したため）
 const getSendCompanyIds = async () => {
-  // 発送企業履歴リスト取得
-  const sendCompanyHistories: any = await $approach.getSendCompanyHistory(selectedBuyneedsHistoryId)
-  // UT用モック
-  // const { data: sendCompanyHistoriesData } = await useFetch('/api/sendComapnyHistory')
-  // sendCompanyHistories.value = ref(sendCompanyHistoriesData.value)
   // 発送企業履歴リストから会社IDの配列を作成する
-  // fix 戻り値が文字列の配列になっているので、APIの戻り値を変更するか、文字列→数値への変更が必要。→戻り値を数値に変更してもらえるように依頼済。
-  sendCompanyIds.value = (sendCompanyHistories.value.sendCompanyHistories).map((sendCompanyHistory: any) => sendCompanyHistory.companyId)
+  const sendCompanyHistoryResponse: any = await $approach.getSendCompanyHistory(selectedBuyneedsHistoryId.value)
+  sendCompanyHistories.value = sendCompanyHistoryResponse.value.sendCompanyHistories
+  sendCompanyIds.value = (sendCompanyHistories.value).map((sendCompanyHistory: any) => sendCompanyHistory.companyId)
 }
 
 /**
@@ -275,22 +224,12 @@ const getSendCompanyIds = async () => {
  * @param searchCompanyName
  */
 const getCompanyData = async (searchCompanyName?: string): Promise<any> => {
-<<<<<<< HEAD
   const companies: any = (
-    await $jmssPortal.getCompanies(sendCompanyIds.value, searchCompanyName, page.value, perPage.value))
-  // const companies: any = ref(companiesData.value)
-=======
-  const { data: companiesData } = (
-    await $jmssPortal.getCompanies(sendCompanyIds.value, searchCompanyName, page.value, perPage.value))
-  const companies: any = ref(companiesData.value)
->>>>>>> 7e4c5f43bb39081c7ba6fa612ffdf88d7dae86f2
-  // UT用モック
-  // const { data: companiesData } = await useFetch('/api/companies')
-  // const companies: any = ref(companiesData.value)
-  // 戻り値のdataを表示リストに格納する
-  // fix ヘッダのkeyと企業取得APIの戻り値の項目名が合ってないので表示できない。スネークからキャメルに変更する処理が必要。→変更処理追加
+    await $jmssPortal.getCompanies((sendCompanyIds.value).join(), searchCompanyName, page.value, perPage.value)
+  )
+  // キャメルケースに変換
   const tmpData = camelcaseKeys(companies.value.data, { deep: true })
-  // fix 処理追加。戻り値のdataをマスタIDが小さい順にソートする
+  // マスタIDが小さい順にソートする
   destinationCompanies.value = tmpData.sort(function (a: any, b: any) {
     return (a.id > b.id) ? 1 : -1
   })
@@ -299,8 +238,6 @@ const getCompanyData = async (searchCompanyName?: string): Promise<any> => {
 }
 // ヘッダ
 const destinationCompanyHeaders: any = [
-  // title,keyでないとヘッダーが消える
-  // fix 企業取得APIの戻り値のキーとkey名を合わせた。
   { title: '', key: 'matchingResult', sortable: false, width: 50, color: '#b3e5fc' },
   { title: 'マスタID', key: 'id', sortable: false, width: 100 },
   { title: '企業名', key: 'name', sortable: false, width: 200 },
@@ -317,7 +254,7 @@ const destinationCompanyHeaders: any = [
   { title: '従業員数', key: 'numberOfEmployee', sortable: false, width: 100 }
 ]
 // 初期表示時、表示データの呼び出し
-getBodyData()
+getBodyData();
 
 /**
  *  tsr内のvalueを取得する処理
@@ -327,14 +264,7 @@ getBodyData()
 const getTsrData = (id: any, targetKey: any) => {
   // 一覧表示用のデータからidをキーにtsr情報を取得して、targetKeyを添え字にしたvalueを取得する
   const result = (destinationCompanies.value).filter((destinationCompanyData: any) => id === destinationCompanyData.id)[0]
-<<<<<<< HEAD
-  console.log(result)
-=======
->>>>>>> 7e4c5f43bb39081c7ba6fa612ffdf88d7dae86f2
-  if (id || targetKey === null || id || targetKey === undefined) {
-    return ''
-  }
-  if (result) {
+  if (result && result.tsr) {
     return result.tsr[targetKey]
   }
   return ''
@@ -347,19 +277,15 @@ const getTsrData = (id: any, targetKey: any) => {
  */
 const getIndustry = (id: any, index: any) => {
   const result = (destinationCompanies.value).filter((destinationCompanyData: any) => id === destinationCompanyData.id)[0]
-  if (id || index === null || id || index === undefined) {
-    return ''
-  }
-  const key = Object.keys(result.industry)[index]
-  if (key) {
-    return result.industry[key]
-  }
+  const industry = confirmationData(result.industries)
+  return industry
 }
 
 /**
  * 一覧表示用郵便番号の「-」追加処理
  * @param zip: 一覧表示データの郵便番号
  */
+// TODO 空判定
 const putHyphen = (zip: any) => {
   if (zip === null || zip === undefined) {
     return ''
@@ -395,7 +321,7 @@ const matchingStart = async (): Promise<void> => {
  */
 const downloadCsv = async (): Promise<void> => {
   // 買いニーズマッチング結果CSV取得APIの呼び出し
-  const downloadList: any = await $approach.getBuyneedsMatchingResultCsv(selectedBuyneedsHistoryId)
+  const downloadList: any = await $approach.getBuyneedsMatchingResultCsv(selectedBuyneedsHistoryId.value)
 
   // ファイルをBlob形式で取得
   const blobData = new Blob(downloadList.value.csv)
@@ -414,28 +340,18 @@ const downloadCsv = async (): Promise<void> => {
  * @param companyId
  */
 const showMatchingResult = (companyId: number): void => {
-// // 引数の会社IDに紐づく発送企業歴IDを取得する
-  // const targetSendCompanyHistory = (
-  //   (sendCompanyHistories.value).filter((sendCompanyHistory: any) =>
-  //     Object.keys(sendCompanyHistory.companyId)[0] === String(companyId))[0]
-  // )
   // 引数の会社IDに紐づく発送企業歴IDを取得する
   const targetSendCompanyHistory = (
-    (sendCompanyHistories.value.value.sendCompanyHistories).filter((sendCompanyHistory: any) =>
-      sendCompanyHistory.companyId === String(companyId))
+    sendCompanyHistories.value.filter((sendCompanyHistory: any) => sendCompanyHistory.companyId === companyId)
   )
   // 選択されている処理日時を取得
-  // const targetProcessDate = (
-  //   processingDateList.value.filter((processingDate: any) =>
-  //     Object.keys(processingDate.id)[0] === String(selectedBuyneedsHistoryId))[0]
-  // )
-  const targetProcessDate = 
-    (processingDateList.value).filter((processingDate: any) => processingDate.id === selectedBuyneedsHistoryId.value)
+  const targetProcessDate = (
+    processingDateList.value.filter((processingDate: any) => processingDate.id === selectedBuyneedsHistoryId.value)
+  )
   // マッチング履歴画面へ遷移する
   const matchResultUrl = router.resolve({
-    path: `/buyneedsMatchResult/${companyId}`,
+    path: `/buyneedsMatchResult/${targetSendCompanyHistory[0].id}`,
     query: {
-      'sendCompanyHistoryId': targetSendCompanyHistory[0].id,
       'processDate': targetProcessDate[0].processingDate
     }
   })
@@ -472,8 +388,11 @@ const onChangePage = (tagetPage: number): void => {
  *  マッチングステータスがマッチング中だった場合は非活性（true）
  */
 const activeBtn = computed((): boolean => {
-  const result = (matchingHistories.value.buyneedsMatchingHistories)
-    .filter((buyneedsMatchingHistoriy: any) => buyneedsMatchingHistoriy.id === selectedBuyneedsHistoryId.value)
+  const result = (
+    matchingHistories.value.buyneedsMatchingHistories.filter(
+      (buyneedsMatchingHistoriy: any) => buyneedsMatchingHistoriy.id === selectedBuyneedsHistoryId.value
+    )
+  )
   if (result[0].matchingStatus === 1) {
     // マッチング中（ステータスが「1（マッチング中）」）の場合は非活性
     return true

@@ -176,7 +176,7 @@ const searchParams: Ref<any> = ref(
 )
 const approachLists: Ref<any> = ref()
 
-<<<<<<< HEAD
+
 
 
 /**
@@ -198,23 +198,20 @@ const allUsers: any= await $jmssPortal.getUsersById(undefined, page.value, perPa
 /**
  * DMリストテーブルに格納されている全てのアプローチリストIDリスト
  */
-<<<<<<< HEAD
+
 const dmLists: any = await $approach.getDmList()
-=======
-const { data: dmListsData } = await $api.approach.getDmList()
->>>>>>> 7e4c5f43bb39081c7ba6fa612ffdf88d7dae86f2
+
 // const dmLists: any = ref(dmListsData.value)
 // const allApproachListIds: number[] = (dmLists.value).map((dmList: any) => dmList.dmList.companyId)
 // UT用モック（DMリストテーブルに格納されている全てのアプローチリストIDリスト）
 // const { data: dmListsData } = await useFetch('/api/dmList')
-<<<<<<< HEAD
+
 // const dmLists: any = ref(dmListsData.value)
-=======
-const dmLists: any = ref(dmListsData.value)
->>>>>>> 7e4c5f43bb39081c7ba6fa612ffdf88d7dae86f2
+
+// const dmLists: any = ref(dmListsData.value)
 // fix DMリスト取得APIはrefInpl(Object)で戻ってくるので、取得方法を修正した。
 //  また、companyIdではなくapproachListIdに変更した。
-const allApproachListIds: number[] = (dmLists.value.dmLists).map((dmList: any) => dmList.approachListId)
+const allApproachListIds: number = (dmLists.value.dmLists).map((dmList: any) => dmList.approachListId)
 
 /**
  * 全てのアプローチリスト

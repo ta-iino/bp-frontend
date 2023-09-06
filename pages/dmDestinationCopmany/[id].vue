@@ -275,15 +275,11 @@ const getSendCompanyIds = async () => {
  * @param searchCompanyName
  */
 const getCompanyData = async (searchCompanyName?: string): Promise<any> => {
-<<<<<<< HEAD
+
   const companies: any = (
     await $jmssPortal.getCompanies(sendCompanyIds.value, searchCompanyName, page.value, perPage.value))
   // const companies: any = ref(companiesData.value)
-=======
-  const { data: companiesData } = (
-    await $jmssPortal.getCompanies(sendCompanyIds.value, searchCompanyName, page.value, perPage.value))
-  const companies: any = ref(companiesData.value)
->>>>>>> 7e4c5f43bb39081c7ba6fa612ffdf88d7dae86f2
+
   // UT用モック
   // const { data: companiesData } = await useFetch('/api/companies')
   // const companies: any = ref(companiesData.value)
@@ -327,10 +323,7 @@ getBodyData()
 const getTsrData = (id: any, targetKey: any) => {
   // 一覧表示用のデータからidをキーにtsr情報を取得して、targetKeyを添え字にしたvalueを取得する
   const result = (destinationCompanies.value).filter((destinationCompanyData: any) => id === destinationCompanyData.id)[0]
-<<<<<<< HEAD
-  console.log(result)
-=======
->>>>>>> 7e4c5f43bb39081c7ba6fa612ffdf88d7dae86f2
+
   if (id || targetKey === null || id || targetKey === undefined) {
     return ''
   }

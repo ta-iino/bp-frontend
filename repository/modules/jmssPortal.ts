@@ -59,7 +59,7 @@ class JmssPortalModule extends BaseApiFactory {
    * @param buyneedsId
    * @returns
    */
-  getBuyneeds (buyneedsIds?: number[], page?: number, limit?: number) {
+  getBuyneeds (buyneedsIds?: string, page?: number, limit?: number) {
     this.options.params = {
       id: buyneedsIds,
       // source_type: sourceType,
@@ -100,7 +100,7 @@ class JmssPortalModule extends BaseApiFactory {
    * @param limit
    * @returns
    */
-  getCompanies (companyIds?: number[], name?: string, page?: number, limit?: number) {
+  getCompanies (companyIds?: string, name?: string, page?: number, limit?: number) {
     this.options.params = {
       id: companyIds,
       name: name,

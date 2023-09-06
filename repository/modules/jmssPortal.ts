@@ -1,12 +1,10 @@
 // エンドポイントが増えてきたら分割する
 // TODO 社内ポータルの受け取り方によって変数の型定義変更の可能性あり
 
-import { useCookies } from 'vue3-cookies'
 import BaseApiFactory from '../factory'
 
 class JmssPortalModule extends BaseApiFactory {
   private urls: any = {
-    getAccessToken: '/api/jmss_portal_auth',
     getApproachLists: '/api/v1/approach_lists',
     getApproachCompanyList: (approachListId: number) => `/api/v1/approach_lists/${approachListId}`,
     getBuyneeds: '/api/v1/buyers',
@@ -15,13 +13,13 @@ class JmssPortalModule extends BaseApiFactory {
     getTeams: '/api/v1/teams'
   }
 
-  private jmssPortalBaseURL
-  private baseURL
-  private options: any = { headers: { 'Authorization': `Bearer ${this.authJmssPortalToken()}` } }
-  constructor (jmssPortalBaseURL: string, baseURL: string) {
+  private jmssPortalBaseURL: string
+  private options: any 
+  constructor (jmssPortalBaseURL: string, accessToken: string) {
     super()
     this.jmssPortalBaseURL = jmssPortalBaseURL
-    this.baseURL = baseURL
+    this.options = { headers: { 'Authorization': `Bearer ${accessToken}` } }
+    this.options.credentials = 'omit'
   }
 
   /**
@@ -31,18 +29,18 @@ class JmssPortalModule extends BaseApiFactory {
    * @param limit
    * @returns アプローチリスト
    */
-  async getApproachLists (approachListId?: number[], searchParams?: any, page?: number, limit?: Number) {
+  async getApproachLists (approachListId?: string, searchParams?: any, page?: number, limit?: Number) {
     this.options.params = {
       id: approachListId,
-      method: 1,
-      team_id: searchParams.chargeOfTeam,
-      user_id: searchParams.chargeOfConsultant,
-      name: searchParams.listName,
-      type: searchParams.approachPurpose,
-      created_at_min: searchParams.registrationDateFrom,
-      created_at_max: searchParams.registrationDateTo,
+      // method: 1,
+      team_id: searchParams?.chargeOfTeam,
+      user_id: searchParams?.chargeOfConsultant,
+      name: searchParams?.listName,
+      type: searchParams?.approachPurpose,
+      created_at_min: searchParams?.registrationDateFrom,
+      created_at_max: searchParams?.registrationDateTo,
       page: page,
-      limit: limit
+      limit: limit,
     }
     return this.call(this.urls.getApproachLists, this.jmssPortalBaseURL, this.options)
   }
@@ -62,7 +60,7 @@ class JmssPortalModule extends BaseApiFactory {
    * @param buyneedsId
    * @returns
    */
-  getBuyneeds (buyneedsIds?: number[], page?: number, limit?: number) {
+  getBuyneeds (buyneedsIds?: string, page?: number, limit?: number) {
     this.options.params = {
       id: buyneedsIds,
       // source_type: sourceType,
@@ -90,7 +88,7 @@ class JmssPortalModule extends BaseApiFactory {
     this.options.params = {
       id: userIds,
       page: page,
-      limit: limit
+      limit: limit,
     }
     return this.call(this.urls.getUsers, this.jmssPortalBaseURL, this.options)
   }
@@ -103,14 +101,15 @@ class JmssPortalModule extends BaseApiFactory {
    * @param limit
    * @returns
    */
-  getCompanies (companyIds?: number[], name?: string, page?: number, limit?: number) {
+  getCompanies (companyIds?: string, name?: string, page?: number, limit?: number) {
     this.options.params = {
       id: companyIds,
       name: name,
       page: page,
-      limit: limit
+      limit: limit,
     }
     return this.call(this.urls.getCompanies, this.jmssPortalBaseURL, this.options)
+    
   }
 
   /**
@@ -124,31 +123,9 @@ class JmssPortalModule extends BaseApiFactory {
     this.options.params = {
       department_id: department_id,
       page: page,
-      limit: limit
+      limit: limit,
     }
     return this.call(this.urls.getTeams, this.jmssPortalBaseURL, this.options)
-  }
-
-  //TODO approach.tsに持っていく。constructorからbaseURLを除きtokenを入れるように変更する
-  // 社内ポータルで使用するため一旦こちらに入れている。
-  // 社内ポータル接続用アクセストークン取得メソッド
-  async authJmssPortalToken () {
-    console.log("authJmssPortalToken")
-    const cookies = useCookies()
-    // cookieが存在しない場合、アクセストークンの発行を行う
-    if (!cookies.cookies.isKey('jmss_portal_access_token')) {
-      // アクセストークン取得用API
-      // APIキーをフロントで持たないためにBackendからアクセスする。
-      const data: any = await useFetch(
-        this.urls.getAccessToken, {
-          baseURL: this.baseURL
-        }
-      )
-      // TODO access_tokenの値をエンコードする必要あり？
-      cookies.cookies.set('jmss_portal_access_token', data.access_token, data.expires_in)
-    }
-
-    return cookies.cookies.get('jmss_portal_access_token')
   }
 }
 

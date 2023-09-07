@@ -9,7 +9,7 @@ export class ApproachModule extends BaseApiFactory {
     getBuyneedsMatchingHistory: '/approach/api/buyneeds_matching_history/',
     getBuyneedsMatchingResultCsv: '/approach/api/buyneeds_matching_result_csv/',
     getBuyneedsMatchingResult: '/approach/api/buyneeds_matching_result/',
-    startBuyneedsMatching: '/approach/api//buyneeds_matching_start/',
+    startBuyneedsMatching: '/approach/api/buyneeds_matching_order/',
     getJmssPortalAccessToken: '/approach/api/create_jmss_portal_access_token/',
   }
 
@@ -33,6 +33,7 @@ export class ApproachModule extends BaseApiFactory {
       approach_list_ids: approachListIds,
       search_condition: searchCondition
     }
+    delete this.options.method
     return this.call(this.urls.getDmList, this.baseURL, this.options)
   }
 
@@ -42,7 +43,7 @@ export class ApproachModule extends BaseApiFactory {
    * @param sendCompanyHistoryId
    * @returns 発送企業履歴リスト
    */
-  async getSendCompanyHistory (buyneedsMatchingHistoryId?: Number, sendCompanyHistoryId?: string) {
+  async getSendCompanyHistory (buyneedsMatchingHistoryId?: number, sendCompanyHistoryId?: number) {
     // パスパラメータで飛ばしてもよさそう。
     this.options.params = {
       buyneeds_matching_history_id: buyneedsMatchingHistoryId,
@@ -61,10 +62,11 @@ export class ApproachModule extends BaseApiFactory {
    * @param approachListId
    * @returns 買いニーズマッチング履歴リスト
    */
-  async getBuyneedsMatchingHistory (approachListId: string) {
+  async getBuyneedsMatchingHistory (approachListId?: number, buyneeds_matching_history_id? : number) {
     this.options.params = {
       current_url: window.location.href,
-      approach_list_id: approachListId
+      approach_list_id: approachListId,
+      buyneeds_matching_history_id: buyneeds_matching_history_id
     }
     return this.call(
       this.urls.getBuyneedsMatchingHistory,
@@ -114,10 +116,10 @@ export class ApproachModule extends BaseApiFactory {
    * @returns メッセージ
    */
   async startBuyneedsMatching (dmListId: Number) {
-    // パスパラメータに変更する
     this.options.body = {
       dm_list_id: dmListId
     }
+    delete this.options.params
     this.options.method = 'POST'
     return this.call(
       this.urls.startBuyneedsMatching,

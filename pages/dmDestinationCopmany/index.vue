@@ -107,9 +107,6 @@
         <template #[`item.representativeAge`]="{ item }">
           {{ getCeoAge(getTsrData(item.raw.id, '生年月日')) }}
         </template>
-        <template #[`item.numberOfEmployee`]="{ item }">
-          {{ getTsrData(item.raw.id, '従業員数') }}
-        </template>
         <template #bottom>
           <div class="text-center pt-2">
             <v-pagination
@@ -168,7 +165,7 @@ const sendCompanyIds: any = []
 /**
  * マッチング処理日時リスト作成
  */
-const matchingHistories: any = await $approach.getBuyneedsMatchingHistory(approachListId)
+const matchingHistories: any = await $approach.getBuyneedsMatchingHistory(Number(approachListId))
 const dmListId: number = ref(matchingHistories.value.dmListId)
 // json形式のリスト{id: 買いニーズマッチング履歴テーブルID, processingDate: マッチング処理日時}を作成
 const processingDateList: any = ref(
@@ -251,7 +248,7 @@ const destinationCompanyHeaders: any = [
   { title: '業種3', key: 'industry3', sortable: false, width: 150 },
   { title: '営業種目', key: 'businessItems', sortable: false, width: 200 },
   { title: '代表者年齢', key: 'representativeAge', sortable: false, width: 120 },
-  { title: '従業員数', key: 'numberOfEmployee', sortable: false, width: 100 }
+  { title: '従業員数', key: 'employees', sortable: false, width: 100 }
 ]
 // 初期表示時、表示データの呼び出し
 getBodyData();
@@ -344,16 +341,9 @@ const showMatchingResult = (companyId: number): void => {
   const targetSendCompanyHistory = (
     sendCompanyHistories.value.filter((sendCompanyHistory: any) => sendCompanyHistory.companyId === companyId)
   )
-  // 選択されている処理日時を取得
-  const targetProcessDate = (
-    processingDateList.value.filter((processingDate: any) => processingDate.id === selectedBuyneedsHistoryId.value)
-  )
   // マッチング履歴画面へ遷移する
   const matchResultUrl = router.resolve({
     path: `/buyneedsMatchResult/${targetSendCompanyHistory[0].id}`,
-    query: {
-      'processDate': targetProcessDate[0].processingDate
-    }
   })
   window.open(matchResultUrl.href, '_blank')
 }

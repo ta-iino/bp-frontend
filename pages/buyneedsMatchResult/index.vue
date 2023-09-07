@@ -119,7 +119,7 @@
                   営業種目:
                 </v-col>
                 <v-col cols="3">
-                  {{ getTargetBuyComapnyData(buyneeds, 'tsr')['営業種目'] }}
+                  {{ getTsrData(getTargetBuyComapnyData(buyneeds, "tsr"), '営業種目') }}
                 </v-col>
               </v-row>
             </v-col>
@@ -171,11 +171,21 @@ import { useRoute } from 'vue-router'
  * 初期値設定
  */
 const route = useRoute()
-const { $approach, $jmssPortal } = useNuxtApp()
+const { $approach, $jmssPortal }: any = useNuxtApp()
 const config = useRuntimeConfig()
 const sendCompanyHistoryId: string = String(route.params.id)
-const processDate: string = String(route.query)
-
+/**
+ *  tsr内のvalueを取得する処理
+ * @param id: 一覧表示データのマスタID
+ * @param targetKey: ターゲットとなるtsr情報のキー値
+ */
+ const getTsrData = (value: any, targetKey: string) => {
+  // 一覧表示用のデータからidをキーにtsr情報を取得して、targetKeyを添え字にしたvalueを取得する
+  if (value && value.tsr) {
+    return value.tsr[targetKey]
+  }
+  return ''
+}
 /**
  * ヘッダ部のデータ作成
  */
@@ -194,9 +204,12 @@ const items: any = [
   { title: '代表者名:', value: sellCompany.value.data[0].representative_name },
   // { title: '業種３:', value: confirmationData(sellCompany.value.data[0].industries) },
   { title: '従業員数:', value: sellCompany.value.data[0].employees, bottom: '名' },
-  { title: '代表者年齢:', value: getCeoAge(sellCompany.value.data[0].tsr['生年月日']) },
-  { title: '営業種目:', value: sellCompany.value.data[0].tsr['営業種目'] }
+  { title: '代表者年齢:', value: getCeoAge(getTsrData(sellCompany.value.data[0],'生年月日')) },
+  { title: '営業種目:', value: getTsrData(sellCompany.value.data[0],'営業種目') }
 ]
+// 処理日時の取得
+const buyneedsMatchingHistories: any = await $approach.getBuyneedsMatchingHistory(undefined, sellCompanyHistory.value.buyneedsMatchingHistoryId)
+const processDate: string = buyneedsMatchingHistories.value.buyneedsMatchingHistories[0].processedDatetime
 
 // /**
 //  * ボディ部のデータ作成.
@@ -230,22 +243,9 @@ const getTargetBuyComapnyData = (buyneeds:any, targetKey:any): any => {
  * @param buyneeds
  */
 const getCompanyIndutryNames = (buyneeds: any): string => {
-  const industry: string = getTargetBuyComapnyData(buyneeds, 'industry')
+  const industry: string = getTargetBuyComapnyData(buyneeds, 'industries')
   const industryNames: string = confirmationData(industry)
   return industryNames
-}
-/**
- *  tsr内のvalueを取得する処理
- * @param id: 一覧表示データのマスタID
- * @param targetKey: ターゲットとなるtsr情報のキー値
- */
- const getTsrData = (id: any, targetKey: any) => {
-  // 一覧表示用のデータからidをキーにtsr情報を取得して、targetKeyを添え字にしたvalueを取得する
-  const result = (destinationCompanies.value).filter((destinationCompanyData: any) => id === destinationCompanyData.id)[0]
-  if (result && result.tsr) {
-    return result.tsr[targetKey]
-  }
-  return ''
 }
 /**
  * 会社名押下時の処理

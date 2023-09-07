@@ -25,6 +25,7 @@ class BaseApiFactory {
         throw createError({
           statusCode: error.value.statusCode,
           statusMessage: error.value.statusMessage,
+          fatal: true
         });
       }
     }

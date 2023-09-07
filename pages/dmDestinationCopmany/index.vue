@@ -93,19 +93,19 @@
           {{ putHyphen(item.raw.zip) }}
         </template>
         <template #[`item.industry1`]="{ item }">
-          {{ getIndustry(item.raw.id, 0) }}
+          {{ getIndutryNames(getTargetData(item.raw.id).industries, 0) }}
         </template>
         <template #[`item.industry2`]="{ item }">
-          {{ getIndustry(item.raw.id, 1) }}
+          {{ getIndutryNames(getTargetData(item.raw.id).industries, 1) }}
         </template>
         <template #[`item.industry3`]="{ item }">
-          {{ getIndustry(item.raw.id, 2) }}
+          {{ getIndutryNames(getTargetData(item.raw.id).industries, 2) }}
         </template>
         <template #[`item.businessItems`]="{ item }">
-          {{ getTsrData(item.raw.id, '営業種目') }}
+          {{ getTsrData(getTargetData(item.raw.id), '営業種目') }}
         </template>
         <template #[`item.representativeAge`]="{ item }">
-          {{ getCeoAge(getTsrData(item.raw.id, '生年月日')) }}
+          {{ getCeoAge(getTsrData(getTargetData(item.raw.id), '生年月日')) }}
         </template>
         <template #bottom>
           <div class="text-center pt-2">
@@ -119,7 +119,7 @@
           </div>
         </template>
         <template #[`item.id`]="{ item }">
-          <span class="link" @click="clickCompanyId(item.raw.id)">{{ item.raw.id }}</span>
+          <span class="link" @click="clickCompany(item.raw.id)">{{ item.raw.id }}</span>
         </template>
         <template #[`item.matchingResult`]="{ item }">
           <v-btn width="120" small class="mr-2 ui-matching-btn ui-btn" color="light-blue-darken-3" @click="showMatchingResult(item.raw.id)">
@@ -150,7 +150,6 @@ import camelcaseKeys from 'camelcase-keys'
 const route = useRoute()
 const router = useRouter()
 const { $approach, $jmssPortal } = useNuxtApp()
-const config = useRuntimeConfig()
 const page: Ref<number> = ref(1)
 const perPage: Ref<number> = ref(50)
 const approachListId: string = String(route.params.id)
@@ -225,7 +224,7 @@ const getCompanyData = async (searchCompanyName?: string): Promise<any> => {
     await $jmssPortal.getCompanies((sendCompanyIds.value).join(), searchCompanyName, page.value, perPage.value)
   )
   // キャメルケースに変換
-  const tmpData = camelcaseKeys(companies.value.data, { deep: true })
+  const tmpData: any = camelcaseKeys(companies.value.data, { deep: true })
   // マスタIDが小さい順にソートする
   destinationCompanies.value = tmpData.sort(function (a: any, b: any) {
     return (a.id > b.id) ? 1 : -1
@@ -253,36 +252,11 @@ const destinationCompanyHeaders: any = [
 // 初期表示時、表示データの呼び出し
 getBodyData();
 
-/**
- *  tsr内のvalueを取得する処理
- * @param id: 一覧表示データのマスタID
- * @param targetKey: ターゲットとなるtsr情報のキー値
- */
-const getTsrData = (id: any, targetKey: any) => {
-  // 一覧表示用のデータからidをキーにtsr情報を取得して、targetKeyを添え字にしたvalueを取得する
-  const result = (destinationCompanies.value).filter((destinationCompanyData: any) => id === destinationCompanyData.id)[0]
-  if (result && result.tsr) {
-    return result.tsr[targetKey]
-  }
-  return ''
-}
-
-/**
- *  業種1,2,3を取得する処理
- * @param id: 一覧表示データのマスタID
- * @param index: 業種のインデックス
- */
-const getIndustry = (id: any, index: any) => {
-  const result = (destinationCompanies.value).filter((destinationCompanyData: any) => id === destinationCompanyData.id)[0]
-  const industry = confirmationData(result.industries)
-  return industry
-}
 
 /**
  * 一覧表示用郵便番号の「-」追加処理
  * @param zip: 一覧表示データの郵便番号
  */
-// TODO 空判定
 const putHyphen = (zip: any) => {
   if (zip === null || zip === undefined) {
     return ''
@@ -318,15 +292,14 @@ const matchingStart = async (): Promise<void> => {
  */
 const downloadCsv = async (): Promise<void> => {
   // 買いニーズマッチング結果CSV取得APIの呼び出し
-  const downloadList: any = await $approach.getBuyneedsMatchingResultCsv(selectedBuyneedsHistoryId.value)
-
+  const csv: any = await $approach.getBuyneedsMatchingResultCsv(selectedBuyneedsHistoryId.value)
   // ファイルをBlob形式で取得
-  const blobData = new Blob(downloadList.value.csv)
+  const blobData = new Blob([csv.value], { type: "text/csv" })
   // ダウンロードリンクを作成
   const downloadLink = document.createElement('a')
-  downloadLink.href = URL.createObjectURL(blobData)
+  downloadLink.href = window.URL.createObjectURL(blobData)
   // ダウンロード時のファイル名
-  downloadLink.download = '発送先企業一覧' + new Date().toLocaleString() + '.csv'
+  downloadLink.download = '発送先企業一覧' + getCurrentTime() + '.csv'
   downloadLink.click()
   // 不要になったURLを解放
   URL.revokeObjectURL(downloadLink.href)
@@ -349,15 +322,6 @@ const showMatchingResult = (companyId: number): void => {
 }
 
 /**
- * 会社ID押下時の処理
- * @param companyId
- */
-const clickCompanyId = (companyId: number): void => {
-  const url = config.public.jmssPortalBaseURL + '/company/' + companyId
-  window.open(url)
-}
-
-/**
  * 戻るボタン押下時の処理用
  */
 const pageBack = (): void => {
@@ -374,6 +338,15 @@ const onChangePage = (tagetPage: number): void => {
 }
 
 /**
+ * 対象発送企業データの取得処理
+ * @param id 対象企業のID
+ */
+const getTargetData = (id: number): any => {
+  const targetData = destinationCompanies.value.filter((destinationCompanyData: any) => id === destinationCompanyData.id)[0]
+  return targetData
+}
+
+/**
  *  ニーズマッチングボタン、ダウンロードボタンの活性/非活性制御
  *  マッチングステータスがマッチング中だった場合は非活性（true）
  */
@@ -383,7 +356,7 @@ const activeBtn = computed((): boolean => {
       (buyneedsMatchingHistoriy: any) => buyneedsMatchingHistoriy.id === selectedBuyneedsHistoryId.value
     )
   )
-  if (result[0].matchingStatus === 1) {
+  if (result[0].matchingStatus === "1") {
     // マッチング中（ステータスが「1（マッチング中）」）の場合は非活性
     return true
   }

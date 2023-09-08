@@ -106,15 +106,12 @@
             {{ formatDate(item.raw.createdAt) }}
           </template>
           <template #[`item.name`]="{ item }">
-            <!-- <nuxt-link :to="`/dmDestinationCopmany/${item.raw.id}`">{{ item.raw.name }}</nuxt-link> -->
             <span class="link" @click="clickListName(item.raw.id)">{{ item.raw.name }}</span>
           </template>
           <template #[`item.requestTeam`]="{ item }">
-            <!--{{ getValueObject(Object.values(item.raw.requestTeam)) }}-->
             {{ confirmationData(item.raw.requestTeam) }}
           </template>
           <template #[`item.jmssIndustries`]="{ item }">
-            <!--{{ getValueObject(Object.values(item.raw.jmssIndustries)) }}-->
             {{ confirmationData(item.raw.jmssIndustries) }}
           </template>
           <template #[`item.matchingStatus`]="{ item }">
@@ -139,7 +136,6 @@
             </div>
           </template>
           <!-- ページネーション ここまで -->
-        <!-- フッター削除 -->
         </v-data-table>
       </v-container>
       <!-- 一覧表示 ここまで -->
@@ -181,7 +177,8 @@ const approachLists: Ref<any> = ref()
 const allTeams: any = await $jmssPortal.getTeams()
 const allUsers: any= await $jmssPortal.getUsersById(undefined, page.value, perPage.value)
 const dmLists: any = await $approach.getDmList()
-const allApproachListIds: number[] = (dmLists.value.dmLists).map((dmList: any) => dmList.approachListId)
+// 初期表示時から変化しないため、状態管理不要
+const allApproachListIds: number[] = dmLists.value.dmLists.map((dmList: any) => dmList.approachListId)
 
 /**
  * プルダウンリスト生成

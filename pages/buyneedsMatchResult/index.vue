@@ -22,7 +22,7 @@
                 <v-col class="px-10 py-0">
                   {{ item.title }}
                 </v-col>
-                <v-col class="pl-4 py-0 link" @click="clickCompanyName()">
+                <v-col class="pl-4 py-0 link" @click="clickCompany(sellCompanyId)">
                   {{ item.value }}
                 </v-col>
               </v-row>
@@ -77,7 +77,7 @@
                   企業:
                 </v-col>
                 <v-col cols="3">
-                  <span class="link" @click="clickCompanyName(getTargetBuyComapnyData(buyneeds, 'id'))">
+                  <span class="link" @click="clickCompany(getTargetBuyComapnyData(buyneeds, 'id'))">
                     {{ getTargetBuyComapnyData(buyneeds, "name") }}
                   </span>
                 </v-col>
@@ -102,7 +102,7 @@
                   業種:
                 </v-col>
                 <v-col cols="3">
-                  {{ getCompanyIndutryNames(buyneeds) }}
+                  {{ getIndutryNames(getTargetBuyComapnyData(buyneeds, 'industries')) }}
                 </v-col>
               </v-row>
             </v-col>
@@ -141,7 +141,7 @@
                   買収希望業種:
                 </v-col>
                 <v-col cols="3">
-                  {{ confirmationData(buyneeds.industries) }}
+                  {{ getIndutryNames(buyneeds.industries) }}
                 </v-col>
               </v-row>
             </v-col>
@@ -164,7 +164,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 /**
@@ -172,20 +171,8 @@ import { useRoute } from 'vue-router'
  */
 const route = useRoute()
 const { $approach, $jmssPortal }: any = useNuxtApp()
-const config = useRuntimeConfig()
 const sendCompanyHistoryId: string = String(route.params.id)
-/**
- *  tsr内のvalueを取得する処理
- * @param id: 一覧表示データのマスタID
- * @param targetKey: ターゲットとなるtsr情報のキー値
- */
- const getTsrData = (value: any, targetKey: string) => {
-  // 一覧表示用のデータからidをキーにtsr情報を取得して、targetKeyを添え字にしたvalueを取得する
-  if (value && value.tsr) {
-    return value.tsr[targetKey]
-  }
-  return ''
-}
+
 /**
  * ヘッダ部のデータ作成
  */
@@ -196,13 +183,13 @@ const sellCompany: any = await $jmssPortal.getCompanies(String(sellCompanyId))
 // 表示タイトルとバリューの作成
 const items: any = [
   { title: '企業名:', value: sellCompany.value.data[0].name},
-  // { title: '業種１:', value: confirmationData(sellCompany.value.data[0].industries) },
+  { title: '業種１:', value: getIndutryNames(sellCompany.value.data[0].industries, 0) },
   { title: '売上:', value: sellCompany.value.data[0].sales, bottom: '百万円' },
   { title: '所在地:', value: sellCompany.value.data[0].address },
-  // { title: '業種２:', value: confirmationData(sellCompany.value.data[0].industries) },
+  { title: '業種２:', value: getIndutryNames(sellCompany.value.data[0].industries, 1) },
   { title: '営業利益:', value: sellCompany.value.data[0].profit, bottom: '百万円' },
   { title: '代表者名:', value: sellCompany.value.data[0].representative_name },
-  // { title: '業種３:', value: confirmationData(sellCompany.value.data[0].industries) },
+  { title: '業種３:', value: getIndutryNames(sellCompany.value.data[0].industries, 2) },
   { title: '従業員数:', value: sellCompany.value.data[0].employees, bottom: '名' },
   { title: '代表者年齢:', value: getCeoAge(getTsrData(sellCompany.value.data[0],'生年月日')) },
   { title: '営業種目:', value: getTsrData(sellCompany.value.data[0],'営業種目') }
@@ -236,24 +223,6 @@ const getTargetBuyComapnyData = (buyneeds:any, targetKey:any): any => {
     return result[targetKey]
   }
   return ''
-}
-
-/**
- * 買手企業の業種表示用(複数処理が必要なためmethods化した)
- * @param buyneeds
- */
-const getCompanyIndutryNames = (buyneeds: any): string => {
-  const industry: string = getTargetBuyComapnyData(buyneeds, 'industries')
-  const industryNames: string = confirmationData(industry)
-  return industryNames
-}
-/**
- * 会社名押下時の処理
- * @param companyId 引数に値が渡されなければ売手企業IDを渡す
- */
-const clickCompanyName = (companyId: number=sellCompanyId): void => {
-  const url = config.public.jmssPortalBaseURL + '/company/' + companyId
-  window.open(url)
 }
 
 /**

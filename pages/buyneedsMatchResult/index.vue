@@ -2,35 +2,38 @@
   <VApp>
     <v-container>
       <!-- 現状だと上半分くらい固定されてしまって若干見づらいので何とかしたい -->
-      <v-row id="sticky" class="my-n6">
-        <v-row>
-          <v-col cols="16" class="px-0 my-3">
-            <VCardTitle class="ml-3 mr-9" style="background-color: #81d4fa;">
+      
+      <v-row id="sticky" style="box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);">
+        <v-row class="px-6">
+          <v-col cols="12" class="my-3">
+            <VCardTitle style="background-color: #81d4fa;">
+              <h4 class="mt-n1 ml-n2">
               買いニーズマッチング結果
+              </h4>
             </VCardTitle>
           </v-col>
         </v-row>
-        <v-sheet color="white" elevation="1" height="172" class="mr-6">
+        <v-sheet color="white" class="px-6" width="100%">
           <v-card-title style="background-color: #b3e5fc;" class="header-back">
             <h4 class="mt-n2 ml-n2">
               DM発送先企業
             </h4>
           </v-card-title>
-          <v-row class="px-16 mb-6 mt-2">
+          <v-row class="px-4 mb-6 mt-auto">
             <v-col v-for="(item) in items" :key="item.title" cols="4">
               <v-row v-if="item.title === '企業名:'">
-                <v-col class="px-10 py-0">
+                <v-col cols="3" class="px-0 py-1">
                   {{ item.title }}
                 </v-col>
-                <v-col class="pl-4 py-0 link" @click="clickCompanyName()">
+                <v-col cols="9" class="px-0 py-1 link" @click="clickCompanyName()">
                   {{ item.value }}
                 </v-col>
               </v-row>
               <v-row v-else>
-                <v-col class="px-10 py-0">
+                <v-col cols="3" class="px-0 py-1">
                   {{ item.title }}
                 </v-col>
-                <v-col class="px-10 py-0">
+                <v-col cols="9" class="px-0 py-1">
                   {{ item.value }} {{ item.bottom }}
                 </v-col>
               </v-row>
@@ -44,15 +47,10 @@
           </v-row>
         </v-sheet>
       </v-row>
-          <!-- そのままではヘッダーの下に潜ってしまうので無理やりスペースを作る -->
-      <v-row class="my-16 comment">
-        <br>
-        <br>
-        <br>
-        <br>
-      </v-row>
-      <v-row class="mt-16 mr-8">
-        <v-row class="mr-n16 pt-1" justify="end">
+
+      <v-container v-if="buyneedsList.data && buyneedsList.data.length" class="ui-vcontaoner pt-0 mb-4">
+      <v-row>
+        <v-row class="pt-10" justify="end">
           <h3>処理日時</h3>
           <span class="mx-10">{{ processDate }}</span>
         </v-row>
@@ -159,7 +157,16 @@
           </v-row>
         </v-sheet>
       </v-row>
+      </v-container>
+      <!-- 追加したところ -->
+        
+    <v-row v-else>
+      <v-col cols="12" class="pt-4 pl-10 text-center">
+        マッチング中です
+      </v-col>
+    </v-row>
     </v-container>
+
   </VApp>
 </template>
 
@@ -270,7 +277,8 @@ const clickCloseButton = (): void => {
 }
 
 #sticky {
-  position: fixed;
+  position: sticky;
+  top: 0;
   z-index: 1;
   background-color: white;
 }

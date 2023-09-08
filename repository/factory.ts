@@ -21,6 +21,8 @@ class BaseApiFactory {
       if (error.value.statusCode == 401 && baseURL === config.public.baseURL) {
         window.location.href = error.value.data
         return
+      } else if(error.value?.statusCode == 404) {
+          return
       } else {
         throw createError({
           statusCode: error.value.statusCode,

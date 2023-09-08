@@ -65,22 +65,25 @@
           </div>
         </v-col>
         <v-col cols="4" class="pt-4 pl-10">
-          <v-text-field v-model="searchCompanyName" label="企業名検索" />
+          <v-row>
+            <v-text-field cols="10" v-model="searchCompanyName" label="企業名検索" />
+            <v-col cols="2">
+              <v-btn class="ui-btn" depressed color="light-blue-darken-3" @click="searchCompany()">
+                  <v-icon dark size="large">
+                    mdi-magnify
+                  </v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
         </v-col>
-        <v-col class="d-flex justify-end mt-n8">
-          <v-btn class="ui-btn" depressed color="light-blue-darken-3" @click="searchCompany()">
-              <v-icon dark size="large">
-                mdi-magnify
-              </v-icon>
-            </v-btn>
-        </v-col>
-      </v-row>
+        
+    </v-row>
+        
     </v-container>
     <!-- ヘッダ部分 ここまで -->
     <!-- 一覧表示 ここから -->
     <v-container v-if="destinationCompanies && destinationCompanies.length" class="ui-vcontaoner pt-0 mb-4">
       <v-data-table
-        v-model:page="page"
         :headers="destinationCompanyHeaders"
         :items="destinationCompanies"
         :items-per-page="perPage"
@@ -114,7 +117,6 @@
               cols="12"
               :length="totalPage"
               :total-visible="12"
-              @input="onChangePage"
             />
           </div>
         </template>
@@ -139,7 +141,7 @@
 
 <script setup lang="ts">
 import { VDataTable } from 'vuetify/lib/labs/components.mjs'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import '@mdi/font/css/materialdesignicons.css'
 import camelcaseKeys from 'camelcase-keys'
@@ -152,7 +154,10 @@ const router = useRouter()
 const { $approach, $jmssPortal } = useNuxtApp()
 const config = useRuntimeConfig()
 const page: Ref<number> = ref(1)
-const perPage: Ref<number> = ref(50)
+const perPage: Ref<number> = ref(2)
+watch(page ,() => {
+  getCompanyData()
+})
 const approachListId: string = String(route.params.id)
 const searchCompanyName: Ref<string> = ref('')
 const totalPage: Ref<number> = ref(0)

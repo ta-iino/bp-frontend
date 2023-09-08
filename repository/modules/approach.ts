@@ -102,7 +102,6 @@ export class ApproachModule extends BaseApiFactory {
       current_url: window.location.href,
       send_company_history_id: sendCompanyHistoryId
     }
-    console.log(sendCompanyHistoryId)
     return this.call(
       this.urls.getBuyneedsMatchingResult,
       this.baseURL,

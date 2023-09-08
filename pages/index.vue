@@ -93,7 +93,6 @@
       <!-- 一覧表示 ここから -->
       <v-container class="ui-vcontaoner pt-3">
         <v-data-table
-          v-model:page="page"
           :headers="headers"
           :items="approachLists"
           :items-per-page="perPage"
@@ -130,9 +129,8 @@
                 v-model="page"
                 cols="12"
                 :length="totalPage"
-                :total-visible="12"
-                @input="onChangePage(page)"
-              />
+                :total-visible="15"
+              ></v-pagination>
             </div>
           </template>
           <!-- ページネーション ここまで -->
@@ -145,7 +143,7 @@
 
 <script setup lang="ts">
 import { VDataTable } from 'vuetify/lib/labs/components.mjs'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import '@mdi/font/css/materialdesignicons.css'
@@ -156,9 +154,12 @@ import camelcaseKeys from 'camelcase-keys'
  */
 const router = useRouter()
 const { $approach, $jmssPortal } = useNuxtApp()
-const page: Ref<number> = ref(1)
-const perPage: Ref<number> = ref(50)
-const totalPage: Ref<number> = ref(0)
+const page: Ref<number> = ref(1) //現在のページ番号
+const perPage: Ref<number> = ref(2) //1ページ当たりのアイテム数
+const totalPage: Ref<number> = ref(3) //全体のページ数
+watch(page ,() => {
+  getApproachListsData(searchParams)
+})
 const searchParams: Ref<any> = ref(
   {
     approachListIds: null,
@@ -285,10 +286,10 @@ const searchButton = (): void => {
  * ページネーションで違うページ押下時の処理
  * @param targetPage クリックしたページネーションの番号
  */
-const onChangePage = (targetPage: number): void => {
-  page.value = targetPage
-  getApproachListsData(searchParams)
-}
+// const onChangePage = (targetPage: number): void => {
+//   // page.value = targetPage
+//   getApproachListsData(searchParams)
+// }
 
 /**
  * リスト名押下時の処理

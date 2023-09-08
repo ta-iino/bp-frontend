@@ -59,4 +59,18 @@ export default defineNuxtConfig({
 
   ssr: false,
   plugins: ['~/plugins/vuetify.ts', '~/plugins/api.ts'],
+  hooks: {
+    'pages:extend'(pages) {
+        pages.push({
+            name: 'dmDestinationCopmany',
+            path: '/dmDestinationCopmany/:id',
+            file: '~/pages/dmDestinationCopmany/index.vue'
+        })
+        pages.push({
+            name: 'buyneedsMatchResult',
+            path: '/buyneedsMatchResult/:id',
+            file: '~/pages/buyneedsMatchResult/index.vue'
+        })        
+    }
+  }
 });

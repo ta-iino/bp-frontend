@@ -1,4 +1,21 @@
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
+
+const removeDigits = () => {
+    return {
+      name: 'remove-digits',
+      apply: 'serve',
+      configureServer(server) {
+        // rewrite digits as ""
+        server.middlewares.use('/', (req, _, next) => {
+          if (req.url.match(/\d+$/)) {
+            req.url = req.url.replace(/\d+$/, '')
+          }
+          next()
+        })
+      },
+    }
+  }
+
 export default defineNuxtConfig({
   runtimeConfig: {
       public: {
@@ -35,6 +52,9 @@ export default defineNuxtConfig({
               usePolling: true
           }
       },
+      plugins: [
+        removeDigits(),
+      ]
   },
 
   ssr: false,

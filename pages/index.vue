@@ -235,7 +235,7 @@ const getApproachListsData = async (searchParams?: any): Promise<void> => {
   const tmpData = camelcaseKeys(approachListsResponse.value.data, { deep: true })
   // 一覧表示データを登録日が新しい順にソートする
   approachLists.value = tmpData.sort(function (a: any, b: any) {
-    return (a.createdAt < b.createdAt) ? 1 : -1
+    return (getTableDmListData(a.id, 'id') < getTableDmListData(b.id, 'id')) ? 1 : -1
   })
 }
 

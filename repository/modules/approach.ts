@@ -33,6 +33,7 @@ export class ApproachModule extends BaseApiFactory {
       approach_list_ids: approachListIds,
       search_condition: searchCondition
     }
+    delete this.options.body
     delete this.options.method
     return this.call(this.urls.getDmList, this.baseURL, this.options)
   }

@@ -288,7 +288,7 @@ const matchingStart = async (): Promise<void> => {
   await $approach.startBuyneedsMatching(dmListId)
   // データ作成及びジョブ送信が完了したら(エラーが起こらなければ)再表示処理を行う
   router.push({
-    path: `/dmDestinationCopmany/${approachListId}}`
+    path: `/dmDestinationCompany/${approachListId}}`
   })
 }
 

@@ -232,9 +232,7 @@ const getCompanyData = async (searchCompanyName?: string): Promise<any> => {
   // キャメルケースに変換
   const tmpData: any = camelcaseKeys(companies.value.data, { deep: true })
   // マスタIDが小さい順にソートする
-  destinationCompanies.value = tmpData.sort(function (a: any, b: any) {
-    return (a.id > b.id) ? 1 : -1
-  })
+  destinationCompanies.value = camelcaseKeys(companies.value.data, { deep: true })
   // 合計ページ(total÷1ページ当たりの表示数)をtotalPageに格納する
   totalPage.value = Math.ceil(companies.value.total / perPage.value)
 }

@@ -30,7 +30,7 @@ class JmssPortalModule extends BaseApiFactory {
    * @returns アプローチリスト
    */
   async getApproachLists (approachListId?: string, searchParams?: any, page?: number, limit?: Number) {
-    this.options.params = {
+    this.options.body = {
       id: approachListId,
       // method: 1,
       team_id: searchParams?.chargeOfTeam,
@@ -42,6 +42,7 @@ class JmssPortalModule extends BaseApiFactory {
       page: page,
       limit: limit,
     }
+    this.options.method = 'POST'
     return this.call(this.urls.getApproachLists, this.jmssPortalBaseURL, this.options)
   }
 
@@ -51,6 +52,7 @@ class JmssPortalModule extends BaseApiFactory {
    * @returns アプローチリスト企業
    */
   getApproachCompanyList (approachListId: number) {
+    this.options.method = 'GET'
     return this.call(this.urls.getApproachCompanyList(approachListId), this.jmssPortalBaseURL)
   }
 
@@ -61,7 +63,7 @@ class JmssPortalModule extends BaseApiFactory {
    * @returns
    */
   getBuyneeds (buyneedsIds?: string, page?: number, limit?: number) {
-    this.options.params = {
+    this.options.body = {
       id: buyneedsIds,
       // source_type: sourceType,
       // company_industry_id: companyIndustryId,
@@ -74,6 +76,7 @@ class JmssPortalModule extends BaseApiFactory {
       page: page,
       limit: limit
     }
+    this.options.method = 'POST'
     return this.call(this.urls.getBuyneeds, this.jmssPortalBaseURL, this.options)
   }
 
@@ -90,6 +93,7 @@ class JmssPortalModule extends BaseApiFactory {
       page: page,
       limit: limit,
     }
+    this.options.method = 'GET'
     return this.call(this.urls.getUsers, this.jmssPortalBaseURL, this.options)
   }
 
@@ -102,12 +106,13 @@ class JmssPortalModule extends BaseApiFactory {
    * @returns
    */
   getCompanies (companyIds?: string, name?: string, page?: number, limit?: number) {
-    this.options.params = {
+    this.options.body = {
       id: companyIds,
       name: name,
       page: page,
       limit: limit,
     }
+    this.options.method = 'POST'
     return this.call(this.urls.getCompanies, this.jmssPortalBaseURL, this.options)
     
   }
@@ -125,6 +130,7 @@ class JmssPortalModule extends BaseApiFactory {
       page: page,
       limit: limit,
     }
+    this.options.method = 'GET'
     return this.call(this.urls.getTeams, this.jmssPortalBaseURL, this.options)
   }
 }

@@ -16,6 +16,7 @@ class BaseApiFactory {
     )
     // API通信時のエラーハンドリング
     if(error.value) {
+      console.log(error)
       // 401の場合、HENNGEへアクセスする
       // backendのCustomAuthMiddleware以外でも401を返すようになったら修正する
       if (error.value.statusCode == 401 && baseURL === config.public.baseURL) {

@@ -155,8 +155,8 @@ import camelcaseKeys from 'camelcase-keys'
 const router = useRouter()
 const { $approach, $jmssPortal } = useNuxtApp()
 const page: Ref<number> = ref(1) //現在のページ番号
-const perPage: Ref<number> = ref(2) //1ページ当たりのアイテム数
-const totalPage: Ref<number> = ref(3) //全体のページ数
+const perPage: Ref<number> = ref(50) //1ページ当たりのアイテム数
+const totalPage: Ref<number> = ref(0) //全体のページ数
 watch(page ,() => {
   getApproachListsData(searchParams)
 })

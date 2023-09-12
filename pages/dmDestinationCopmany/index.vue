@@ -153,13 +153,13 @@ const route = useRoute()
 const router = useRouter()
 const { $approach, $jmssPortal } = useNuxtApp()
 const page: Ref<number> = ref(1)
-const perPage: Ref<number> = ref(2)
+const perPage: Ref<number> = ref(50)
+const totalPage: Ref<number> = ref(0)
+const searchCompanyName: Ref<string> = ref('')
 watch(page ,() => {
-  getCompanyData()
+  getCompanyData(searchCompanyName.value)
 })
 const approachListId: string = String(route.params.id)
-const searchCompanyName: Ref<string> = ref('')
-const totalPage: Ref<number> = ref(0)
 // 発送企業データ(社内ポータル接続)
 const destinationCompanies: Ref<any> = ref()
 // 発送企業履歴データ（バックエンド接続）
@@ -331,15 +331,6 @@ const showMatchingResult = (companyId: number): void => {
  */
 const pageBack = (): void => {
   router.go(-1)
-}
-
-/**
- * ページネーションで違うページ押下時の処理
- * @param tagetPage クリックしたページネーションの番号
- */
-const onChangePage = (tagetPage: number): void => {
-  page.value = tagetPage
-  getCompanyData()
 }
 
 /**

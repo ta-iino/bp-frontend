@@ -101,6 +101,9 @@
           :height="528"
           fixed-header
         >
+          <template #[`item.id`]="{ item }">
+            {{ getTableDmListData(item.raw.id, 'id') }}
+          </template>
           <template #[`item.createdAt`]="{ item }">
             {{ formatDate(item.raw.createdAt) }}
           </template>

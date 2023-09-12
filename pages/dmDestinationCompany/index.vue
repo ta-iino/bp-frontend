@@ -286,10 +286,8 @@ const searchCompany = () => {
 const matchingStart = async (): Promise<void> => {
   // マッチング処理開始APIの呼び出し
   await $approach.startBuyneedsMatching(dmListId)
-  // データ作成及びジョブ送信が完了したら(エラーが起こらなければ)再表示処理を行う
-  router.push({
-    path: `/dmDestinationCompany/${approachListId}}`
-  })
+  // データ作成及びジョブ送信が完了したら(エラーが起こらなければ)リロードする
+  location.reload();
 }
 
 /**

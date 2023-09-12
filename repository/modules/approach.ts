@@ -34,7 +34,7 @@ export class ApproachModule extends BaseApiFactory {
       search_condition: searchCondition
     }
     delete this.options.body
-    delete this.options.method
+    this.options.method = 'GET'
     return this.call(this.urls.getDmList, this.baseURL, this.options)
   }
 
@@ -51,6 +51,8 @@ export class ApproachModule extends BaseApiFactory {
       send_company_history_id: sendCompanyHistoryId,
       current_url: window.location.href
     }
+    delete this.options.body
+    this.options.method = 'GET'
     return this.call(
       this.urls.getSendCompanyHistory,
       this.baseURL,
@@ -69,6 +71,8 @@ export class ApproachModule extends BaseApiFactory {
       approach_list_id: approachListId,
       buyneeds_matching_history_id: buyneeds_matching_history_id
     }
+    delete this.options.body
+    this.options.method = 'GET'
     return this.call(
       this.urls.getBuyneedsMatchingHistory,
       this.baseURL,
@@ -85,6 +89,8 @@ export class ApproachModule extends BaseApiFactory {
     this.options.params = {
             buyneeds_matching_history_id: buyneedsMatchingHistoryId
     }
+    delete this.options.body
+    this.options.method = 'GET'
     return this.call(
       this.urls.getBuyneedsMatchingResultCsv,
       this.baseURL,
@@ -103,6 +109,8 @@ export class ApproachModule extends BaseApiFactory {
       current_url: window.location.href,
       send_company_history_id: sendCompanyHistoryId
     }
+    delete this.options.body
+    this.options.method = 'GET'
     return this.call(
       this.urls.getBuyneedsMatchingResult,
       this.baseURL,
@@ -111,7 +119,7 @@ export class ApproachModule extends BaseApiFactory {
   }
 
   /**
-   * マッチング処理開始API(post通信のためベースapi使えず)
+   * マッチング処理開始API
    * @param dmListId
    * @returns メッセージ
    */

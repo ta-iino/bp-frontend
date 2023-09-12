@@ -62,9 +62,9 @@ export default defineNuxtConfig({
   hooks: {
     'pages:extend'(pages) {
         pages.push({
-            name: 'dmDestinationCopmany',
-            path: '/dmDestinationCopmany/:id',
-            file: '~/pages/dmDestinationCopmany/index.vue'
+            name: 'dmDestinationCompany',
+            path: '/dmDestinationCompany/:id',
+            file: '~/pages/dmDestinationCompany/index.vue'
         })
         pages.push({
             name: 'buyneedsMatchResult',

@@ -42,6 +42,7 @@ class JmssPortalModule extends BaseApiFactory {
       page: page,
       limit: limit,
     }
+    delete this.options.params
     this.options.method = 'POST'
     return this.call(this.urls.getApproachLists, this.jmssPortalBaseURL, this.options)
   }
@@ -52,6 +53,7 @@ class JmssPortalModule extends BaseApiFactory {
    * @returns アプローチリスト企業
    */
   getApproachCompanyList (approachListId: number) {
+    delete this.options.body
     this.options.method = 'GET'
     return this.call(this.urls.getApproachCompanyList(approachListId), this.jmssPortalBaseURL)
   }
@@ -76,6 +78,7 @@ class JmssPortalModule extends BaseApiFactory {
       page: page,
       limit: limit
     }
+    delete this.options.params
     this.options.method = 'POST'
     return this.call(this.urls.getBuyneeds, this.jmssPortalBaseURL, this.options)
   }
@@ -93,6 +96,7 @@ class JmssPortalModule extends BaseApiFactory {
       page: page,
       limit: limit,
     }
+    delete this.options.body
     this.options.method = 'GET'
     return this.call(this.urls.getUsers, this.jmssPortalBaseURL, this.options)
   }
@@ -112,6 +116,7 @@ class JmssPortalModule extends BaseApiFactory {
       page: page,
       limit: limit,
     }
+    delete this.options.params
     this.options.method = 'POST'
     return this.call(this.urls.getCompanies, this.jmssPortalBaseURL, this.options)
     
@@ -130,6 +135,7 @@ class JmssPortalModule extends BaseApiFactory {
       page: page,
       limit: limit,
     }
+    delete this.options.body
     this.options.method = 'GET'
     return this.call(this.urls.getTeams, this.jmssPortalBaseURL, this.options)
   }

@@ -82,7 +82,7 @@
     </v-container>
     <!-- ヘッダ部分 ここまで -->
     <!-- 一覧表示 ここから -->
-    <v-container v-if="destinationCompanies && destinationCompanies.length" class="ui-vcontaoner pt-0 mb-4">
+    <v-container v-if="destinationCompanies" class="ui-vcontaoner pt-0 mb-4">
       <v-data-table
         :headers="destinationCompanyHeaders"
         :items="destinationCompanies"

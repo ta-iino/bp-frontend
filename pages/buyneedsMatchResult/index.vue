@@ -46,14 +46,14 @@
         </v-sheet>
       </v-row>
 
-      <v-container v-if="buyneedsListData && buyneedsListData.length" class="ui-vcontaoner pt-0 mb-4">
+      <v-container v-if="buyneedsListData" class="ui-vcontaoner pt-0 mb-4">
         <v-row>
           <v-row class="pt-10" justify="end">
             <h3>処理日時</h3>
             <span class="mx-10">{{ processDate }}</span>
           </v-row>
           <v-sheet
-            v-for="(buyneeds, i) in buyneedsListData.data"
+            v-for="(buyneeds, i) in buyneedsListData"
             :key="i"
             cols="16"
             class="mx-6 my-2"
@@ -213,7 +213,7 @@ const processDate: string = buyneedsMatchingHistories.value.buyneedsMatchingHist
 const buyneedsMatchingResult: any = await $approach.getBuyneedsMatchingResult(sendCompanyHistoryId)
 
 // マッチング結果が存在する場合のみ取得処理を行う
-if(buyneedsMatchingResult && buyneedsMatchingResult.length) {
+if(buyneedsMatchingResult) {
     // 買い手企業情報取得APIの呼び出し
   const buyCompanyIds: number[] = buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId)
   const buyCompanyList: any = await $jmssPortal.getCompanies(buyCompanyIds.join())

@@ -5,7 +5,7 @@
       <v-row>
         <v-col cols="12" class="px-0 my-3 py-0" style="background-color: #81D4FA">
           <v-card-title class="headline font-weight-bold">
-            DM発送企業一覧
+            DM発送先企業一覧
           </v-card-title>
         </v-col>
       </v-row>
@@ -198,6 +198,7 @@ const items: any = [
   { title: '備考：', value: approachListCamelData.note },
   { title: '', value: '' }, // 画面レイアウト上空欄を作るため
   { title: '', value: '' }, // 画面レイアウト上空欄を作るため
+  { title: '発送日：', value: approachListCamelData.dmDate },
   { title: '登録日：', value: formatDate(approachListCamelData.createdAt) },
   { title: '状況：', value: getMatchngStatusStr(matchingHistories.value.buyneedsMatchingHistories[0].matchingStatus) }
 ]

@@ -283,21 +283,12 @@ const searchButton = (): void => {
 }
 
 /**
- * ページネーションで違うページ押下時の処理
- * @param targetPage クリックしたページネーションの番号
- */
-// const onChangePage = (targetPage: number): void => {
-//   // page.value = targetPage
-//   getApproachListsData(searchParams)
-// }
-
-/**
  * リスト名押下時の処理
  * @param approachListId
  */
 const clickListName = (approachListId: number):void => {
   router.push({
-    path: `/dmDestinationCopmany/${approachListId}`
+    path: `/dmDestinationCompany/${approachListId}`
   })
 }
 </script>

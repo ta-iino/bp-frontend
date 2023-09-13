@@ -133,7 +133,7 @@
     </v-container>
     <v-row v-else>
       <v-col cols="12" class="pt-4 pl-10 text-center">
-        マッチング中です
+        表示中です。なお、マッチング中の場合には表示されませんので、完了後に再表示ください。
       </v-col>
     </v-row>
   </div>

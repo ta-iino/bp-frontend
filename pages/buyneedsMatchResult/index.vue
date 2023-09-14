@@ -46,19 +46,20 @@
         </v-sheet>
       </v-row>
 
-      <v-container v-if="buyneedsListData" class="ui-vcontaoner pt-0 mb-4">
+      <v-container v-if="buyneedsMatchingResult" class="ui-vcontaoner pt-0 mb-4">
         <v-row>
           <v-row class="pt-10" justify="end">
             <h3>処理日時</h3>
             <span class="mx-10">{{ processDate }}</span>
           </v-row>
           <v-sheet
-            v-for="(buyneeds, i) in buyneedsListData"
+            v-for="(matchingResult, i) in buyneedsMatchingResult.buyneedsMatchingResults"
             :key="i"
             cols="16"
             class="mx-6 my-2"
             elevation="1"
             height="auto"
+            width="100%"
           >
             <v-card-title style="background-color: #e1f5fe;" class="header-back">
               <h4 class="mt-n2 ml-n2">
@@ -73,15 +74,15 @@
                     企業:
                   </v-col>
                   <v-col cols="3">
-                    <span class="link" @click="clickCompany(getTargetBuyComapnyData(buyneeds, 'id'))">
-                      {{ getTargetBuyComapnyData(buyneeds, "name") }}
+                    <span class="link" @click="clickCompany(getTargetBuyComapnyData(matchingResult, 'id'))">
+                      {{ getTargetBuyComapnyData(matchingResult, "name") }}
                     </span>
                   </v-col>
                   <v-col cols="2">
                     都道府県:
                   </v-col>
                   <v-col cols="3">
-                    {{ getTargetBuyComapnyData(buyneeds, 'pref') }}
+                    {{ getTargetBuyComapnyData(matchingResult, 'pref') }}
                   </v-col>
                 </v-row>
               </v-col>
@@ -92,13 +93,13 @@
                     買収実績:
                   </v-col>
                   <v-col cols="3">
-                    {{ buyneeds.accuracy }}
+                    {{ getTargetBuyneedsData(matchingResult, 'accuracy') }}
                   </v-col>
                   <v-col cols="2">
                     業種:
                   </v-col>
                   <v-col cols="3">
-                    {{ getIndutryNames(getTargetBuyComapnyData(buyneeds, 'industries')) }}
+                    {{ getIndutryNames(getTargetBuyComapnyData(matchingResult, 'industries')) }}
                   </v-col>
                 </v-row>
               </v-col>
@@ -109,13 +110,13 @@
                     売上高:
                   </v-col>
                   <v-col cols="3">
-                    {{ getTargetBuyComapnyData(buyneeds, 'sales') }} 百万円
+                    {{ getTargetBuyComapnyData(matchingResult, 'sales') }} 百万円
                   </v-col>
                   <v-col cols="2">
                     営業種目:
                   </v-col>
                   <v-col cols="3">
-                    {{ getTsrData(getTargetBuyComapnyData(buyneeds, "tsr"), '営業種目') }}
+                    {{ getTsrData(getTargetBuyComapnyData(matchingResult, "tsr"), '営業種目') }}
                   </v-col>
                 </v-row>
               </v-col>
@@ -126,7 +127,7 @@
                     買収希望エリア:
                   </v-col>
                   <v-col cols="3">
-                    {{ getValueObject(Object.values(buyneeds.prefs)) }}
+                    {{ getValueObject(Object.values(getTargetBuyneedsData(matchingResult, 'prefs'))) }}
                   </v-col>
                 </v-row>
               </v-col>
@@ -137,7 +138,7 @@
                     買収希望業種:
                   </v-col>
                   <v-col cols="3">
-                    {{ getIndutryNames(buyneeds.industries) }}
+                    {{ getIndutryNames(getTargetBuyneedsData(matchingResult, 'industries')) }}
                   </v-col>
                 </v-row>
               </v-col>
@@ -148,7 +149,7 @@
                     希望コメント:
                   </v-col>
                   <v-col cols="3">
-                    <span id="comment">{{ buyneeds.remarks }}</span>
+                    <span id="comment">{{ getTargetBuyneedsData(matchingResult, 'remarks') }}</span>
                   </v-col>
                 </v-row>
               </v-col>
@@ -180,6 +181,9 @@ const sendCompanyHistoryId: string = String(route.params.id)
 const buyCompanyListData: Ref<any> = ref()
 const buyneedsListData: Ref<any> = ref()
 
+// TODO 全てをawaitするとパフォーマンスが悪いらしい。
+// 以下などを参考に先にリクエストだけ送っておくようにしたい
+// https://qiita.com/im36-123/items/c0678a46ee0f8e44e150 https://makky12.hatenablog.com/entry/2020/01/11/175931
 
 /**
  * ヘッダ部のデータ作成
@@ -187,7 +191,7 @@ const buyneedsListData: Ref<any> = ref()
 const sellCompanyHistory: any = await $approach.getSendCompanyHistory(undefined, sendCompanyHistoryId)
 const sellCompanyId: number = sellCompanyHistory.value.sendCompanyHistories[0].companyId
 // 売手企業情報取得APIの呼び出し
-const sellCompany: any = await $jmssPortal.getCompanies(String(sellCompanyId))
+const sellCompany: any = await $jmssPortal.getSendCompanies(String(sellCompanyId))
 // 表示タイトルとバリューの作成
 const items: any = [
   { title: '企業名:', value: sellCompany.value.data[0].name},
@@ -214,29 +218,45 @@ const buyneedsMatchingResult: any = await $approach.getBuyneedsMatchingResult(se
 
 // マッチング結果が存在する場合のみ取得処理を行う
 if(buyneedsMatchingResult) {
+  const buyneedsMatchingResults: any = buyneedsMatchingResult.value.buyneedsMatchingResults
     // 買い手企業情報取得APIの呼び出し
-  const buyCompanyIds: number[] = buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId)
+  const buyCompanyIds: number[] = buyneedsMatchingResults.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId)
   const buyCompanyList: any = await $jmssPortal.getCompanies(buyCompanyIds.join())
   buyCompanyListData.value = buyCompanyList.value.data
 
   // 買いニーズ情報取得APIの呼び出し
-  const buyneedsIds: number[] = buyneedsMatchingResult.value.buyneedsMatchingResults.map((item: { buyneedsId: number; }) => item.buyneedsId)
+  const buyneedsIds: number[] = buyneedsMatchingResults.map((item: { buyneedsId: number; }) => item.buyneedsId)
   const buyneedsList: any = await $jmssPortal.getBuyneeds(buyneedsIds.join())
   buyneedsListData.value = buyneedsList.value.data
 }
 
 /**
- * 買いニーズに紐づく買手企業から特定データを取得する
- * @param buyneeds
+ * 買手企業の情報を取得する
+ * @param matchingResult
  * @param targetKey
  */
-const getTargetBuyComapnyData = (buyneeds:any, targetKey:any): any => {
-  const result: any = buyCompanyListData.value.filter((buyCompany: any) => Object.keys(buyneeds.company)[0] === String(buyCompany.id))[0]
+const getTargetBuyComapnyData = (matchingResult:any, targetKey:any): any => {
+  const result: any = buyCompanyListData.value.filter((buyCompany: any) => matchingResult.candidateCompanyId === buyCompany.id)[0]
   if (result || result !== undefined) {
     return result[targetKey]
   }
   return ''
 }
+
+/**
+ * 買いニーズの情報を取得する
+ * @param matchingResult
+ * @param targetKey
+ */
+ const getTargetBuyneedsData = (matchingResult:any, targetKey:any): any => {
+  const result: any = buyneedsListData.value.filter((buyneeds: any) => matchingResult.buyneedsId === buyneeds.id)[0]
+  if (result || result !== undefined) {
+    return result[targetKey]
+  }
+  return ''
+}
+
+
 
 /**
  * 閉じるボタン押下時の処理

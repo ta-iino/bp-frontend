@@ -5,7 +5,7 @@ const config = useRuntimeConfig()
  * @param companyId
  */
 export const clickCompany = (companyId: number): void => {
-    const url = config.public.jmssPortalBaseURL + 'company/' + companyId
+    const url = config.public.jmssPortalBaseURL + '/company/' + companyId
     window.open(url)
 }
 

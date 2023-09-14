@@ -102,7 +102,7 @@ class JmssPortalModule extends BaseApiFactory {
   }
 
   /**
-   * 企業マスタ取得API
+   * 企業マスタ取得API(POST通信)
    * @param companyIds
    * @param name
    * @param page
@@ -121,6 +121,30 @@ class JmssPortalModule extends BaseApiFactory {
     return this.call(this.urls.getCompanies, this.jmssPortalBaseURL, this.options)
     
   }
+
+  // マッチング結果表示画面で2回企業情報を取得しに行くときにusefetchがキャッシュする関係でGET通信を使用している。
+  // TODO どこかのタイミングでuseAsyncDataの記述に変えたい。
+  // https://blog.cloud-acct.com/posts/nuxt3-usefetch-cashe/ 
+ /**
+   * 企業マスタ取得API(GET通信)
+   * @param companyIds
+   * @param name
+   * @param page
+   * @param limit
+   * @returns
+   */
+ getSendCompanies (companyIds?: string, name?: string, page?: number, limit?: number) {
+  this.options.params = {
+    id: companyIds,
+    name: name,
+    page: page,
+    limit: limit,
+  }
+  delete this.options.body
+  this.options.method = 'GET'
+  return this.call(this.urls.getCompanies, this.jmssPortalBaseURL, this.options)
+  
+}  
 
   /**
    * チーム取得API

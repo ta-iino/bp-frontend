@@ -80,8 +80,14 @@ export const getTsrData = (value: any, targetKey: string) => {
  * @param index
  */
 export const getIndutryNames = (industry: any, index?: number): string => {
+  console.log(industry)
   const industryNames: string = confirmationData(industry)
   return index === undefined ? industryNames : industryNames.split(",")[index];
 }
 
-  
+/**
+ * 閉じるボタン押下時の処理
+ */
+export const clickCloseButton = (): void => {
+  window.close()
+}

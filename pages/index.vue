@@ -290,10 +290,12 @@ const searchButton = (): void => {
  * @param approachListId
  */
 const clickListName = (approachListId: number):void => {
-  router.push({
+  const dmDestinationCompanyUrl = router.resolve({
     path: `/dmDestinationCompany/${approachListId}`
   })
+  window.open(dmDestinationCompanyUrl.href, '_blank')
 }
+
 </script>
 
 <style>

@@ -59,8 +59,8 @@
             </v-btn>
           </div>
           <div class="px-2">
-            <v-btn class="v-btn" depressed color="light-blue-darken-4" border="0" @click="pageBack()">
-              戻る
+            <v-btn class="v-btn" depressed color="light-blue-darken-4" border="0" @click="clickCloseButton()">
+              閉じる
             </v-btn>
           </div>
         </v-col>
@@ -203,22 +203,28 @@ const items: any = [
   { title: '状況：', value: getMatchngStatusStr(matchingHistories.value.buyneedsMatchingHistories[0].matchingStatus) }
 ]
 
+
+
+
 /**
  * ボディ部のデータ取得メソッド
  */
-const getBodyData = async (): Promise<any> => {
-  await getSendCompanyIds();
-  await getCompanyData();
+const getBodyData = async (): Promise<void> => {
+  // 発送企業履歴リストから会社IDの配列を作成する
+  const sendCompanyHistoryResponse: any = await $approach.getSendCompanyHistory(selectedBuyneedsHistoryId.value);
+  if(sendCompanyHistoryResponse === undefined) {
+    initBodyData();
+  }
+  sendCompanyHistories.value = sendCompanyHistoryResponse.value.sendCompanyHistories;
+  sendCompanyIds.value = (sendCompanyHistories.value).map((sendCompanyHistory: any) => sendCompanyHistory.companyId);
+  getCompanyData();
 }
 
-/**
- * 発送対象企業の企業マスタID群を取得する
- */
-const getSendCompanyIds = async () => {
-  // 発送企業履歴リストから会社IDの配列を作成する
-  const sendCompanyHistoryResponse: any = await $approach.getSendCompanyHistory(selectedBuyneedsHistoryId.value)
-  sendCompanyHistories.value = sendCompanyHistoryResponse.value.sendCompanyHistories
-  sendCompanyIds.value = (sendCompanyHistories.value).map((sendCompanyHistory: any) => sendCompanyHistory.companyId)
+const initBodyData = (): void => {
+  sendCompanyHistories.value = null;
+  sendCompanyIds.value = null;
+  destinationCompanies.value = null;
+  totalPage.value = 0;
 }
 
 /**
@@ -319,13 +325,6 @@ const showMatchingResult = (companyId: number): void => {
     path: `/buyneedsMatchResult/${targetSendCompanyHistory[0].id}`,
   })
   window.open(matchResultUrl.href, '_blank')
-}
-
-/**
- * 戻るボタン押下時の処理用
- */
-const pageBack = (): void => {
-  router.go(-1)
 }
 
 /**

@@ -341,12 +341,7 @@ const getTargetData = (id: number): any => {
  *  マッチングステータスがマッチング中だった場合は非活性（true）
  */
 const activeBtn = computed((): boolean => {
-  const result = (
-    matchingHistories.value.buyneedsMatchingHistories.filter(
-      (buyneedsMatchingHistoriy: any) => buyneedsMatchingHistoriy.id === selectedBuyneedsHistoryId.value
-    )
-  )
-  if (result[0].matchingStatus === "1") {
+  if (matchingHistories.value.buyneedsMatchingHistories[0].matchingStatus === "1") {
     // マッチング中（ステータスが「1（マッチング中）」）の場合は非活性
     return true
   }

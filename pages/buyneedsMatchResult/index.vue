@@ -257,13 +257,6 @@ const getTargetBuyComapnyData = (matchingResult:any, targetKey:any): any => {
 }
 
 
-
-/**
- * 閉じるボタン押下時の処理
- */
-const clickCloseButton = (): void => {
-  window.close()
-}
 </script>
 
 <style>

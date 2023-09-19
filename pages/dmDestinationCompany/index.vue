@@ -59,8 +59,8 @@
             </v-btn>
           </div>
           <div class="px-2">
-            <v-btn class="v-btn" depressed color="light-blue-darken-4" border="0" @click="pageBack()">
-              戻る
+            <v-btn class="v-btn" depressed color="light-blue-darken-4" border="0" @click="clickCloseButton()">
+              閉じる
             </v-btn>
           </div>
         </v-col>
@@ -203,22 +203,28 @@ const items: any = [
   { title: '状況：', value: getMatchngStatusStr(matchingHistories.value.buyneedsMatchingHistories[0].matchingStatus) }
 ]
 
+
+
+
 /**
  * ボディ部のデータ取得メソッド
  */
-const getBodyData = async (): Promise<any> => {
-  await getSendCompanyIds();
-  await getCompanyData();
+const getBodyData = async (): Promise<void> => {
+  // 発送企業履歴リストから会社IDの配列を作成する
+  const sendCompanyHistoryResponse: any = await $approach.getSendCompanyHistory(selectedBuyneedsHistoryId.value);
+  if(sendCompanyHistoryResponse === undefined) {
+    initBodyData();
+  }
+  sendCompanyHistories.value = sendCompanyHistoryResponse.value.sendCompanyHistories;
+  sendCompanyIds.value = (sendCompanyHistories.value).map((sendCompanyHistory: any) => sendCompanyHistory.companyId);
+  getCompanyData();
 }
 
-/**
- * 発送対象企業の企業マスタID群を取得する
- */
-const getSendCompanyIds = async () => {
-  // 発送企業履歴リストから会社IDの配列を作成する
-  const sendCompanyHistoryResponse: any = await $approach.getSendCompanyHistory(selectedBuyneedsHistoryId.value)
-  sendCompanyHistories.value = sendCompanyHistoryResponse.value.sendCompanyHistories
-  sendCompanyIds.value = (sendCompanyHistories.value).map((sendCompanyHistory: any) => sendCompanyHistory.companyId)
+const initBodyData = (): void => {
+  sendCompanyHistories.value = null;
+  sendCompanyIds.value = null;
+  destinationCompanies.value = null;
+  totalPage.value = 0;
 }
 
 /**
@@ -322,13 +328,6 @@ const showMatchingResult = (companyId: number): void => {
 }
 
 /**
- * 戻るボタン押下時の処理用
- */
-const pageBack = (): void => {
-  router.go(-1)
-}
-
-/**
  * 対象発送企業データの取得処理
  * @param id 対象企業のID
  */
@@ -342,12 +341,7 @@ const getTargetData = (id: number): any => {
  *  マッチングステータスがマッチング中だった場合は非活性（true）
  */
 const activeBtn = computed((): boolean => {
-  const result = (
-    matchingHistories.value.buyneedsMatchingHistories.filter(
-      (buyneedsMatchingHistoriy: any) => buyneedsMatchingHistoriy.id === selectedBuyneedsHistoryId.value
-    )
-  )
-  if (result[0].matchingStatus === "1") {
+  if (matchingHistories.value.buyneedsMatchingHistories[0].matchingStatus === "1") {
     // マッチング中（ステータスが「1（マッチング中）」）の場合は非活性
     return true
   }

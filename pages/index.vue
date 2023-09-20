@@ -101,9 +101,6 @@
           :height="528"
           fixed-header
         >
-          <template #[`item.id`]="{ item }">
-            {{ getTableDmListData(item.raw.id, 'id') }}
-          </template>
           <template #[`item.createdAt`]="{ item }">
             {{ formatDate(item.raw.createdAt) }}
           </template>
@@ -232,11 +229,7 @@ const getApproachListsData = async (searchParams?: any): Promise<void> => {
   // 合計ページ(total÷1ページ当たりの表示数)をtotalPageに格納する（切り上げ）
   totalPage.value = Math.ceil(approachListsResponse.value.total / perPage.value)
   // 取得したデータのキーをキャメルケースに変換する
-  const tmpData = camelcaseKeys(approachListsResponse.value.data, { deep: true })
-  // 一覧表示データを登録日が新しい順にソートする
-  approachLists.value = tmpData.sort(function (a: any, b: any) {
-    return (getTableDmListData(a.id, 'id') < getTableDmListData(b.id, 'id')) ? 1 : -1
-  })
+  approachLists.value = camelcaseKeys(approachListsResponse.value.data, { deep: true })
 }
 
 // 初期表示用に呼び出し

@@ -76,13 +76,16 @@ export const getTsrData = (value: any, targetKey: string) => {
 
 /**
  * 業種表示変換用処理
- * @param buyneeds
+ * @param industries
  * @param index
  */
-export const getIndutryNames = (industry: any, index?: number): string => {
-  console.log(industry)
-  const industryNames: string = confirmationData(industry)
-  return index === undefined ? industryNames : industryNames.split(",")[index];
+export const getIndutryNames = (industries: any, index?: number): string => {
+  if (industries === null || industries === undefined) {
+    return ''
+  }
+  const industryNames: [] = industries.map((industry: any) => Object.values(industry)[0]);
+  const res: string = (index === undefined ? industryNames.join(',') : industryNames[index])
+  return res
 }
 
 /**

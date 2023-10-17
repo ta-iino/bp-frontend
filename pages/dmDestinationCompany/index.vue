@@ -96,19 +96,19 @@
           {{ putHyphen(item.raw.zip) }}
         </template>
         <template #[`item.industry1`]="{ item }">
-          {{ getIndutryNames(getTargetData(item.raw.id).industries, 0) }}
+          {{ getIndutryNames(item.raw.industries, 0) }}
         </template>
         <template #[`item.industry2`]="{ item }">
-          {{ getIndutryNames(getTargetData(item.raw.id).industries, 1) }}
+          {{ getIndutryNames(item.raw.industries, 1) }}
         </template>
         <template #[`item.industry3`]="{ item }">
-          {{ getIndutryNames(getTargetData(item.raw.id).industries, 2) }}
+          {{ getIndutryNames(item.raw.industries, 2) }}
         </template>
         <template #[`item.businessItems`]="{ item }">
-          {{ getTsrData(getTargetData(item.raw.id), '営業種目') }}
+          {{ getTsrData(item.raw.tsr, '営業種目') }}
         </template>
         <template #[`item.representativeAge`]="{ item }">
-          {{ getCeoAge(getTsrData(getTargetData(item.raw.id), '生年月日')) }}
+          {{ getCeoAge(getTsrData(item.raw.tsr, '生年月日')) }}
         </template>
         <template #bottom>
           <div class="text-center pt-2">
@@ -325,15 +325,6 @@ const showMatchingResult = (companyId: number): void => {
     path: `/buyneedsMatchResult/${targetSendCompanyHistory[0].id}`,
   })
   window.open(matchResultUrl.href, '_blank')
-}
-
-/**
- * 対象発送企業データの取得処理
- * @param id 対象企業のID
- */
-const getTargetData = (id: number): any => {
-  const targetData = destinationCompanies.value.filter((destinationCompanyData: any) => id === destinationCompanyData.id)[0]
-  return targetData
 }
 
 /**

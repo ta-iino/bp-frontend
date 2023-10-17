@@ -71,7 +71,7 @@ export const getCeoAge = (ceoBirthday: string) => {
  */
 export const getTsrData = (value: any, targetKey: string) => {
     // 一覧表示用のデータからidをキーにtsr情報を取得して、targetKeyを添え字にしたvalueを取得する
-    return (value && value.tsr) ? value.tsr[targetKey] : ''
+    return value ? value[targetKey] : ''
 }
 
 /**

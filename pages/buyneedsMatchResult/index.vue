@@ -203,8 +203,8 @@ const items: any = [
   { title: '代表者名:', value: sellCompany.value.data[0].representative_name },
   { title: '業種３:', value: getIndutryNames(sellCompany.value.data[0].industries, 2) },
   { title: '従業員数:', value: sellCompany.value.data[0].employees, bottom: '名' },
-  { title: '代表者年齢:', value: getCeoAge(getTsrData(sellCompany.value.data[0],'生年月日')) },
-  { title: '営業種目:', value: getTsrData(sellCompany.value.data[0],'営業種目') }
+  { title: '代表者年齢:', value: getCeoAge(getTsrData(sellCompany.value.data[0].tsr,'生年月日')) },
+  { title: '営業種目:', value: getTsrData(sellCompany.value.data[0].tsr,'営業種目') }
 ]
 // 処理日時の取得
 const buyneedsMatchingHistories: any = await $approach.getBuyneedsMatchingHistory(undefined, sellCompanyHistory.value.buyneedsMatchingHistoryId)

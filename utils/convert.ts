@@ -29,16 +29,16 @@ export const getMatchngStatusStr = (codeValue: string): string => {
 
 export const getCurrentTime = (): string => {
   // 現在の時刻を取得
-  const currentDate: Date = new Date();
+  const currentDate = new Date();
 
   // 年、月、日、時、分を取得
-  const year: number = currentDate.getFullYear();
-  const month: string = String(currentDate.getMonth() + 1).padStart(2, '0'); // 月は0から始まるため、+1する
-  const day: string = String(currentDate.getDate()).padStart(2, '0');
-  const hours: string = String(currentDate.getHours()).padStart(2, '0');
-  const minutes: string = String(currentDate.getMinutes()).padStart(2, '0');
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // 月は0から始まるため、+1する
+  const day = String(currentDate.getDate()).padStart(2, '0');
+  const hours = String(currentDate.getHours()).padStart(2, '0');
+  const minutes = String(currentDate.getMinutes()).padStart(2, '0');
   
   // yyyymmdd_hhmm形式で表示
-  const formattedDate: string = `${year}${month}${day}_${hours}${minutes}`;
+  const formattedDate = `${year}${month}${day}_${hours}${minutes}`;
   return formattedDate
 }

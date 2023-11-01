@@ -1,6 +1,3 @@
-// エンドポイントが増えてきたら分割する
-// TODO 社内ポータルの受け取り方によって変数の型定義変更の可能性あり
-
 import BaseApiFactory from '../factory'
 
 class JmssPortalModule extends BaseApiFactory {
@@ -109,7 +106,7 @@ class JmssPortalModule extends BaseApiFactory {
    * @param limit
    * @returns
    */
-  getCompanies (companyIds?: string, name?: string, page?: number, limit?: number) {
+  getCompanies (companyIds?: string, page?: number, limit?: number, name?: string) {
     this.options.body = {
       id: companyIds,
       name: name,

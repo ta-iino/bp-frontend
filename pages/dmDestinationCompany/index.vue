@@ -185,7 +185,7 @@ const selectedBuyneedsHistoryId: Ref<number> = ref(processingDateList.value[0].i
 const approachListData: any = await $jmssPortal.getApproachLists(approachListId)
 // 取得したデータのキーをキャメルケースに変換する
 const approachListCamelData = camelcaseKeys(approachListData.value.data[0], { deep: true })
-const items: any = [
+const items = [
   { title: '担当チーム：', value: confirmationData(approachListCamelData.requestTeam) },
   { title: '担当コンサルタント：', value: confirmationData(approachListCamelData.requestUsers) },
   { title: 'リスト名：', value: approachListCamelData.name },
@@ -216,10 +216,13 @@ const getBodyData = async (): Promise<void> => {
     initBodyData();
   }
   sendCompanyHistories.value = sendCompanyHistoryResponse.value.sendCompanyHistories;
-  sendCompanyIds.value = (sendCompanyHistories.value).map((sendCompanyHistory: any) => sendCompanyHistory.companyId);
+  sendCompanyIds.value = sendCompanyHistories.value.map((sendCompanyHistory: any) => sendCompanyHistory.companyId);
   getCompanyData();
 }
 
+/**
+ * ボディ部の初期化処理
+ */
 const initBodyData = (): void => {
   sendCompanyHistories.value = null;
   sendCompanyIds.value = null;
@@ -233,7 +236,7 @@ const initBodyData = (): void => {
  */
 const getCompanyData = async (searchCompanyName?: string): Promise<any> => {
   const companies: any = (
-    await $jmssPortal.getCompanies((sendCompanyIds.value).join(), searchCompanyName, page.value, perPage.value)
+    await $jmssPortal.getCompanies((sendCompanyIds.value).join(), page.value, perPage.value, searchCompanyName)
   )
   // キャメルケースに変換
   destinationCompanies.value = camelcaseKeys(companies.value.data, { deep: true })
@@ -241,7 +244,7 @@ const getCompanyData = async (searchCompanyName?: string): Promise<any> => {
   totalPage.value = Math.ceil(companies.value.total / perPage.value)
 }
 // ヘッダ
-const destinationCompanyHeaders: any = [
+const destinationCompanyHeaders = [
   { title: '', key: 'matchingResult', sortable: false, width: 50, color: '#b3e5fc' },
   { title: 'マスタID', key: 'id', sortable: false, width: 100 },
   { title: '企業名', key: 'name', sortable: false, width: 200 },
@@ -297,18 +300,255 @@ const matchingStart = async (): Promise<void> => {
  * ダウンロード押下時の処理
  */
 const downloadCsv = async (): Promise<void> => {
-  // 買いニーズマッチング結果CSV取得APIの呼び出し
-  const csv: any = await $approach.getBuyneedsMatchingResultCsv(selectedBuyneedsHistoryId.value)
-  // ファイルをBlob形式で取得
-  const blobData = new Blob([csv.value], { type: "text/csv" })
-  // ダウンロードリンクを作成
+  // 事前データの取得
+  var sendCompanyHistoryMap: any = {};
+  sendCompanyHistories.value.map((sendCompanyHistory: any) => sendCompanyHistoryMap[sendCompanyHistory["id"]] = sendCompanyHistory["companyId"]);
+  const sendCompanyDataList: any = await callUpToTotalNum(sendCompanyIds.value.join(), false);
+  const sendCompanyDataValues: any = Object.values(sendCompanyDataList);
+  const buyneedsMatchingResults: any = await $approach.getBuyneedsMatchingResult(Object.keys(sendCompanyHistoryMap).map(Number));
+  var buyCompanyList:any = [];
+  var buyneedsList: any = [];
+  if (buyneedsMatchingResults.value) {
+    const buyCompanyIds: number[] = buyneedsMatchingResults.value.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId);
+    const buyneedsIds: number[] = buyneedsMatchingResults.value.map((item: { buyneedsId: number; }) => item.buyneedsId);
+    buyCompanyList = await callUpToTotalNum(buyCompanyIds.join(), false);
+    buyneedsList = await callUpToTotalNum( buyneedsIds.join());
+  }
+
+  // 発送企業履歴ID毎にマッチング結果をまとめる
+  // relationKeyDictのkeyには発送企業の社内ポータル側企業マスタIDをセットしておく
+  var befSendCompanyId = 0;
+  var relationKeyDict: any = {}
+  var matchingResultDicts: any = []
+  buyneedsMatchingResults.value.map((buyneedsMatchingResult: any) => {
+    const sendCompanyHistoryId = buyneedsMatchingResult.sendCompanyHistoryId
+    if(befSendCompanyId !== sendCompanyHistoryId) {
+      relationKeyDict[sendCompanyHistoryMap[sendCompanyHistoryId]] = matchingResultDicts
+      matchingResultDicts = []
+    }
+    matchingResultDicts.push(buyneedsMatchingResult)
+  }) 
+
+
+  var buyCompanyCount = 0;
+  var csvDataList: any = []
+  sendCompanyDataValues.map((sendCompanyData: any) => {
+    var csvData = createSendCompanyData(sendCompanyData)
+    const matchedRelationKeyDict = relationKeyDict[sendCompanyData["id"]]
+    // # 買手候補企業数を取得する(ヘッダ作成に使用する)
+    if (buyCompanyCount < matchedRelationKeyDict.length) {
+      buyCompanyCount = matchedRelationKeyDict.length
+    }
+        
+    // # 評価スコアの降順にソート
+    const sortedMatchedRelationKeyDict = matchedRelationKeyDict.sort((a: any, b: any) => {
+      (a.valuationScore > b.valuationScore) ? 1 : -1
+    })
+    // # マッチング結果の分だけ処理が実行される
+    sortedMatchedRelationKeyDict.map((targetDataKey: any) => {
+      const buyCompanyData: any = buyCompanyList[targetDataKey["candidateCompanyId"]]
+      if (buyCompanyData !== null && buyCompanyData.length !== 0) {
+        csvData = csvData.concat(createBuyCompanyData(buyCompanyData))
+      }
+
+      const buyneedsData: any = buyneedsList[targetDataKey["buyneedsId"]]
+      if (buyneedsData !== null && buyneedsData.length !== 0) {
+        csvData = csvData.concat(createBuyneedsData(buyneedsData))
+      }
+    })
+    csvDataList.push(csvData)
+  })
+
+  var output: any = []
+  output.push(createCsvHeader(buyCompanyCount));
+  csvDataList.map((csvData: any) => {output.push(csvData)})
+  // 先頭に,が入らないよう処理する
+  const csvContent = output.map((row: any) => row.map(csvEscape).join(",")).join("\n");
+
+  // CSVファイルの作成
+  const bom = new Uint8Array([0xef, 0xbb, 0xbf])
+  const blobData = new Blob([bom, csvContent], { type: "text/csv" })
   const downloadLink = document.createElement('a')
   downloadLink.href = window.URL.createObjectURL(blobData)
-  // ダウンロード時のファイル名
-  downloadLink.download = '発送先企業一覧' + getCurrentTime() + '.csv'
+  downloadLink.download = approachListId + '_' + approachListCamelData.name + '_発送先企業一覧_' + getCurrentTime() + '.csv'
   downloadLink.click()
-  // 不要になったURLを解放
   URL.revokeObjectURL(downloadLink.href)
+}
+
+/**
+ * 上限数まで社内ポータルAPIを叩く
+ */
+const callUpToTotalNum = async (ids: string, isBuyneeds=true, limitNum=500, pageNum=1, toNum=0, totalNum=1): Promise<{}>  => {
+  var outputData: any = {}
+
+  while (toNum < totalNum) {
+    // funcを引数に渡したやり方がうまくいかないため、条件分岐でそれぞれ呼び出している。
+    var data_json: any = {}
+    if(isBuyneeds) {
+      data_json = await $jmssPortal.getBuyneeds(ids, pageNum, limitNum);
+    } else {
+      data_json = await $jmssPortal.getCompanies(ids, pageNum, limitNum);
+    }
+    
+    const data: any = data_json.value.data
+    if (data === undefined || data === null || data.length === 0) {
+      break
+    }
+    totalNum = data_json.value.total
+    toNum = data_json.value.to
+    if (toNum === null) {
+      break
+    }
+    data.map((data2: any) => outputData[data2["id"]] = data2)
+    pageNum += 1
+  }
+
+  return outputData
+}
+
+/**
+ * CSV出力用発送企業データ作成メソッド
+ * @param sendCompanyData 
+ */
+const createSendCompanyData = (sendCompanyData: any): any => {
+  const tsrData = sendCompanyData["tsr"];
+  const csvSendCompanyData = [
+    sendCompanyData["id"],
+    sendCompanyData["corporate_number"],
+    sendCompanyData["duns_number"],
+    sendCompanyData["listed_on"],
+    sendCompanyData["name"],
+    sendCompanyData["representative_name"],
+    sendCompanyData["representative_birthday"],
+    sendCompanyData["zip"],
+    sendCompanyData["pref"],
+    sendCompanyData["address"],
+    sendCompanyData["tel"],
+    sendCompanyData["fax"],
+    sendCompanyData["email"],
+    sendCompanyData["url"],
+    sendCompanyData["established_date"],
+    getTsrData(tsrData, "創業年月"),
+    sendCompanyData["capital"],
+    sendCompanyData["employees"],
+    getIndutryCodes(sendCompanyData["industries"], 0),
+    getIndutryCodes(sendCompanyData["industries"], 1),
+    getIndutryCodes(sendCompanyData["industries"], 2),
+    getTsrData(tsrData, "営業種目"),
+    sendCompanyData["officers"],
+    sendCompanyData["shareholders"],
+    sendCompanyData["sales"],
+    sendCompanyData["profit"],
+    getTsrData(tsrData, "営業所・支店"),
+    getTsrData(tsrData, "仕入先"),
+    getTsrData(tsrData, "販売先"),
+    getTsrData(tsrData, "取引銀行"),
+    getTsrData(tsrData, "概況"),
+  ]
+  return csvSendCompanyData
+}
+
+/**
+ * CSV出力用買手候補企業データ作成メソッド
+ * @param buyCompanyData 
+ */
+const createBuyCompanyData = (buyCompanyData: any): any => {
+  const tsrData = buyCompanyData["tsr"];
+  const csvBuyCompanyData = [
+    buyCompanyData["id"],
+    buyCompanyData["name"],
+    buyCompanyData["pref"],
+    getIndutryCodes(buyCompanyData["industries"], 0),
+    getTsrData(tsrData, "営業種目"),
+    buyCompanyData["sales"]
+  ];
+  return csvBuyCompanyData
+}
+
+/**
+ * CSV出力用買いニーズデータ作成メソッド
+ * @param buyneedsData 
+ */
+const createBuyneedsData = (buyneedsData: any): any => {
+  const csvBuyneedsData = [
+    buyneedsData["accuracy"],
+    confirmationData(buyneedsData["prefs"]),
+    getIndutryCodes(buyneedsData["industries"]),
+    buyneedsData["remarks"],
+  ];
+  return csvBuyneedsData
+}
+
+/**
+ * csvヘッダ作成メソッド
+ * @param buyCompanyCount 
+ */
+const createCsvHeader = (buyCompanyCount: number): any => {
+  var csvHeader = [
+    "企業マスタID",
+    "法人番号",
+    "TSR企業コード",
+    "株式市場",
+    "企業名",
+    "代表者名",
+    "代表者生年月日",
+    "郵便番号",
+    "都道府県",
+    "所在地",
+    "電話番号",
+    "FAX番号",
+    "Email",
+    "URL",
+    "設立年月",
+    "創業年月",
+    "資本金",
+    "従業員数",
+    "業種1",
+    "業種2",
+    "業種3",
+    "営業種目",
+    "役員",
+    "株主構成",
+    "売上",
+    "利益",
+    "営業所・支店",
+    "仕入先",
+    "販売先",
+    "取引銀行",
+    "概況",
+  ]
+  const csvHeaderBuyneeds = [
+    "企業マスタID",
+    "買手候補",
+    "都道府県",
+    "業種",
+    "営業種目",
+    "売上高（百万円）",
+    "買収実績",
+    "買収希望エリア",
+    "買収希望業種",
+    "買いニーズ登録コメント",
+  ]
+  for(var i = 0; i < buyCompanyCount; i++) {
+    csvHeader = csvHeader.concat(csvHeaderBuyneeds)
+  }
+  return csvHeader
+}
+
+/**
+ * エスケープ処理(Excelの同じセル内に収まるようにする)
+ * @param value 
+ */
+ const csvEscape = (value: any) => {
+  if (value === null || value === undefined) {
+    return value
+  }
+  if (typeof value === "string" || value instanceof String) {
+    if (value.includes(', ') || value.includes('\n')) {
+      return `"${value}"`;
+    }
+  }
+  return value;
 }
 
 /**

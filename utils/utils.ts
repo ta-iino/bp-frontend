@@ -23,7 +23,7 @@ export const confirmationData = (objectData: any) => {
  * オブジェクトのvalueを配列で取り出し、表示する
  */
 export const getValueObject = (arrayValue: any): string => {
-  return arrayValue ? arrayValue.join(',') : arrayValue
+  return arrayValue ? arrayValue.join(', ') : arrayValue
 }
 
 /**
@@ -45,9 +45,9 @@ export const getCeoAge = (ceoBirthday: string) => {
     if (!ceoBirthday || ceoBirthday == undefined) {
       return ''
     }
-    const year: number = Number(ceoBirthday.substring(0, 4))
-    const month: number = Number(ceoBirthday.substring(5, 7))
-    const date: number = Number(ceoBirthday.substring(8, 10))
+    const year = Number(ceoBirthday.substring(0, 4))
+    const month = Number(ceoBirthday.substring(5, 7))
+    const date = Number(ceoBirthday.substring(8, 10))
   
     // 今日
     const today = new Date()
@@ -75,7 +75,7 @@ export const getTsrData = (value: any, targetKey: string) => {
 }
 
 /**
- * 業種表示変換用処理
+ * 業種表示変換用処理(業種名)
  * @param industries
  * @param index
  */
@@ -85,6 +85,20 @@ export const getIndutryNames = (industries: any, index?: number): string => {
   }
   const industryNames: [] = industries.map((industry: any) => Object.values(industry)[0]);
   const res: string = (index === undefined ? industryNames.join(',') : industryNames[index])
+  return res
+}
+
+/**
+ * 業種表示変換用処理(業種コード)
+ * @param industries
+ * @param index
+ */
+export const getIndutryCodes = (industries: any, index?: number): string => {
+  if (industries === null || industries === undefined) {
+    return ''
+  }
+  const industryCodes: [] = industries.map((industry: any) => Object.keys(industry)[0]);
+  const res: string = (index === undefined ? industryCodes.join(', ') : industryCodes[index])
   return res
 }
 

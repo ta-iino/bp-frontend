@@ -305,7 +305,7 @@ const downloadCsv = async (): Promise<void> => {
   const downloadLink = document.createElement('a')
   downloadLink.href = window.URL.createObjectURL(blobData)
   // ダウンロード時のファイル名
-  downloadLink.download = '発送先企業一覧' + getCurrentTime() + '.csv'
+  downloadLink.download = approachListId + '_' + approachListCamelData.name + '_発送先企業一覧_' + getCurrentTime() + '.csv'
   downloadLink.click()
   // 不要になったURLを解放
   URL.revokeObjectURL(downloadLink.href)

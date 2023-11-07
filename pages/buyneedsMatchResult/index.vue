@@ -177,7 +177,7 @@ import { useRoute } from 'vue-router'
  */
 const route = useRoute()
 const { $approach, $jmssPortal }: any = useNuxtApp()
-const sendCompanyHistoryId: string = String(route.params.id)
+const sendCompanyHistoryId: number = Number(route.params.id)
 const buyCompanyListData: Ref<any> = ref()
 const buyneedsListData: Ref<any> = ref()
 
@@ -191,7 +191,7 @@ const buyneedsListData: Ref<any> = ref()
 const sellCompanyHistory: any = await $approach.getSendCompanyHistory(undefined, sendCompanyHistoryId)
 const sellCompanyId: number = sellCompanyHistory.value.sendCompanyHistories[0].companyId
 // 売手企業情報取得APIの呼び出し
-const sellCompany: any = await $jmssPortal.getSendCompanies(String(sellCompanyId))
+const sellCompany: any = await $jmssPortal.getCompanies(String(sellCompanyId))
 // 表示タイトルとバリューの作成
 const items: any = [
   { title: '企業名:', value: sellCompany.value.data[0].name},
@@ -218,7 +218,7 @@ const buyneedsMatchingResult: any = await $approach.getBuyneedsMatchingResult(se
 
 // マッチング結果が存在する場合のみ取得処理を行う
 if(buyneedsMatchingResult) {
-  const buyneedsMatchingResults: any = buyneedsMatchingResult.value.buyneedsMatchingResults
+  const buyneedsMatchingResults: any = buyneedsMatchingResult.value
     // 買い手企業情報取得APIの呼び出し
   const buyCompanyIds: number[] = buyneedsMatchingResults.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId)
   const buyCompanyList: any = await $jmssPortal.getCompanies(buyCompanyIds.join())

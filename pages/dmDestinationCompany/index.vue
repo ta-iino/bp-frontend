@@ -82,7 +82,7 @@
     </v-container>
     <!-- ヘッダ部分 ここまで -->
     <!-- 一覧表示 ここから -->
-    <v-container v-if="filteredMatchingHistory.matchingStatus == 2" class="ui-vcontaoner pt-0 mb-4">
+    <v-container v-if="selectedMatchingStatus === '2'" class="ui-vcontaoner pt-0 mb-4">
       <v-data-table
         :headers="destinationCompanyHeaders"
         :items="destinationCompanies"
@@ -165,6 +165,7 @@ const destinationCompanies: Ref<any> = ref()
 // 発送企業履歴データ（バックエンド接続）
 const sendCompanyHistories: Ref<any> = ref()
 const sendCompanyIds: any = []
+const selectedMatchingStatus: Ref<any> = ref()
 
 /**
  * マッチング処理日時リスト作成
@@ -218,6 +219,7 @@ const getBodyData = async (): Promise<void> => {
   sendCompanyHistories.value = sendCompanyHistoryResponse.value.sendCompanyHistories;
   sendCompanyIds.value = (sendCompanyHistories.value).map((sendCompanyHistory: any) => sendCompanyHistory.companyId);
   getCompanyData();
+  selectedMatchingStatus.value = matchingHistories.value.buyneedsMatchingHistories.filter((history: any) => selectedBuyneedsHistoryId.value === history.id)[0].matchingStatus;
 }
 
 const initBodyData = (): void => {
@@ -338,11 +340,6 @@ const activeBtn = computed((): boolean => {
   }
   return false
 })
-
-/**
- * マッチング処理日時のidを取得する
- */
-const filteredMatchingHistory: any = (matchingHistories.value.buyneedsMatchingHistories).filter((history: any) => selectedBuyneedsHistoryId.value === history.id)[0]
 
 </script>
 

@@ -315,23 +315,29 @@ const downloadCsv = async (): Promise<void> => {
     buyneedsList = await callUpToTotalNum( buyneedsIds.join());
   }
 
-  // 発送企業履歴ID毎にマッチング結果をまとめる
-  // relationKeyDictのkeyには発送企業の社内ポータル側企業マスタIDをセットしておく
-  var befSendCompanyId = 0;
-  var relationKeyDict: any = {}
-  var matchingResultDicts: any = []
-  buyneedsMatchingResults.value.map((buyneedsMatchingResult: any) => {
-    const sendCompanyHistoryId = buyneedsMatchingResult.sendCompanyHistoryId
-    if(befSendCompanyId !== sendCompanyHistoryId) {
-      relationKeyDict[sendCompanyHistoryMap[sendCompanyHistoryId]] = matchingResultDicts
-      matchingResultDicts = []
-    }
-    matchingResultDicts.push(buyneedsMatchingResult)
-  }) 
+  const relationKeyDict = createRelationKeyDict(buyneedsMatchingResults, sendCompanyHistoryMap)
+  const [buyCompanyCount, csvDataList]: any = createCsvDataList(sendCompanyDataValues, relationKeyDict, buyCompanyList, buyneedsList);
+  var output: any = []
+  output.push(createCsvHeader(buyCompanyCount));
+  csvDataList.map((csvData: any) => output.push(csvData))
+  // 先頭に,が入らないよう処理する
+  const csvContent = output.map((row: any) => row.map(csvEscape).join(",")).join("\n");
+  const title = approachListId + '_' + approachListCamelData.name + '_発送先企業一覧_' + getCurrentTime() + '.csv'
+  createCsv(csvContent, title)
+}
 
-
+/**
+ * CSVの出力データ作成
+ * @param sendCompanyDataValues
+ * @param relationKeyDict 
+ * @param buyCompanyList 
+ * @param buyneedsList 
+ */
+const createCsvDataList = (sendCompanyDataValues: any, relationKeyDict: any, buyCompanyList: any, buyneedsList: any): any => {
   var buyCompanyCount = 0;
-  var csvDataList: any = []
+  const csvDataList: any = []
+  // idの降順に並び替え
+  sendCompanyDataValues.sort((a: any, b: any) => b.id - a.id)
   sendCompanyDataValues.map((sendCompanyData: any) => {
     var csvData = createSendCompanyData(sendCompanyData)
     const matchedRelationKeyDict = relationKeyDict[sendCompanyData["id"]]
@@ -340,12 +346,12 @@ const downloadCsv = async (): Promise<void> => {
       buyCompanyCount = matchedRelationKeyDict.length
     }
         
-    // # 評価スコアの降順にソート
-    const sortedMatchedRelationKeyDict = matchedRelationKeyDict.sort((a: any, b: any) => {
-      (a.valuationScore > b.valuationScore) ? 1 : -1
+    // # 評価スコアの降順, 買いニーズの昇順にソート
+    matchedRelationKeyDict.sort((a: any, b: any) => {
+      return a.valuationScore !== b.valuationScore ? b.valuationScore - a.valuationScore : a.buyneedsId - b.buyneedsId
     })
     // # マッチング結果の分だけ処理が実行される
-    sortedMatchedRelationKeyDict.map((targetDataKey: any) => {
+    matchedRelationKeyDict.map((targetDataKey: any) => {
       const buyCompanyData: any = buyCompanyList[targetDataKey["candidateCompanyId"]]
       if (buyCompanyData !== null && buyCompanyData.length !== 0) {
         csvData = csvData.concat(createBuyCompanyData(buyCompanyData))
@@ -358,25 +364,41 @@ const downloadCsv = async (): Promise<void> => {
     })
     csvDataList.push(csvData)
   })
-
-  var output: any = []
-  output.push(createCsvHeader(buyCompanyCount));
-  csvDataList.map((csvData: any) => {output.push(csvData)})
-  // 先頭に,が入らないよう処理する
-  const csvContent = output.map((row: any) => row.map(csvEscape).join(",")).join("\n");
-
-  // CSVファイルの作成
-  const bom = new Uint8Array([0xef, 0xbb, 0xbf])
-  const blobData = new Blob([bom, csvContent], { type: "text/csv" })
-  const downloadLink = document.createElement('a')
-  downloadLink.href = window.URL.createObjectURL(blobData)
-  downloadLink.download = approachListId + '_' + approachListCamelData.name + '_発送先企業一覧_' + getCurrentTime() + '.csv'
-  downloadLink.click()
-  URL.revokeObjectURL(downloadLink.href)
+  return [buyCompanyCount, csvDataList]
 }
 
 /**
- * 上限数まで社内ポータルAPIを叩く
+ * 発送企業履歴ID毎にマッチング結果をまとめる
+ * relationKeyDictのkeyには発送企業の社内ポータル側企業マスタIDをセットしておく
+ * @param buyneedsMatchingResults 
+ * @param sendCompanyHistoryMap 
+ */
+const createRelationKeyDict = (buyneedsMatchingResults: any, sendCompanyHistoryMap: any): any => {
+  var sendCompanyHistoryId = 0;
+  var befSendCompanyId = buyneedsMatchingResults.value[0].sendCompanyHistoryId;
+  var relationKeyDict: any = {};
+  var matchingResultDicts: any = [];
+  buyneedsMatchingResults.value.map((buyneedsMatchingResult: any) => {
+    sendCompanyHistoryId = buyneedsMatchingResult.sendCompanyHistoryId;
+    if(befSendCompanyId !== sendCompanyHistoryId) {
+      relationKeyDict[sendCompanyHistoryMap[befSendCompanyId]] = matchingResultDicts;
+      matchingResultDicts = [];
+      befSendCompanyId = sendCompanyHistoryId;
+    }
+    matchingResultDicts.push(buyneedsMatchingResult);
+  })
+  relationKeyDict[sendCompanyHistoryMap[befSendCompanyId]] = matchingResultDicts;
+  return relationKeyDict;
+}
+
+/**
+ * 上限数まで社内ポータルAPIを叩く(utilsに持っていくとfuncメソッド内のthisがnullになる)
+ * @param ids 
+ * @param isBuyneeds 
+ * @param limitNum 
+ * @param pageNum 
+ * @param toNum 
+ * @param totalNum 
  */
 const callUpToTotalNum = async (ids: string, isBuyneeds=true, limitNum=500, pageNum=1, toNum=0, totalNum=1): Promise<{}>  => {
   var outputData: any = {}
@@ -533,22 +555,6 @@ const createCsvHeader = (buyCompanyCount: number): any => {
     csvHeader = csvHeader.concat(csvHeaderBuyneeds)
   }
   return csvHeader
-}
-
-/**
- * エスケープ処理(Excelの同じセル内に収まるようにする)
- * @param value 
- */
- const csvEscape = (value: any) => {
-  if (value === null || value === undefined) {
-    return value
-  }
-  if (typeof value === "string" || value instanceof String) {
-    if (value.includes(', ') || value.includes('\n')) {
-      return `"${value}"`;
-    }
-  }
-  return value;
 }
 
 /**

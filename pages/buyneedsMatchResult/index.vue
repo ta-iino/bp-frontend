@@ -46,14 +46,14 @@
         </v-sheet>
       </v-row>
 
-      <v-container v-if="buyneedsMatchingResult" class="ui-vcontaoner pt-0 mb-4">
+      <v-container v-if="buyneedsMatchingResults" class="ui-vcontaoner pt-0 mb-4">
         <v-row>
           <v-row class="pt-10" justify="end">
             <h3>処理日時</h3>
             <span class="mx-10">{{ processDate }}</span>
           </v-row>
           <v-sheet
-            v-for="(matchingResult, i) in buyneedsMatchingResult.buyneedsMatchingResults"
+            v-for="(matchingResult, i) in buyneedsMatchingResults"
             :key="i"
             cols="16"
             class="mx-6 my-2"
@@ -127,7 +127,7 @@
                     買収希望エリア:
                   </v-col>
                   <v-col cols="3">
-                    {{ getValueObject(Object.values(getTargetBuyneedsData(matchingResult, 'prefs'))) }}
+                    {{ confirmationData(getTargetBuyneedsData(matchingResult, 'prefs')) }}
                   </v-col>
                 </v-row>
               </v-col>
@@ -177,7 +177,7 @@ import { useRoute } from 'vue-router'
  */
 const route = useRoute()
 const { $approach, $jmssPortal }: any = useNuxtApp()
-const sendCompanyHistoryId: string = String(route.params.id)
+const sendCompanyHistoryId: number = Number(route.params.id)
 const buyCompanyListData: Ref<any> = ref()
 const buyneedsListData: Ref<any> = ref()
 
@@ -190,8 +190,7 @@ const buyneedsListData: Ref<any> = ref()
  */
 const sellCompanyHistory: any = await $approach.getSendCompanyHistory(undefined, sendCompanyHistoryId)
 const sellCompanyId: number = sellCompanyHistory.value.sendCompanyHistories[0].companyId
-// 売手企業情報取得APIの呼び出し
-const sellCompany: any = await $jmssPortal.getSendCompanies(String(sellCompanyId))
+const sellCompany: any = await $jmssPortal.getCompanies(String(sellCompanyId))
 // 表示タイトルとバリューの作成
 const items: any = [
   { title: '企業名:', value: sellCompany.value.data[0].name},
@@ -214,18 +213,17 @@ const processDate: string = buyneedsMatchingHistories.value.buyneedsMatchingHist
 //  * ボディ部のデータ作成.
 //  */
 // マッチング結果取得APIの呼び出し
-const buyneedsMatchingResult: any = await $approach.getBuyneedsMatchingResult(sendCompanyHistoryId)
+const buyneedsMatchingResults: any = await $approach.getBuyneedsMatchingResult(sendCompanyHistoryId)
 
 // マッチング結果が存在する場合のみ取得処理を行う
-if(buyneedsMatchingResult) {
-  const buyneedsMatchingResults: any = buyneedsMatchingResult.value.buyneedsMatchingResults
+if(buyneedsMatchingResults) {
     // 買い手企業情報取得APIの呼び出し
-  const buyCompanyIds: number[] = buyneedsMatchingResults.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId)
+  const buyCompanyIds: number[] = buyneedsMatchingResults.value.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId)
   const buyCompanyList: any = await $jmssPortal.getCompanies(buyCompanyIds.join())
   buyCompanyListData.value = buyCompanyList.value.data
 
   // 買いニーズ情報取得APIの呼び出し
-  const buyneedsIds: number[] = buyneedsMatchingResults.map((item: { buyneedsId: number; }) => item.buyneedsId)
+  const buyneedsIds: number[] = buyneedsMatchingResults.value.map((item: { buyneedsId: number; }) => item.buyneedsId)
   const buyneedsList: any = await $jmssPortal.getBuyneeds(buyneedsIds.join())
   buyneedsListData.value = buyneedsList.value.data
 }

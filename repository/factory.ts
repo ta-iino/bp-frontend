@@ -4,8 +4,10 @@
 class BaseApiFactory {
   async call (url: string, baseURL?: string, options?: any) {
     const config = useRuntimeConfig()
+    const e_time = String(new Date().getTime());
     const { data, error } = await useFetch(
       url, {
+        key: e_time,
         baseURL: baseURL,
         method: options?.method,
         headers: options?.headers,

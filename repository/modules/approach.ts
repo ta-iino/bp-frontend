@@ -7,7 +7,6 @@ export class ApproachModule extends BaseApiFactory {
     getDmList: '/approach/api/get_dm_list/',
     getSendCompanyHistory: '/approach/api/send_company_history/',
     getBuyneedsMatchingHistory: '/approach/api/buyneeds_matching_history/',
-    getBuyneedsMatchingResultCsv: '/approach/api/buyneeds_matching_result_csv/',
     getBuyneedsMatchingResult: '/approach/api/buyneeds_matching_result/',
     startBuyneedsMatching: '/approach/api/buyneeds_matching_order/',
     getJmssPortalAccessToken: '/approach/api/create_jmss_portal_access_token/',
@@ -81,36 +80,17 @@ export class ApproachModule extends BaseApiFactory {
   }
 
   /**
-   * 買いニーズマッチング結果CSV取得API
-   * @param buyneedsMatchingHistoryId
-   * @returns 買いニーズマッチング結果CSVファイル
-   */
-  async getBuyneedsMatchingResultCsv (buyneedsMatchingHistoryId: Number) {
-    this.options.params = {
-            buyneeds_matching_history_id: buyneedsMatchingHistoryId
-    }
-    delete this.options.body
-    this.options.method = 'GET'
-    return this.call(
-      this.urls.getBuyneedsMatchingResultCsv,
-      this.baseURL,
-      this.options
-    )
-  }
-
-  /**
    * 買いニーズマッチング結果取得API
    * @param sendCompanyHistoryId
    * @returns 買いニーズマッチング結果JSON形式
    */
-  async getBuyneedsMatchingResult (sendCompanyHistoryId: String) {
+  async getBuyneedsMatchingResult (sendCompanyHistoryId: Number | Number[]) {
     
-    this.options.params = {
-      current_url: window.location.href,
+    this.options.body = {
       send_company_history_id: sendCompanyHistoryId
     }
-    delete this.options.body
-    this.options.method = 'GET'
+    delete this.options.params
+    this.options.method = 'POST'
     return this.call(
       this.urls.getBuyneedsMatchingResult,
       this.baseURL,

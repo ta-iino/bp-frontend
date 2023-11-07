@@ -1,6 +1,3 @@
-// エンドポイントが増えてきたら分割する
-// TODO 社内ポータルの受け取り方によって変数の型定義変更の可能性あり
-
 import BaseApiFactory from '../factory'
 
 class JmssPortalModule extends BaseApiFactory {
@@ -109,7 +106,7 @@ class JmssPortalModule extends BaseApiFactory {
    * @param limit
    * @returns
    */
-  getCompanies (companyIds?: string, name?: string, page?: number, limit?: number) {
+  getCompanies (companyIds?: string, page?: number, limit?: number, name?: string) {
     this.options.body = {
       id: companyIds,
       name: name,
@@ -121,30 +118,6 @@ class JmssPortalModule extends BaseApiFactory {
     return this.call(this.urls.getCompanies, this.jmssPortalBaseURL, this.options)
     
   }
-
-  // マッチング結果表示画面で2回企業情報を取得しに行くときにusefetchがキャッシュする関係でGET通信を使用している。
-  // TODO どこかのタイミングでuseAsyncDataの記述に変えたい。
-  // https://blog.cloud-acct.com/posts/nuxt3-usefetch-cashe/ 
- /**
-   * 企業マスタ取得API(GET通信)
-   * @param companyIds
-   * @param name
-   * @param page
-   * @param limit
-   * @returns
-   */
- getSendCompanies (companyIds?: string, name?: string, page?: number, limit?: number) {
-  this.options.params = {
-    id: companyIds,
-    name: name,
-    page: page,
-    limit: limit,
-  }
-  delete this.options.body
-  this.options.method = 'GET'
-  return this.call(this.urls.getCompanies, this.jmssPortalBaseURL, this.options)
-  
-}  
 
   /**
    * チーム取得API

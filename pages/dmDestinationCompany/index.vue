@@ -29,7 +29,7 @@
             :items="processingDateList"
             item-value="id"
             item-title="processingDate"
-            @update:modelValue="getBodyData"
+            @update:modelValue="getBodyData()"
           />
         </v-col>
         <v-col cols="1" class="px-0" />
@@ -40,7 +40,7 @@
               depressed
               color="light-blue-darken-4"
               border="0"
-              :disabled="activeBtn"
+              :disabled="disableMatchingBtn"
               @click="matchingStart()"
             >
               ニーズマッチング
@@ -52,7 +52,7 @@
               depressed
               color="light-blue-darken-4"
               border="0"
-              :disabled="activeBtn"
+              :disabled="disableDownloadBtn"
               @click="downloadCsv()"
             >
               ダウンロード
@@ -82,7 +82,7 @@
     </v-container>
     <!-- ヘッダ部分 ここまで -->
     <!-- 一覧表示 ここから -->
-    <v-container v-if="selectedMatchingStatus === '2'" class="ui-vcontaoner pt-0 mb-4">
+    <v-container v-if="selectedMatchingStatus === '2' && sendCompanyHistories" class="ui-vcontaoner pt-0 mb-4">
       <v-data-table
         :headers="destinationCompanyHeaders"
         :items="destinationCompanies"
@@ -131,9 +131,19 @@
       </v-data-table>
       <!-- 一覧表示 ここまで -->
     </v-container>
-    <v-row v-else>
+    <v-row v-else-if="selectedMatchingStatus === '2' && !sendCompanyHistories">
       <v-col cols="12" class="pt-4 pl-10 text-center">
-        表示中です。なお、マッチング中の場合には表示されませんので、完了後に再表示ください。
+        データが存在しません。
+      </v-col>
+    </v-row>      
+    <v-row v-else-if="selectedMatchingStatus === '1'">
+      <v-col cols="12" class="pt-4 pl-10 text-center">
+        マッチング中です。
+      </v-col>
+    </v-row>
+    <v-row v-else-if="selectedMatchingStatus === '3'">
+      <v-col cols="12" class="pt-4 pl-10 text-center">
+        マッチングに失敗しました。再度ニーズマッチングボタンをクリックしてください。
       </v-col>
     </v-row>
   </div>
@@ -211,6 +221,7 @@ const items = [
  * ボディ部のデータ取得メソッド
  */
 const getBodyData = async (): Promise<void> => {
+  selectedMatchingStatus.value = matchingHistories.value.buyneedsMatchingHistories.filter((history: any) => selectedBuyneedsHistoryId.value === history.id)[0].matchingStatus;
   // 発送企業履歴リストから会社IDの配列を作成する
   const sendCompanyHistoryResponse: any = await $approach.getSendCompanyHistory(selectedBuyneedsHistoryId.value);
   if(sendCompanyHistoryResponse === undefined) {
@@ -219,7 +230,6 @@ const getBodyData = async (): Promise<void> => {
   sendCompanyHistories.value = sendCompanyHistoryResponse.value.sendCompanyHistories;
   sendCompanyIds.value = sendCompanyHistories.value.map((sendCompanyHistory: any) => sendCompanyHistory.companyId);
   getCompanyData();
-  selectedMatchingStatus.value = matchingHistories.value.buyneedsMatchingHistories.filter((history: any) => selectedBuyneedsHistoryId.value === history.id)[0].matchingStatus;
 }
 
 /**
@@ -576,15 +586,19 @@ const showMatchingResult = (companyId: number): void => {
 }
 
 /**
- *  ニーズマッチングボタン、ダウンロードボタンの活性/非活性制御
- *  マッチングステータスがマッチング中だった場合は非活性（true）
+ * ニーズマッチングボタンの制御
+ * 最新のステータスがマッチング中のみ非活性(true)
  */
-const activeBtn = computed((): boolean => {
-  if (matchingHistories.value.buyneedsMatchingHistories[0].matchingStatus === "1") {
-    // マッチング中（ステータスが「1（マッチング中）」）の場合は非活性
-    return true
-  }
-  return false
+const disableMatchingBtn = computed((): boolean => {
+  return matchingHistories.value.buyneedsMatchingHistories[0].matchingStatus === "1" ? true : false;
+})
+
+/**
+ * ダウンロードボタンの制御
+ * 選択中のステータスがマッチング中、マッチング失敗の場合のみ非活性
+ */
+ const disableDownloadBtn = computed((): boolean => {
+  return selectedMatchingStatus.value === "3" || selectedMatchingStatus.value ==="1" ? true : false;
 })
 
 </script>

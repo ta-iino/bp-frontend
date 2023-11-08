@@ -215,6 +215,7 @@ const getBodyData = async (): Promise<void> => {
   const sendCompanyHistoryResponse: any = await $approach.getSendCompanyHistory(selectedBuyneedsHistoryId.value);
   if(sendCompanyHistoryResponse === undefined) {
     initBodyData();
+    return;
   }
   sendCompanyHistories.value = sendCompanyHistoryResponse.value.sendCompanyHistories;
   sendCompanyIds.value = sendCompanyHistories.value.map((sendCompanyHistory: any) => sendCompanyHistory.companyId);

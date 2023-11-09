@@ -307,30 +307,36 @@ const matchingStart = async (): Promise<void> => {
  * ダウンロード押下時の処理
  */
 const downloadCsv = async (): Promise<void> => {
-  // 事前データの取得
-  var sendCompanyHistoryMap: any = {};
-  sendCompanyHistories.value.map((sendCompanyHistory: any) => sendCompanyHistoryMap[sendCompanyHistory["id"]] = sendCompanyHistory["companyId"]);
-  const sendCompanyDataList: any = await callUpToTotalNum(sendCompanyIds.value.join(), false);
-  const sendCompanyDataValues: any = Object.values(sendCompanyDataList);
-  const buyneedsMatchingResults: any = await $approach.getBuyneedsMatchingResult(Object.keys(sendCompanyHistoryMap).map(Number));
-  var buyCompanyList:any = [];
-  var buyneedsList: any = [];
-  if (buyneedsMatchingResults.value) {
-    const buyCompanyIds: number[] = buyneedsMatchingResults.value.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId);
-    const buyneedsIds: number[] = buyneedsMatchingResults.value.map((item: { buyneedsId: number; }) => item.buyneedsId);
-    buyCompanyList = await callUpToTotalNum(buyCompanyIds.join(), false);
-    buyneedsList = await callUpToTotalNum( buyneedsIds.join());
-  }
+  try{
+    // 事前データの取得
+    var sendCompanyHistoryMap: any = {};
+    sendCompanyHistories.value.map((sendCompanyHistory: any) => sendCompanyHistoryMap[sendCompanyHistory["id"]] = sendCompanyHistory["companyId"]);
+    const sendCompanyDataList: any = await callUpToTotalNum(sendCompanyIds.value.join(), false);
+    const sendCompanyDataValues: any = Object.values(sendCompanyDataList);
+    const buyneedsMatchingResults: any = await $approach.getBuyneedsMatchingResult(Object.keys(sendCompanyHistoryMap).map(Number));
+    var buyCompanyList:any = [];
+    var buyneedsList: any = [];
+    if (buyneedsMatchingResults.value) {
+      const buyCompanyIds: number[] = buyneedsMatchingResults.value.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId);
+      const buyneedsIds: number[] = buyneedsMatchingResults.value.map((item: { buyneedsId: number; }) => item.buyneedsId);
+      buyCompanyList = await callUpToTotalNum(buyCompanyIds.join(), false);
+      buyneedsList = await callUpToTotalNum( buyneedsIds.join());
+    }
 
-  const relationKeyDict = createRelationKeyDict(buyneedsMatchingResults, sendCompanyHistoryMap)
-  const [buyCompanyCount, csvDataList]: any = createCsvDataList(sendCompanyDataValues, relationKeyDict, buyCompanyList, buyneedsList);
-  var output: any = []
-  output.push(createCsvHeader(buyCompanyCount));
-  csvDataList.map((csvData: any) => output.push(csvData))
-  // 先頭に,が入らないよう処理する
-  const csvContent = output.map((row: any) => row.map(csvEscape).join(",")).join("\n");
-  const title = approachListId + '_' + approachListCamelData.name + '_発送先企業一覧_' + getCurrentTime() + '.csv'
-  createCsv(csvContent, title)
+    const relationKeyDict = createRelationKeyDict(buyneedsMatchingResults, sendCompanyHistoryMap)
+    const [buyCompanyCount, csvDataList]: any = createCsvDataList(sendCompanyDataValues, relationKeyDict, buyCompanyList, buyneedsList);
+    var output: any = []
+    output.push(createCsvHeader(buyCompanyCount));
+    csvDataList.map((csvData: any) => output.push(csvData))
+    // 先頭に,が入らないよう処理する
+    const csvContent = output.map((row: any) => row.map(csvEscape).join(",")).join("\n");
+    const title = approachListId + '_' + approachListCamelData.name + '_発送先企業一覧_' + getCurrentTime() + '.csv'
+    createCsv(csvContent, title)
+  } catch(error: any) {
+    throw createError({
+      fatal: true
+    });
+  }
 }
 
 /**
@@ -348,6 +354,10 @@ const createCsvDataList = (sendCompanyDataValues: any, relationKeyDict: any, buy
   sendCompanyDataValues.map((sendCompanyData: any) => {
     var csvData = createSendCompanyData(sendCompanyData)
     const matchedRelationKeyDict = relationKeyDict[sendCompanyData["id"]]
+    if(matchedRelationKeyDict === undefined) {
+      csvDataList.push(csvData)
+      return
+    }
     // # 買手候補企業数を取得する(ヘッダ作成に使用する)
     if (buyCompanyCount < matchedRelationKeyDict.length) {
       buyCompanyCount = matchedRelationKeyDict.length

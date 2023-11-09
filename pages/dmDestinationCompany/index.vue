@@ -163,14 +163,13 @@ const totalPage: Ref<number> = ref(0)
 const searchCompanyName: Ref<string> = ref('')
 watch(page ,() => {
   getCompanyData(searchCompanyName.value)
-})
+});
 const approachListId: string = String(route.params.id)
 // 発送企業データ(社内ポータル接続)
 const destinationCompanies: Ref<any> = ref()
 // 発送企業履歴データ（バックエンド接続）
 const sendCompanyHistories: Ref<any> = ref()
 const sendCompanyIds: any = []
-const selectedMatchingStatus: Ref<string> = ref('')
 
 /**
  * マッチング処理日時リスト作成
@@ -182,8 +181,12 @@ const processingDateList: any = ref(
   (matchingHistories.value.buyneedsMatchingHistories).filter((matchingHistories: any) => matchingHistories.id && matchingHistories.processedDatetime)
   .map((matchingHistories: any) => ({ id: matchingHistories.id, processingDate: matchingHistories.processedDatetime }))
 )
-// 最新のマッチング処理日時をAPIに渡す
+
 const selectedBuyneedsHistoryId: Ref<number> = ref(processingDateList.value[0].id)
+const selectedMatchingStatus: Ref<string> = ref('')
+watch(selectedBuyneedsHistoryId ,() => {
+  selectedMatchingStatus.value = matchingHistories.value.buyneedsMatchingHistories.filter((history: any) => selectedBuyneedsHistoryId.value === history.id)[0].matchingStatus;
+}, {immediate: true});
 
 /**
  * ヘッダ部
@@ -209,17 +212,12 @@ const items = [
   { title: '状況：', value: getMatchngStatusStr(matchingHistories.value.buyneedsMatchingHistories[0].matchingStatus) }
 ]
 
-
-
-
 /**
  * ボディ部のデータ取得メソッド
  */
 const getBodyData = async (): Promise<void> => {
   // 発送企業履歴リストから会社IDの配列を作成する
   const sendCompanyHistoryResponse: any = await $approach.getSendCompanyHistory(selectedBuyneedsHistoryId.value);
-  const matchingStatus = matchingHistories.value.buyneedsMatchingHistories.filter((history: any) => selectedBuyneedsHistoryId.value === history.id)[0].matchingStatus;
-  selectedMatchingStatus.value = matchingStatus;
   if(sendCompanyHistoryResponse === undefined) {
     initBodyData();
     return;

@@ -1,152 +1,147 @@
 <template>
-  <div id="app">
-    <!-- ヘッダ部分 ここから -->
-    <v-container class="pb-0">
-      <v-row>
-        <v-col cols="12" class="px-0 my-3 py-0" style="background-color: #81D4FA">
-          <v-card-title class="headline font-weight-bold">
-            DM発送先企業一覧
-          </v-card-title>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col v-for="(item) in items" :key="item.title" cols="4" class="d-flex px-0 py-0">
-          <!-- 上が少しはみ出るのでv-if:0<=i, i<=2で対応？ -->
-          <v-col cols="6" class="px-0 py-1">
-            {{ item.title }}
+  <v-app>
+    <div id="app">
+      <!-- ヘッダ部分 ここから -->
+      <v-container class="pb-0">
+        <v-row>
+          <v-col cols="12" class="px-0 my-3 py-0" style="background-color: #81D4FA">
+            <v-card-title class="headline font-weight-bold">
+              DM発送先企業一覧
+            </v-card-title>
           </v-col>
-          <v-col cols="6" class="px-0 py-1">
-            {{ item.value }}
-          </v-col>
-        </v-col>
-      </v-row>
-      <v-row class="py-3">
-        <v-col cols="3" class="px-0">
-          <v-select
-            v-model="selectedBuyneedsHistoryId"
-            label="マッチング処理日時"
-            filled
-            :items="processingDateList"
-            item-value="id"
-            item-title="processingDate"
-            @update:modelValue="getBodyData()"
-          />
-        </v-col>
-        <v-col cols="1" class="px-0" />
-        <v-col cols="4" class="px-0 d-flex">
-          <div class="ml-n8 mr-2">
-            <v-btn
-              class="v-btn"
-              depressed
-              color="light-blue-darken-4"
-              border="0"
-              :disabled="disableMatchingBtn"
-              @click="matchingStart()"
-            >
-              ニーズマッチング
-            </v-btn>
-          </div>
-          <div class="px-2">
-            <v-btn
-              class="v-btn"
-              depressed
-              color="light-blue-darken-4"
-              border="0"
-              :disabled="disableDownloadBtn"
-              @click="downloadCsv()"
-            >
-              ダウンロード
-            </v-btn>
-          </div>
-          <div class="px-2">
-            <v-btn class="v-btn" depressed color="light-blue-darken-4" border="0" @click="clickCloseButton()">
-              閉じる
-            </v-btn>
-          </div>
-        </v-col>
-        <v-col cols="4" class="pt-4 pl-10">
-          <v-row>
-            <v-text-field cols="10" v-model="searchCompanyName" label="企業名検索" />
-            <v-col cols="2">
-              <v-btn class="ui-btn" depressed color="light-blue-darken-3" @click="searchCompany()">
-                  <v-icon dark size="large">
-                    mdi-magnify
-                  </v-icon>
-              </v-btn>
+        </v-row>
+        <v-row>
+          <v-col v-for="(item) in items" :key="item.title" cols="4" class="d-flex px-0 py-0">
+            <!-- 上が少しはみ出るのでv-if:0<=i, i<=2で対応？ -->
+            <v-col cols="6" class="px-0 py-1">
+              {{ item.title }}
             </v-col>
-          </v-row>
-        </v-col>
-        
-    </v-row>
-        
-    </v-container>
-    <!-- ヘッダ部分 ここまで -->
-    <!-- 一覧表示 ここから -->
-    <v-container v-if="selectedMatchingStatus === '2' && sendCompanyHistories" class="ui-vcontaoner pt-0 mb-4">
-      <v-data-table
-        :headers="destinationCompanyHeaders"
-        :items="destinationCompanies"
-        :items-per-page="perPage"
-        hide-default-footer
-        class="elevation-1 ui-vdatatable"
-        :height="528"
-        fixed-header
-      >
-        <template #[`item.zip`]="{ item }">
-          {{ putHyphen(item.raw.zip) }}
-        </template>
-        <template #[`item.industry1`]="{ item }">
-          {{ getIndutryNames(item.raw.industries, 0) }}
-        </template>
-        <template #[`item.industry2`]="{ item }">
-          {{ getIndutryNames(item.raw.industries, 1) }}
-        </template>
-        <template #[`item.industry3`]="{ item }">
-          {{ getIndutryNames(item.raw.industries, 2) }}
-        </template>
-        <template #[`item.businessItems`]="{ item }">
-          {{ getTsrData(item.raw.tsr, '営業種目') }}
-        </template>
-        <template #[`item.representativeAge`]="{ item }">
-          {{ getCeoAge(getTsrData(item.raw.tsr, '生年月日')) }}
-        </template>
-        <template #bottom>
-          <div class="text-center pt-2">
-            <v-pagination
-              v-model="page"
-              cols="12"
-              :length="totalPage"
-              :total-visible="12"
+            <v-col cols="6" class="px-0 py-1">
+              {{ item.value }}
+            </v-col>
+          </v-col>
+        </v-row>
+        <v-row class="py-3">
+          <v-col cols="3" class="px-0">
+            <v-select
+              v-model="selectedBuyneedsHistoryId"
+              label="マッチング処理日時"
+              filled
+              :items="processingDateList"
+              item-value="id"
+              item-title="processingDate"
+              @update:modelValue="getBodyData()"
             />
-          </div>
-        </template>
-        <template #[`item.id`]="{ item }">
-          <span class="link" @click="clickCompany(item.raw.id)">{{ item.raw.id }}</span>
-        </template>
-        <template #[`item.matchingResult`]="{ item }">
-          <v-btn width="120" small class="mr-2 ui-matching-btn ui-btn" color="light-blue-darken-3" @click="showMatchingResult(item.raw.id)">
-            マッチング結果
-          </v-btn>
-        </template>
-      </v-data-table>
-      <!-- 一覧表示 ここまで -->
-    </v-container>
-    <v-row v-else-if="selectedMatchingStatus === '2' && !sendCompanyHistories">
-      <v-col cols="12" class="pt-4 pl-10 text-center">
-        データが存在しません。
-      </v-col>
-    </v-row>      
-    <v-row v-else-if="selectedMatchingStatus === '1'">
-      <v-col cols="12" class="pt-4 pl-10 text-center">
-        マッチング中です。
-      </v-col>
-    </v-row>
-    <v-row v-else-if="selectedMatchingStatus === '3'">
-      <v-col cols="12" class="pt-4 pl-10 text-center">
-        マッチングに失敗しました。再度ニーズマッチングボタンをクリックしてください。
-      </v-col>
-    </v-row>
-  </div>
+          </v-col>
+          <v-col cols="1" class="px-0" />
+          <v-col cols="4" class="px-0 d-flex">
+            <div class="ml-n8 mr-2">
+              <v-btn
+                class="v-btn"
+                depressed
+                color="light-blue-darken-4"
+                border="0"
+                :disabled="disableMatchingBtn"
+                @click="matchingStart()"
+              >
+                ニーズマッチング
+              </v-btn>
+            </div>
+            <div class="px-2">
+              <v-btn
+                class="v-btn"
+                depressed
+                color="light-blue-darken-4"
+                border="0"
+                :disabled="disableDownloadBtn"
+                @click="downloadCsv()"
+              >
+                ダウンロード
+              </v-btn>
+            </div>
+            <div class="px-2">
+              <v-btn class="v-btn" depressed color="light-blue-darken-4" border="0" @click="clickCloseButton()">
+                閉じる
+              </v-btn>
+            </div>
+          </v-col>
+          <v-col cols="4" class="pt-4 pl-10">
+            <v-row>
+              <v-text-field cols="10" v-model="searchCompanyName" label="企業名検索" />
+              <v-col cols="2">
+                <v-btn class="ui-btn" depressed color="light-blue-darken-3" @click="searchCompany()">
+                    <v-icon dark size="large">
+                      mdi-magnify
+                    </v-icon>
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-col>
+      </v-row>
+      </v-container>
+      <!-- ヘッダ部分 ここまで -->
+      <!-- 一覧表示 ここから -->
+      <v-container v-show="selectedMatchingStatus === '2'" class="ui-vcontaoner pt-0 mb-4">
+        <v-data-table
+          :headers="destinationCompanyHeaders"
+          :items="destinationCompanies"
+          :items-per-page="perPage"
+          hide-default-footer
+          class="elevation-1 ui-vdatatable"
+          :height="528"
+          fixed-header
+        >
+          <template #[`item.zip`]="{ item }">
+            {{ putHyphen(item.raw.zip) }}
+          </template>
+          <template #[`item.industry1`]="{ item }">
+            {{ getIndutryNames(item.raw.industries, 0) }}
+          </template>
+          <template #[`item.industry2`]="{ item }">
+            {{ getIndutryNames(item.raw.industries, 1) }}
+          </template>
+          <template #[`item.industry3`]="{ item }">
+            {{ getIndutryNames(item.raw.industries, 2) }}
+          </template>
+          <template #[`item.businessItems`]="{ item }">
+            {{ getTsrData(item.raw.tsr, '営業種目') }}
+          </template>
+          <template #[`item.representativeAge`]="{ item }">
+            {{ getCeoAge(getTsrData(item.raw.tsr, '生年月日')) }}
+          </template>
+          <template #bottom>
+            <div class="text-center pt-2">
+              <v-pagination
+                v-model="page"
+                cols="12"
+                :length="totalPage"
+                :total-visible="12"
+              />
+            </div>
+          </template>
+          <template #[`item.id`]="{ item }">
+            <span class="link" @click="clickCompany(item.raw.id)">{{ item.raw.id }}</span>
+          </template>
+          <template #[`item.matchingResult`]="{ item }">
+            <v-btn width="120" small class="mr-2 ui-matching-btn ui-btn" color="light-blue-darken-3" @click="showMatchingResult(item.raw.id)">
+              マッチング結果
+            </v-btn>
+          </template>
+        </v-data-table>
+        <!-- 一覧表示 ここまで -->
+      </v-container>    
+      <v-row v-show="selectedMatchingStatus === '1'">
+        <v-col cols="12" class="pt-4 pl-10 text-center">
+          マッチング中です。
+        </v-col>
+      </v-row>
+      <v-row v-show="selectedMatchingStatus === '3'">
+        <v-col cols="12" class="pt-4 pl-10 text-center">
+          マッチングに失敗しました。再度ニーズマッチングボタンをクリックしてください。
+        </v-col>
+      </v-row>
+    </div>
+  </v-app>
 </template>
 
 <script setup lang="ts">
@@ -168,14 +163,13 @@ const totalPage: Ref<number> = ref(0)
 const searchCompanyName: Ref<string> = ref('')
 watch(page ,() => {
   getCompanyData(searchCompanyName.value)
-})
+});
 const approachListId: string = String(route.params.id)
 // 発送企業データ(社内ポータル接続)
 const destinationCompanies: Ref<any> = ref()
 // 発送企業履歴データ（バックエンド接続）
 const sendCompanyHistories: Ref<any> = ref()
 const sendCompanyIds: any = []
-const selectedMatchingStatus: Ref<any> = ref()
 
 /**
  * マッチング処理日時リスト作成
@@ -187,8 +181,12 @@ const processingDateList: any = ref(
   (matchingHistories.value.buyneedsMatchingHistories).filter((matchingHistories: any) => matchingHistories.id && matchingHistories.processedDatetime)
   .map((matchingHistories: any) => ({ id: matchingHistories.id, processingDate: matchingHistories.processedDatetime }))
 )
-// 最新のマッチング処理日時をAPIに渡す
+
 const selectedBuyneedsHistoryId: Ref<number> = ref(processingDateList.value[0].id)
+const selectedMatchingStatus: Ref<string> = ref('')
+watch(selectedBuyneedsHistoryId ,() => {
+  selectedMatchingStatus.value = matchingHistories.value.buyneedsMatchingHistories.filter((history: any) => selectedBuyneedsHistoryId.value === history.id)[0].matchingStatus;
+}, {immediate: true});
 
 /**
  * ヘッダ部
@@ -214,14 +212,10 @@ const items = [
   { title: '状況：', value: getMatchngStatusStr(matchingHistories.value.buyneedsMatchingHistories[0].matchingStatus) }
 ]
 
-
-
-
 /**
  * ボディ部のデータ取得メソッド
  */
 const getBodyData = async (): Promise<void> => {
-  selectedMatchingStatus.value = matchingHistories.value.buyneedsMatchingHistories.filter((history: any) => selectedBuyneedsHistoryId.value === history.id)[0].matchingStatus;
   // 発送企業履歴リストから会社IDの配列を作成する
   const sendCompanyHistoryResponse: any = await $approach.getSendCompanyHistory(selectedBuyneedsHistoryId.value);
   if(sendCompanyHistoryResponse === undefined) {
@@ -313,30 +307,36 @@ const matchingStart = async (): Promise<void> => {
  * ダウンロード押下時の処理
  */
 const downloadCsv = async (): Promise<void> => {
-  // 事前データの取得
-  var sendCompanyHistoryMap: any = {};
-  sendCompanyHistories.value.map((sendCompanyHistory: any) => sendCompanyHistoryMap[sendCompanyHistory["id"]] = sendCompanyHistory["companyId"]);
-  const sendCompanyDataList: any = await callUpToTotalNum(sendCompanyIds.value.join(), false);
-  const sendCompanyDataValues: any = Object.values(sendCompanyDataList);
-  const buyneedsMatchingResults: any = await $approach.getBuyneedsMatchingResult(Object.keys(sendCompanyHistoryMap).map(Number));
-  var buyCompanyList:any = [];
-  var buyneedsList: any = [];
-  if (buyneedsMatchingResults.value) {
-    const buyCompanyIds: number[] = buyneedsMatchingResults.value.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId);
-    const buyneedsIds: number[] = buyneedsMatchingResults.value.map((item: { buyneedsId: number; }) => item.buyneedsId);
-    buyCompanyList = await callUpToTotalNum(buyCompanyIds.join(), false);
-    buyneedsList = await callUpToTotalNum( buyneedsIds.join());
-  }
+  try{
+    // 事前データの取得
+    var sendCompanyHistoryMap: any = {};
+    sendCompanyHistories.value.map((sendCompanyHistory: any) => sendCompanyHistoryMap[sendCompanyHistory["id"]] = sendCompanyHistory["companyId"]);
+    const sendCompanyDataList: any = await callUpToTotalNum(sendCompanyIds.value.join(), false);
+    const sendCompanyDataValues: any = Object.values(sendCompanyDataList);
+    const buyneedsMatchingResults: any = await $approach.getBuyneedsMatchingResult(Object.keys(sendCompanyHistoryMap).map(Number));
+    var buyCompanyList:any = [];
+    var buyneedsList: any = [];
+    if (buyneedsMatchingResults.value) {
+      const buyCompanyIds: number[] = buyneedsMatchingResults.value.map((item: { candidateCompanyId: number; }) => item.candidateCompanyId);
+      const buyneedsIds: number[] = buyneedsMatchingResults.value.map((item: { buyneedsId: number; }) => item.buyneedsId);
+      buyCompanyList = await callUpToTotalNum(buyCompanyIds.join(), false);
+      buyneedsList = await callUpToTotalNum( buyneedsIds.join());
+    }
 
-  const relationKeyDict = createRelationKeyDict(buyneedsMatchingResults, sendCompanyHistoryMap)
-  const [buyCompanyCount, csvDataList]: any = createCsvDataList(sendCompanyDataValues, relationKeyDict, buyCompanyList, buyneedsList);
-  var output: any = []
-  output.push(createCsvHeader(buyCompanyCount));
-  csvDataList.map((csvData: any) => output.push(csvData))
-  // 先頭に,が入らないよう処理する
-  const csvContent = output.map((row: any) => row.map(csvEscape).join(",")).join("\n");
-  const title = approachListId + '_' + approachListCamelData.name + '_発送先企業一覧_' + getCurrentTime() + '.csv'
-  createCsv(csvContent, title)
+    const relationKeyDict = createRelationKeyDict(buyneedsMatchingResults, sendCompanyHistoryMap)
+    const [buyCompanyCount, csvDataList]: any = createCsvDataList(sendCompanyDataValues, relationKeyDict, buyCompanyList, buyneedsList);
+    var output: any = []
+    output.push(createCsvHeader(buyCompanyCount));
+    csvDataList.map((csvData: any) => output.push(csvData))
+    // 先頭に,が入らないよう処理する
+    const csvContent = output.map((row: any) => row.map(csvEscape).join(",")).join("\n");
+    const title = approachListId + '_' + approachListCamelData.name + '_発送先企業一覧_' + getCurrentTime() + '.csv'
+    createCsv(csvContent, title)
+  } catch(error: any) {
+    throw createError({
+      fatal: true
+    });
+  }
 }
 
 /**
@@ -354,6 +354,10 @@ const createCsvDataList = (sendCompanyDataValues: any, relationKeyDict: any, buy
   sendCompanyDataValues.map((sendCompanyData: any) => {
     var csvData = createSendCompanyData(sendCompanyData)
     const matchedRelationKeyDict = relationKeyDict[sendCompanyData["id"]]
+    if(matchedRelationKeyDict === undefined) {
+      csvDataList.push(csvData)
+      return
+    }
     // # 買手候補企業数を取得する(ヘッダ作成に使用する)
     if (buyCompanyCount < matchedRelationKeyDict.length) {
       buyCompanyCount = matchedRelationKeyDict.length

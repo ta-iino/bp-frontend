@@ -329,7 +329,7 @@ const downloadCsv = async (): Promise<void> => {
     output.push(createCsvHeader(buyCompanyCount));
     csvDataList.map((csvData: any) => output.push(csvData))
     // 先頭に,が入らないよう処理する
-    const csvContent = output.map((row: any) => row.map(csvEscape).join(",")).join("\n");
+    const csvContent = output.map((row: any) => row.map(csvEscape).join(",")).join("\r\n");
     const title = approachListId + '_' + approachListCamelData.name + '_発送先企業一覧_' + getCurrentTime() + '.csv'
     createCsv(csvContent, title)
   } catch(error: any) {

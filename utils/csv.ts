@@ -22,7 +22,7 @@ export const csvEscape = (value: any) => {
         return value
     }
     if (typeof value === "string" || value instanceof String) {
-        if (value.includes(', ') || value.includes('\n')) {
+        if (value.includes(',') || value.includes('\n')) {
         return `"${value}"`;
         }
     }

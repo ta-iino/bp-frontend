@@ -53,10 +53,10 @@
                 depressed
                 color="light-blue-darken-4"
                 border="0"
-                :disabled="disableDownloadBtn"
+                :disabled="disableDownloadBtn || isCsvDownloading"
                 @click="downloadCsv()"
               >
-                ダウンロード
+              {{ isCsvDownloading ? 'ダウンロード中...' : 'ダウンロード' }}
               </v-btn>
             </div>
             <div class="px-2">
@@ -90,6 +90,7 @@
           class="elevation-1 ui-vdatatable"
           :height="528"
           fixed-header
+          :loading="isPageLoading"
         >
           <template #[`item.zip`]="{ item }">
             {{ putHyphen(item.raw.zip) }}
@@ -128,6 +129,14 @@
             </v-btn>
           </template>
         </v-data-table>
+        <v-overlay v-model="isCsvDownloading" :persistent="true">
+          <v-progress-circular 
+            indeterminate
+            :rotate="360"
+            color="white"
+            :size="100"
+          ></v-progress-circular>
+        </v-overlay>
         <!-- 一覧表示 ここまで -->
       </v-container>    
       <v-row v-show="selectedMatchingStatus === '1'">
@@ -164,6 +173,8 @@ const searchCompanyName: Ref<string> = ref('')
 watch(page ,() => {
   getCompanyData(searchCompanyName.value)
 });
+const isCsvDownloading: Ref<boolean> = ref(false)
+const isPageLoading: Ref<boolean> = ref(false)
 const approachListId: string = String(route.params.id)
 // 発送企業データ(社内ポータル接続)
 const destinationCompanies: Ref<any> = ref()
@@ -242,6 +253,7 @@ const initBodyData = (): void => {
  * @param searchCompanyName
  */
 const getCompanyData = async (searchCompanyName?: string): Promise<any> => {
+  isPageLoading.value = true;
   const companies: any = (
     await $jmssPortal.getCompanies((sendCompanyIds.value).join(), page.value, perPage.value, searchCompanyName)
   )
@@ -249,6 +261,7 @@ const getCompanyData = async (searchCompanyName?: string): Promise<any> => {
   destinationCompanies.value = camelcaseKeys(companies.value.data, { deep: true })
   // 合計ページ(total÷1ページ当たりの表示数)をtotalPageに格納する
   totalPage.value = Math.ceil(companies.value.total / perPage.value)
+  isPageLoading.value = false;
 }
 // ヘッダ
 const destinationCompanyHeaders = [
@@ -308,6 +321,7 @@ const matchingStart = async (): Promise<void> => {
  */
 const downloadCsv = async (): Promise<void> => {
   try{
+    isCsvDownloading.value = true;
     // 事前データの取得
     var sendCompanyHistoryMap: any = {};
     sendCompanyHistories.value.map((sendCompanyHistory: any) => sendCompanyHistoryMap[sendCompanyHistory["id"]] = sendCompanyHistory["companyId"]);
@@ -332,6 +346,7 @@ const downloadCsv = async (): Promise<void> => {
     const csvContent = output.map((row: any) => row.map(csvEscape).join(",")).join("\r\n");
     const title = approachListId + '_' + approachListCamelData.name + '_発送先企業一覧_' + getCurrentTime() + '.csv'
     createCsv(csvContent, title)
+    isCsvDownloading.value = false;
   } catch(error: any) {
     throw createError({
       fatal: true
@@ -370,12 +385,12 @@ const createCsvDataList = (sendCompanyDataValues: any, relationKeyDict: any, buy
     // # マッチング結果の分だけ処理が実行される
     matchedRelationKeyDict.map((targetDataKey: any) => {
       const buyCompanyData: any = buyCompanyList[targetDataKey["candidateCompanyId"]]
-      if (buyCompanyData !== null && buyCompanyData.length !== 0) {
+      if (buyCompanyData !== undefined) {
         csvData = csvData.concat(createBuyCompanyData(buyCompanyData))
       }
 
       const buyneedsData: any = buyneedsList[targetDataKey["buyneedsId"]]
-      if (buyneedsData !== null && buyneedsData.length !== 0) {
+      if (buyneedsData !== undefined) {
         csvData = csvData.concat(createBuyneedsData(buyneedsData))
       }
     })
@@ -627,4 +642,12 @@ const disableMatchingBtn = computed((): boolean => {
   text-align: center;
   display: none;
 }
+
+.v-overlay__content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 </style>

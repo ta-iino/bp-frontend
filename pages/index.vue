@@ -100,6 +100,7 @@
           class="elevation-1 ui-vdatatable"
           :height="528"
           fixed-header
+          :loading="isPageLoading"
         >
           <template #[`item.createdAt`]="{ item }">
             {{ formatDate(item.raw.createdAt) }}
@@ -160,6 +161,7 @@ const totalPage: Ref<number> = ref(0) //全体のページ数
 watch(page ,() => {
   getApproachListsData(searchParams)
 })
+const isPageLoading: Ref<boolean> = ref(false)
 const searchParams: Ref<any> = ref(
   {
     approachListIds: null,
@@ -223,6 +225,7 @@ function removeDuplicate (dataArray: any) {
  * @param searchParams
  */
 const getApproachListsData = async (searchParams?: any): Promise<void> => {
+  isPageLoading.value = true;
   // 社内ポータルからのアプローチリスト取得
   const approachListsResponse: any = await $jmssPortal.getApproachLists(allApproachListIds.join(), searchParams?.value, page.value, perPage.value)
 
@@ -230,6 +233,7 @@ const getApproachListsData = async (searchParams?: any): Promise<void> => {
   totalPage.value = Math.ceil(approachListsResponse.value.total / perPage.value)
   // 取得したデータのキーをキャメルケースに変換する
   approachLists.value = camelcaseKeys(approachListsResponse.value.data, { deep: true })
+  isPageLoading.value = false;
 }
 
 // 初期表示用に呼び出し

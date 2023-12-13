@@ -53,10 +53,10 @@
                 depressed
                 color="light-blue-darken-4"
                 border="0"
-                :disabled="disableDownloadBtn || isCSVDownloading"
+                :disabled="disableDownloadBtn || isCsvDownloading"
                 @click="downloadCsv()"
               >
-              {{ isCSVDownloading ? 'ダウンロード中...' : 'ダウンロード' }}
+              {{ isCsvDownloading ? 'ダウンロード中...' : 'ダウンロード' }}
               </v-btn>
             </div>
             <div class="px-2">
@@ -129,7 +129,7 @@
             </v-btn>
           </template>
         </v-data-table>
-        <v-overlay v-model="isCSVDownloading" :persistent="true">
+        <v-overlay v-model="isCsvDownloading" :persistent="true">
           <v-progress-circular 
             indeterminate
             :rotate="360"
@@ -173,7 +173,7 @@ const searchCompanyName: Ref<string> = ref('')
 watch(page ,() => {
   getCompanyData(searchCompanyName.value)
 });
-const isCSVDownloading: Ref<boolean> = ref(false)
+const isCsvDownloading: Ref<boolean> = ref(false)
 const isPageLoading: Ref<boolean> = ref(false)
 const approachListId: string = String(route.params.id)
 // 発送企業データ(社内ポータル接続)
@@ -321,7 +321,7 @@ const matchingStart = async (): Promise<void> => {
  */
 const downloadCsv = async (): Promise<void> => {
   try{
-    isCSVDownloading.value = true;
+    isCsvDownloading.value = true;
     // 事前データの取得
     var sendCompanyHistoryMap: any = {};
     sendCompanyHistories.value.map((sendCompanyHistory: any) => sendCompanyHistoryMap[sendCompanyHistory["id"]] = sendCompanyHistory["companyId"]);
@@ -346,7 +346,7 @@ const downloadCsv = async (): Promise<void> => {
     const csvContent = output.map((row: any) => row.map(csvEscape).join(",")).join("\r\n");
     const title = approachListId + '_' + approachListCamelData.name + '_発送先企業一覧_' + getCurrentTime() + '.csv'
     createCsv(csvContent, title)
-    isCSVDownloading.value = false;
+    isCsvDownloading.value = false;
   } catch(error: any) {
     throw createError({
       fatal: true

@@ -129,7 +129,7 @@
             </v-btn>
           </template>
         </v-data-table>
-        <v-overlay v-model="isCsvDownloading" :persistent="true">
+        <v-overlay v-model="isCsvDownloading" :persistent="true" class="overlay_content_center">
           <v-progress-circular 
             indeterminate
             :rotate="360"
@@ -643,11 +643,10 @@ const disableMatchingBtn = computed((): boolean => {
   display: none;
 }
 
-.v-overlay__content {
-  position: absolute;
+.overlay_content_center {
+  justify-content: center; 
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  bottom: 50%;
 }
 
 </style>

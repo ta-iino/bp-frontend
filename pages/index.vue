@@ -243,7 +243,7 @@ const getTableDmListData = (approachListId:any, targetKey:any): any => {
   const result = (dmLists.value.dmLists).filter((dmListData: any) => approachListId === dmListData.approachListId)[0]
   if (result) {
     if (targetKey === 'matchingStatus') {
-      return getMatchngStatusStr(result[targetKey])
+      return getMatchingStatusStr(result[targetKey])
     }
     return result[targetKey]
   }

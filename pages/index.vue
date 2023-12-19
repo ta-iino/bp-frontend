@@ -12,24 +12,24 @@
         <!-- 検索フォーム ここから -->
         <v-row>
           <v-col cols="2" class="px-0 py-0">
-            <v-select
+            <v-autocomplete
               v-model="searchParams.chargeOfTeam"
               label="チーム"
               item-title="name"
               item-value="id"
               :items="pulldownChargeOfTeam"
               clearable
-            />
+            ></v-autocomplete>
           </v-col>
           <v-col cols="2" class="px-0 py-0">
-            <v-select
+            <v-autocomplete
               v-model="searchParams.chargeOfConsultant"
               label="担当コンサルタント"
               item-title="name"
               item-value="id"
               :items="pulldownChargeOfConsultant"
               clearable
-            />
+            ></v-autocomplete>
           </v-col>
           <v-col cols="2" class="px-0 py-0">
             <v-text-field

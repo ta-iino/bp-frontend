@@ -220,7 +220,7 @@ const items = [
   { title: '', value: '' }, // 画面レイアウト上空欄を作るため
   { title: '発送日：', value: approachListCamelData.dmDate },
   { title: '登録日：', value: formatDate(approachListCamelData.createdAt) },
-  { title: '状況：', value: getMatchngStatusStr(matchingHistories.value.buyneedsMatchingHistories[0].matchingStatus) }
+  { title: '状況：', value: getMatchingStatusStr(matchingHistories.value.buyneedsMatchingHistories[0].matchingStatus) }
 ]
 
 /**

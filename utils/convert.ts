@@ -10,7 +10,7 @@ export const formatDate = (date: string): string => {
 /**
  *  マッチングステータスのコードに紐づくを文字列に変換する処理
  */
-export const getMatchngStatusStr = (codeValue: string): string => {
+export const getMatchingStatusStr = (codeValue: string): string => {
   switch (codeValue) {
     case "1":
       return 'マッチング中'

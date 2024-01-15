@@ -17,12 +17,13 @@ export const getValueObject = (arrayValue: any): string => {
 /**
  *  アプローチ区分の文字列に紐づくコードを設定する処理
  */
-export const getApproachTypeCode = (array: any) => {
-  array.push({ id: 1, name: '売り打診' })
-  array.push({ id: 2, name: '買い打診' })
-  array.push({ id: 3, name: '提携打診' })
-  array.push({ id: 99, name: 'その他' })
-
+export const getApproachTypeCode = () => {
+  const array: {id: number, name: string}[] = [
+    { id: 1, name: '売り打診' },
+    { id: 2, name: '買い打診' },
+    { id: 3, name: '提携打診' },
+    { id: 99, name: 'その他' }
+  ]
   return array
 }
 

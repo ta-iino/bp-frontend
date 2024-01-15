@@ -16,7 +16,7 @@
               v-model="searchParams.chargeOfTeam"
               label="チーム"
               item-title="name"
-              item-value="id"
+              item-value="id"              
               :items="pulldownChargeOfTeam"
               clearable
             ></v-autocomplete>
@@ -26,7 +26,7 @@
               v-model="searchParams.chargeOfConsultant"
               label="担当コンサルタント"
               item-title="name"
-              item-value="id"
+              item-value="id"              
               :items="pulldownChargeOfConsultant"
               clearable
             ></v-autocomplete>
@@ -184,41 +184,17 @@ const dmLists: any = await $approach.getDmList()
 const allApproachListIds: number[] = dmLists.value.dmLists.map((dmList: any) => dmList.approachListId)
 
 /**
- * プルダウンリスト生成
+ * プルダウンリスト作成メソッド
+ * @param array
  */
-const pulldownChargeOfTeamArray: any = []
-const pulldownChargeOfConsultantArray: any = []
-const pulldownApproachPurposeArray: any = []
-
-// チームのプルダウンに必要なリストを取得
-for (let i = 0; i < allTeams.value.length; i++) {
-  if (allTeams.value[i].parent_id !== 0) {
-    pulldownChargeOfTeamArray.push({ id: allTeams.value[i].id, name: allTeams.value[i].name })
-  }
-}
-// 担当コンサルタントのプルダウンに必要なリストを取得
-for (let i = 0; i < allUsers.value.length; i++) {
-  pulldownChargeOfConsultantArray.push({ id: allUsers.value[i].id, name: allUsers.value[i].name })
+const createPulldown = (array: any): {id: number, name: string}[] => {
+  return array.map((value: any) => ({id: value.id, name: value.name}))
 }
 
 // 各プルダウンを作成
-const pulldownChargeOfTeam = removeDuplicate(pulldownChargeOfTeamArray)
-const pulldownChargeOfConsultant = removeDuplicate(pulldownChargeOfConsultantArray)
-const pulldownApproachPurpose = getApproachTypeCode(pulldownApproachPurposeArray)
-
-// 重複を削除するメソッドを定義する
-function removeDuplicate (dataArray: any) {
-  const seenNames = new Set()
-  const uniqueArray = []
-
-  for (const item of dataArray) {
-    if (!seenNames.has(item.name)) {
-      seenNames.add(item.name)
-      uniqueArray.push(item)
-    }
-  }
-  return uniqueArray
-}
+const pulldownChargeOfConsultant: {id: number, name: string}[] = createPulldown(allUsers.value.filter((user: any) => 0 !== user.departments.filter((department: any) => 2 === department.id).length));
+const pulldownChargeOfTeam: {id: number, name: string}[] = createPulldown(allTeams.value.filter((team1: any) => team1.parent_id !== 0));
+const pulldownApproachPurpose = getApproachTypeCode();
 
 /**
  * 一覧表示用データ取得処理(アプローチリスト取得API)
@@ -267,7 +243,7 @@ const getTableDmListData = (approachListId:any, targetKey:any): any => {
   const result = (dmLists.value.dmLists).filter((dmListData: any) => approachListId === dmListData.approachListId)[0]
   if (result) {
     if (targetKey === 'matchingStatus') {
-      return getMatchngStatusStr(result[targetKey])
+      return getMatchingStatusStr(result[targetKey])
     }
     return result[targetKey]
   }

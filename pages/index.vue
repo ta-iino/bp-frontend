@@ -193,7 +193,7 @@ const createPulldown = (array: any): {id: number, name: string}[] => {
 
 // 各プルダウンを作成
 const pulldownChargeOfConsultant: {id: number, name: string}[] = createPulldown(allUsers.value.filter((user: any) => 0 !== user.departments.filter((department: any) => 2 === department.id).length));
-const pulldownChargeOfTeam: {id: number, name: string}[] = createPulldown(allTeams.value.filter((team1: any) => team1.parent_id !== 0));
+const pulldownChargeOfTeam: {id: number, name: string}[] = createPulldown(allTeams.value.filter((team1: any) => team1.department_id === 2));
 const pulldownApproachPurpose = getApproachTypeCode();
 
 /**

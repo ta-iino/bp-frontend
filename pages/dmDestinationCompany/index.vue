@@ -11,12 +11,11 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-col v-for="(item) in items" :key="item.title" cols="4" class="d-flex px-0 py-0">
-            <!-- 上が少しはみ出るのでv-if:0<=i, i<=2で対応？ -->
-            <v-col cols="4" class="px-0 py-1 bg-blue-grey-lighten-4 bordered-column d-flex align-center justify-center font-weight-bold">
+          <v-col v-for="(item) in items" :key="item.title" cols="4" class="d-flex px-0 py-0 bordered-column">
+            <v-col cols="4" class="px-0 py-1 bg-blue-grey-lighten-4 d-flex align-center justify-center font-weight-bold">
               {{ item.title }}
             </v-col>
-            <v-col cols="8" class="px-0 py-1 pl-2 bordered-column">
+            <v-col cols="8" class="px-0 py-1 pl-2">
               {{ item.value }}
             </v-col>
           </v-col>
@@ -34,7 +33,6 @@
             />
           </v-col>
           <v-col cols="6" class="d-flex align-center justify-center">
-            <!-- <v-col cols="4"> -->
             <div class="pr-3">
               <v-btn
                 class="v-btn"
@@ -47,8 +45,6 @@
                 ニーズマッチング
               </v-btn>
             </div>
-          <!-- </v-col> -->
-          <!-- <v-col cols="4"> -->
             <div class="pr-3">
               <v-btn
                 class="v-btn"
@@ -61,14 +57,11 @@
               {{ isCsvDownloading ? 'ダウンロード中...' : 'ダウンロード' }}
               </v-btn>
             </div>
-          <!-- </v-col> -->
-          <!-- <v-col cols="4"> -->
             <div class="pr-3">
-              <v-btn class="v-btn bg-grey-lighten-2" depressed border="0" style="color: #FFFFFF;" @click="clickCloseButton()">
+              <v-btn class="v-btn bg-grey-lighten-2" depressed border="0" @click="clickCloseButton()">
                 ページを閉じる
               </v-btn>
             </div>
-          <!-- </v-col> -->
           </v-col>
           <v-col cols="3" class="pt-6">
             <v-row>

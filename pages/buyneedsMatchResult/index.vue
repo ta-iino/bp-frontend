@@ -17,21 +17,21 @@
               DM発送先企業
             </h4>
           </v-card-title>
-          <v-row class="px-4 mb-6 mt-auto">
-            <v-col v-for="(item) in items" :key="item.title" cols="4">
-              <v-row v-if="item.title === '企業名:'">
-                <v-col cols="3" class="px-0 py-1">
+          <v-row class="px-3 mb-6 mt-auto">
+            <v-col v-for="(item) in items" :key="item.title" cols="4" class="bordered-column d-flex">
+              <v-row v-if="item.title === '企業名'">
+                <v-col cols="3" class="px-0 py-1 bg-blue-grey-lighten-4 d-flex align-center justify-center font-weight-bold">
                   {{ item.title }}
                 </v-col>
-                <v-col class="pl-4 py-0 link" @click="clickCompany(sellCompanyId)">
+                <v-col cols="9" class="px-0 py-1 pl-2 link" @click="clickCompany(sellCompanyId)">
                   {{ item.value }}
                 </v-col>
               </v-row>
               <v-row v-else>
-                <v-col cols="3" class="px-0 py-1">
+                <v-col cols="3" class="px-0 py-1 bg-blue-grey-lighten-4 d-flex align-center justify-center font-weight-bold">
                   {{ item.title }}
                 </v-col>
-                <v-col cols="9" class="px-0 py-1">
+                <v-col cols="9" class="px-0 py-1 pl-2">
                   {{ item.value }} {{ item.bottom }}
                 </v-col>
               </v-row>
@@ -39,8 +39,8 @@
           </v-row>
           <v-row justify="center" class="mt-n6">
             <!-- DM送付先画面で別タブで開かれたら閉じれるはず -->
-            <v-btn color="light-blue-darken-4" class="mb-4" border="0" @click="clickCloseButton()">
-              閉じる
+            <v-btn color="light-blue-darken-4" class="mb-4 my-10 bg-grey-lighten-2" border="0" @click="clickCloseButton()">
+              ページを閉じる
             </v-btn>
           </v-row>
         </v-sheet>
@@ -193,17 +193,17 @@ const sellCompanyId: number = sellCompanyHistory.value.sendCompanyHistories[0].c
 const sellCompany: any = await $jmssPortal.getCompanies(String(sellCompanyId))
 // 表示タイトルとバリューの作成
 const items: any = [
-  { title: '企業名:', value: sellCompany.value.data[0].name},
-  { title: '業種１:', value: getIndutryNames(sellCompany.value.data[0].industries, 0) },
-  { title: '売上:', value: sellCompany.value.data[0].sales, bottom: '百万円' },
-  { title: '所在地:', value: sellCompany.value.data[0].address },
-  { title: '業種２:', value: getIndutryNames(sellCompany.value.data[0].industries, 1) },
-  { title: '営業利益:', value: sellCompany.value.data[0].profit, bottom: '百万円' },
-  { title: '代表者名:', value: sellCompany.value.data[0].representative_name },
-  { title: '業種３:', value: getIndutryNames(sellCompany.value.data[0].industries, 2) },
-  { title: '従業員数:', value: sellCompany.value.data[0].employees, bottom: '名' },
-  { title: '代表者年齢:', value: getCeoAge(getTsrData(sellCompany.value.data[0].tsr,'生年月日')) },
-  { title: '営業種目:', value: getTsrData(sellCompany.value.data[0].tsr,'営業種目') }
+  { title: '企業名', value: sellCompany.value.data[0].name},
+  { title: '業種１', value: getIndutryNames(sellCompany.value.data[0].industries, 0) },
+  { title: '売上', value: sellCompany.value.data[0].sales, bottom: '百万円' },
+  { title: '所在地', value: sellCompany.value.data[0].address },
+  { title: '業種２', value: getIndutryNames(sellCompany.value.data[0].industries, 1) },
+  { title: '営業利益', value: sellCompany.value.data[0].profit, bottom: '百万円' },
+  { title: '代表者名', value: sellCompany.value.data[0].representative_name },
+  { title: '業種３', value: getIndutryNames(sellCompany.value.data[0].industries, 2) },
+  { title: '従業員数', value: sellCompany.value.data[0].employees, bottom: '名' },
+  { title: '代表者年齢', value: getCeoAge(getTsrData(sellCompany.value.data[0].tsr,'生年月日')) },
+  { title: '営業種目', value: getTsrData(sellCompany.value.data[0].tsr,'営業種目') }
 ]
 // 処理日時の取得
 const buyneedsMatchingHistories: any = await $approach.getBuyneedsMatchingHistory(undefined, sellCompanyHistory.value.buyneedsMatchingHistoryId)
@@ -277,5 +277,9 @@ const getTargetBuyComapnyData = (matchingResult:any, targetKey:any): any => {
     color: -webkit-link;
     cursor: pointer;
     text-decoration: underline;
+}
+
+.bordered-column {
+  border: 1px solid #ECEFF1;
 }
 </style>

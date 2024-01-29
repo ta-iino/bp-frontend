@@ -11,18 +11,17 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-col v-for="(item) in items" :key="item.title" cols="4" class="d-flex px-0 py-0">
-            <!-- 上が少しはみ出るのでv-if:0<=i, i<=2で対応？ -->
-            <v-col cols="6" class="px-0 py-1">
+          <v-col v-for="(item) in items" :key="item.title" cols="4" class="d-flex px-0 py-0 bordered-column">
+            <v-col cols="4" class="px-0 py-1 bg-blue-grey-lighten-4 d-flex align-center justify-center font-weight-bold">
               {{ item.title }}
             </v-col>
-            <v-col cols="6" class="px-0 py-1">
+            <v-col cols="8" class="px-0 py-1 pl-2">
               {{ item.value }}
             </v-col>
           </v-col>
         </v-row>
         <v-row class="py-3">
-          <v-col cols="3" class="px-0">
+          <v-col cols="3" class="px-0 pr-3">
             <v-select
               v-model="selectedBuyneedsHistoryId"
               label="マッチング処理日時"
@@ -33,13 +32,12 @@
               @update:modelValue="getBodyData()"
             />
           </v-col>
-          <v-col cols="1" class="px-0" />
-          <v-col cols="4" class="px-0 d-flex">
-            <div class="ml-n8 mr-2">
+          <v-col cols="6" class="d-flex align-center justify-center">
+            <div class="pr-3">
               <v-btn
                 class="v-btn"
                 depressed
-                color="light-blue-darken-4"
+                color="orange-darken-3"
                 border="0"
                 :disabled="disableMatchingBtn"
                 @click="matchingStart()"
@@ -47,7 +45,7 @@
                 ニーズマッチング
               </v-btn>
             </div>
-            <div class="px-2">
+            <div class="pr-3">
               <v-btn
                 class="v-btn"
                 depressed
@@ -59,13 +57,13 @@
               {{ isCsvDownloading ? 'ダウンロード中...' : 'ダウンロード' }}
               </v-btn>
             </div>
-            <div class="px-2">
-              <v-btn class="v-btn" depressed color="light-blue-darken-4" border="0" @click="clickCloseButton()">
-                閉じる
+            <div class="pr-3">
+              <v-btn class="v-btn bg-grey-lighten-2" depressed border="0" @click="clickCloseButton()">
+                ページを閉じる
               </v-btn>
             </div>
           </v-col>
-          <v-col cols="4" class="pt-4 pl-10">
+          <v-col cols="3" class="pt-6">
             <v-row>
               <v-text-field cols="10" v-model="searchCompanyName" label="企業名検索" />
               <v-col cols="2">
@@ -206,21 +204,21 @@ const approachListData: any = await $jmssPortal.getApproachLists(approachListId)
 // 取得したデータのキーをキャメルケースに変換する
 const approachListCamelData = camelcaseKeys(approachListData.value.data[0], { deep: true })
 const items = [
-  { title: '担当チーム：', value: confirmationData(approachListCamelData.requestTeam) },
-  { title: '担当コンサルタント：', value: confirmationData(approachListCamelData.requestUsers) },
-  { title: 'リスト名：', value: approachListCamelData.name },
-  { title: 'アプローチ区分：', value: approachListCamelData.type },
-  { title: '業種：', value: confirmationData(approachListCamelData.jmssIndustries) },
-  { title: '地域：', value: confirmationData(approachListCamelData.areas) },
-  { title: '売上：', value: confirmationData(approachListCamelData.salesRanges) },
-  { title: '発送社数：', value: matchingHistories.value.buyneedsMatchingHistories[0].sendCompanyCount },
-  { title: '利用業者名：', value: approachListCamelData.venderName },
-  { title: '備考：', value: approachListCamelData.note },
+  { title: '担当チーム', value: confirmationData(approachListCamelData.requestTeam) },
+  { title: '担当コンサル', value: confirmationData(approachListCamelData.requestUsers) },
+  { title: 'リスト名', value: approachListCamelData.name },
+  { title: 'アプローチ区分', value: approachListCamelData.type },
+  { title: '業種', value: confirmationData(approachListCamelData.jmssIndustries) },
+  { title: '地域', value: confirmationData(approachListCamelData.areas) },
+  { title: '売上', value: confirmationData(approachListCamelData.salesRanges) },
+  { title: '発送社数', value: matchingHistories.value.buyneedsMatchingHistories[0].sendCompanyCount },
+  { title: '利用業者名', value: approachListCamelData.venderName },
+  { title: '備考', value: approachListCamelData.note },
   { title: '', value: '' }, // 画面レイアウト上空欄を作るため
   { title: '', value: '' }, // 画面レイアウト上空欄を作るため
-  { title: '発送日：', value: approachListCamelData.dmDate },
-  { title: '登録日：', value: formatDate(approachListCamelData.createdAt) },
-  { title: '状況：', value: getMatchingStatusStr(matchingHistories.value.buyneedsMatchingHistories[0].matchingStatus) }
+  { title: '発送日', value: approachListCamelData.dmDate },
+  { title: '登録日', value: formatDate(approachListCamelData.createdAt) },
+  { title: '状況', value: getMatchingStatusStr(matchingHistories.value.buyneedsMatchingHistories[0].matchingStatus) }
 ]
 
 /**
@@ -649,4 +647,7 @@ const disableMatchingBtn = computed((): boolean => {
   bottom: 50%;
 }
 
+.bordered-column {
+  border: 1px solid #ECEFF1;
+}
 </style>

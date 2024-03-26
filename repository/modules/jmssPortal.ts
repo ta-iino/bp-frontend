@@ -26,6 +26,7 @@ class JmssPortalModule extends BaseApiFactory {
    * @returns アプローチリスト
    */
   async getApproachLists (approachListId?: string, searchParams?: any, page?: number, limit?: Number) {
+    this.options = { headers: { 'Authorization': `Bearer ${useCookies().cookies.get('jmss_portal_access_token')}` } }
     this.options.body = {
       id: approachListId,
       // method: 1,
@@ -39,7 +40,6 @@ class JmssPortalModule extends BaseApiFactory {
       limit: limit,
     }
     delete this.options.params
-    this.options = { headers: { 'Authorization': `Bearer ${useCookies().cookies.get('jmss_portal_access_token')}` } }
     this.options.credentials = 'omit'
     this.options.method = 'POST'
     return this.call(this.urls.getApproachLists, this.jmssPortalBaseURL, this.options)
@@ -51,8 +51,8 @@ class JmssPortalModule extends BaseApiFactory {
    * @returns アプローチリスト企業
    */
   getApproachCompanyList (approachListId: number) {
-    delete this.options.body
     this.options = { headers: { 'Authorization': `Bearer ${useCookies().cookies.get('jmss_portal_access_token')}` } }
+    delete this.options.body
     this.options.credentials = 'omit'
     this.options.method = 'GET'
     return this.call(this.urls.getApproachCompanyList(approachListId), this.jmssPortalBaseURL)
@@ -65,6 +65,7 @@ class JmssPortalModule extends BaseApiFactory {
    * @returns
    */
   getBuyneeds (buyneedsIds?: string, page?: number, limit?: number) {
+    this.options = { headers: { 'Authorization': `Bearer ${useCookies().cookies.get('jmss_portal_access_token')}` } }
     this.options.body = {
       id: buyneedsIds,
       // source_type: sourceType,
@@ -79,7 +80,6 @@ class JmssPortalModule extends BaseApiFactory {
       limit: limit
     }
     delete this.options.params
-    this.options = { headers: { 'Authorization': `Bearer ${useCookies().cookies.get('jmss_portal_access_token')}` } }
     this.options.credentials = 'omit'
     this.options.method = 'POST'
     return this.call(this.urls.getBuyneeds, this.jmssPortalBaseURL, this.options)
@@ -93,13 +93,13 @@ class JmssPortalModule extends BaseApiFactory {
    * @returns
    */
   getUsersById (userIds?: number[], page?: number, limit?: number) {
+    this.options = { headers: { 'Authorization': `Bearer ${useCookies().cookies.get('jmss_portal_access_token')}` } }
     this.options.params = {
       id: userIds,
       page: page,
       limit: limit,
     }
     delete this.options.body
-    this.options = { headers: { 'Authorization': `Bearer ${useCookies().cookies.get('jmss_portal_access_token')}` } }
     this.options.credentials = 'omit'
     this.options.method = 'GET'
     return this.call(this.urls.getUsers, this.jmssPortalBaseURL, this.options)
@@ -114,6 +114,7 @@ class JmssPortalModule extends BaseApiFactory {
    * @returns
    */
   getCompanies (companyIds?: string, page?: number, limit?: number, name?: string) {
+    this.options = { headers: { 'Authorization': `Bearer ${useCookies().cookies.get('jmss_portal_access_token')}` } }
     this.options.body = {
       id: companyIds,
       name: name,
@@ -121,7 +122,6 @@ class JmssPortalModule extends BaseApiFactory {
       limit: limit,
     }
     delete this.options.params
-    this.options = { headers: { 'Authorization': `Bearer ${useCookies().cookies.get('jmss_portal_access_token')}` } }
     this.options.credentials = 'omit'
     this.options.method = 'POST'
     return this.call(this.urls.getCompanies, this.jmssPortalBaseURL, this.options)
@@ -136,13 +136,13 @@ class JmssPortalModule extends BaseApiFactory {
    * @returns
    */
   getTeams (department_id?: number[], page?: number, limit?: number) {
+    this.options = { headers: { 'Authorization': `Bearer ${useCookies().cookies.get('jmss_portal_access_token')}` } }
     this.options.params = {
       department_id: department_id,
       page: page,
       limit: limit,
     }
     delete this.options.body
-    this.options = { headers: { 'Authorization': `Bearer ${useCookies().cookies.get('jmss_portal_access_token')}` } }
     this.options.credentials = 'omit'
     this.options.method = 'GET'
     return this.call(this.urls.getTeams, this.jmssPortalBaseURL, this.options)

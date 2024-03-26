@@ -1,4 +1,5 @@
 import BaseApiFactory from '../factory'
+import { useCookies } from 'vue3-cookies'
 
 class JmssPortalModule extends BaseApiFactory {
   private urls: any = {
@@ -11,12 +12,10 @@ class JmssPortalModule extends BaseApiFactory {
   }
 
   private jmssPortalBaseURL: string
-  private options: any 
-  constructor (jmssPortalBaseURL: string, accessToken: string) {
+  private options: any = {} 
+  constructor (jmssPortalBaseURL: string) {
     super()
     this.jmssPortalBaseURL = jmssPortalBaseURL
-    this.options = { headers: { 'Authorization': `Bearer ${accessToken}` } }
-    this.options.credentials = 'omit'
   }
 
   /**
@@ -40,6 +39,8 @@ class JmssPortalModule extends BaseApiFactory {
       limit: limit,
     }
     delete this.options.params
+    this.options = { headers: { 'Authorization': `Bearer ${useCookies().cookies.get('jmss_portal_access_token')}` } }
+    this.options.credentials = 'omit'
     this.options.method = 'POST'
     return this.call(this.urls.getApproachLists, this.jmssPortalBaseURL, this.options)
   }
@@ -51,6 +52,8 @@ class JmssPortalModule extends BaseApiFactory {
    */
   getApproachCompanyList (approachListId: number) {
     delete this.options.body
+    this.options = { headers: { 'Authorization': `Bearer ${useCookies().cookies.get('jmss_portal_access_token')}` } }
+    this.options.credentials = 'omit'
     this.options.method = 'GET'
     return this.call(this.urls.getApproachCompanyList(approachListId), this.jmssPortalBaseURL)
   }
@@ -76,6 +79,8 @@ class JmssPortalModule extends BaseApiFactory {
       limit: limit
     }
     delete this.options.params
+    this.options = { headers: { 'Authorization': `Bearer ${useCookies().cookies.get('jmss_portal_access_token')}` } }
+    this.options.credentials = 'omit'
     this.options.method = 'POST'
     return this.call(this.urls.getBuyneeds, this.jmssPortalBaseURL, this.options)
   }
@@ -94,6 +99,8 @@ class JmssPortalModule extends BaseApiFactory {
       limit: limit,
     }
     delete this.options.body
+    this.options = { headers: { 'Authorization': `Bearer ${useCookies().cookies.get('jmss_portal_access_token')}` } }
+    this.options.credentials = 'omit'
     this.options.method = 'GET'
     return this.call(this.urls.getUsers, this.jmssPortalBaseURL, this.options)
   }
@@ -114,6 +121,8 @@ class JmssPortalModule extends BaseApiFactory {
       limit: limit,
     }
     delete this.options.params
+    this.options = { headers: { 'Authorization': `Bearer ${useCookies().cookies.get('jmss_portal_access_token')}` } }
+    this.options.credentials = 'omit'
     this.options.method = 'POST'
     return this.call(this.urls.getCompanies, this.jmssPortalBaseURL, this.options)
     
@@ -133,6 +142,8 @@ class JmssPortalModule extends BaseApiFactory {
       limit: limit,
     }
     delete this.options.body
+    this.options = { headers: { 'Authorization': `Bearer ${useCookies().cookies.get('jmss_portal_access_token')}` } }
+    this.options.credentials = 'omit'
     this.options.method = 'GET'
     return this.call(this.urls.getTeams, this.jmssPortalBaseURL, this.options)
   }

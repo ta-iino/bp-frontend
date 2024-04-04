@@ -3,6 +3,7 @@
  */
 class BaseApiFactory {
   async call (url: string, baseURL?: string, options?: any) {
+    const config = useRuntimeConfig()
     const e_time = String(new Date().getTime());
     const { data, error } = await useFetch(
       url, {
@@ -17,12 +18,11 @@ class BaseApiFactory {
     )
     // API通信時のエラーハンドリング
     if(error.value) {
-      // 401の場合、ログイン画面へ遷移する
-      if (error.value.statusCode == 401) {
-        useRouter().push('/login');
+      // 401の場合、HENNGEへアクセスする
+      // backendのCustomAuthMiddleware以外でも401を返すようになったら修正する
+      if (error.value.statusCode == 401 && baseURL === config.public.baseURL) {
+        window.location.href = error.value.data
         return
-      } else if (error.value.statusCode == 403) {
-        return error.value.data
       } else if(error.value.statusCode == 404 && error.value.data) {
         // undefinedでのエラーを避けるため先にdataの有無を確認しておく
         if(error.value.data.not_transition_error) {

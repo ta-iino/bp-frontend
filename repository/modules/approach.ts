@@ -1,7 +1,6 @@
 // エンドポイントが増えてきたら分割する
 import BaseApiFactory from '../factory'
 import { useCookies } from 'vue3-cookies'
-import JmssPortalModule from '~/repository/modules/jmssPortal'
 
 export class ApproachModule extends BaseApiFactory {
   private urls: any = {
@@ -11,7 +10,6 @@ export class ApproachModule extends BaseApiFactory {
     getBuyneedsMatchingResult: '/approach/api/buyneeds_matching_result/',
     startBuyneedsMatching: '/approach/api/buyneeds_matching_order/',
     getJmssPortalAccessToken: '/approach/api/create_jmss_portal_access_token/',
-    login: 'approach/api/login/',
   }
 
   private baseURL: string
@@ -119,42 +117,22 @@ export class ApproachModule extends BaseApiFactory {
   }
 
   /**
-   * ログイン処理用API
-   * @param emial
-   * @param password
-   * @returns メッセージ
-   */
-  async login (email: string, password: string) {
-    this.options.body = {
-      email: email,
-      password: password
-    }
-    delete this.options.params
-    this.options.method = 'POST'
-    return this.call(
-      this.urls.login,
-      this.baseURL,
-      this.options
-    )
-  }  
-  /**
    * 社内ポータル接続用アクセストークン取得メソッド
+   * @returns 社内ポータル接続用アクセストークン
    */
-  async getJmssPortalAccessToken (): Promise<void> {
+  async getJmssPortalAccessToken (): Promise<string> {
     const cookies = useCookies()
     // cookieが存在しない場合、アクセストークンの発行を行う
     if (!cookies.cookies.isKey('jmss_portal_access_token')) {
       // アクセストークン取得用API
       // APIキーをフロントで持たないためにBackendからアクセスする。
-      this.options = {}
-      this.options.credentials = 'include'
       this.options.params = {
         current_url: window.location.href,
       }
-      this.options.method = 'GET'
       const data: any = await this.call(this.urls.getJmssPortalAccessToken, this.baseURL, this.options)
       cookies.cookies.set('jmss_portal_access_token', data.value.accessToken, data.value.expiresIn)
     }
+    return cookies.cookies.get('jmss_portal_access_token')
   }
 }
 

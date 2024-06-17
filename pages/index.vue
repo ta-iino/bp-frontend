@@ -9,6 +9,25 @@
             </v-card-title>
           </v-col>
         </v-row>
+        <!-- 画面遷移ボタン ここから -->
+        <v-row>
+          <v-col cols="2">
+            <v-btn class="ui-btn" width="100%" depressed color="light-blue-darken-3" @click="navigateTo('/createTemplate')">
+              雛形登録
+            </v-btn>
+          </v-col>
+          <v-col cols="2">
+            <v-btn class="ui-btn" width="100%" depressed color="light-blue-darken-3" @click="navigateTo('/selectSendSimultaneouslyDestination')">
+              DM同時発送先選択
+            </v-btn>
+          </v-col>
+          <v-col cols="2">
+            <v-btn class="ui-btn" width="100%" depressed color="light-blue-darken-3" @click="navigateTo('/letterFileList')">
+              レターファイル一覧
+            </v-btn>
+          </v-col>
+        </v-row>
+        <!-- 画面遷移ボタン ここまで -->
         <!-- 検索フォーム ここから -->
         <v-row>
           <v-col cols="2" class="px-0 py-0">

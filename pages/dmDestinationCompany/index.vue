@@ -58,6 +58,18 @@
               </v-btn>
             </div>
             <div class="pr-3">
+              <v-btn
+                class="v-btn"
+                depressed
+                color="light-blue-darken-3"
+                border="0"
+                :disabled="disableDownloadBtn || isCsvDownloading"
+                @click="clickCreateLetterBtn()"
+              >
+                レター作成
+              </v-btn>
+            </div>
+            <div class="pr-3">
               <v-btn class="v-btn bg-grey-lighten-2" depressed border="0" @click="clickCloseButton()">
                 ページを閉じる
               </v-btn>
@@ -619,6 +631,17 @@ const disableMatchingBtn = computed((): boolean => {
   return selectedMatchingStatus.value === "3" || selectedMatchingStatus.value ==="1" ? true : false;
 })
 
+<script>
+/**
+ * レター作成ボタン押下時の処理
+ * @param approachListId
+ */
+const clickCreateLetterBtn = (approachListId: number):void => {
+  const createLetterUrl = router.resolve({
+    path: `/createLetter`
+  })
+  window.open(createLetterUrl.href, '_blank')
+}
 </script>
 
 <style>
@@ -642,7 +665,7 @@ const disableMatchingBtn = computed((): boolean => {
 }
 
 .overlay_content_center {
-  justify-content: center; 
+  justify-content: center;
   top: 50%;
   bottom: 50%;
 }

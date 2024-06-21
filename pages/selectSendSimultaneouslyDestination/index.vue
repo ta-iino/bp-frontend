@@ -100,9 +100,35 @@
             </v-btn>
           </v-col>
           <v-col cols="1">
-            <v-btn class="ui-btn bg-grey-lighten-2" width="100%">
-              作成
-            </v-btn>
+            <v-dialog max-width="500">
+              <template v-slot:activator="{ props: activatorProps }">
+                <v-btn class="ui-btn bg-grey-lighten-2" width="100%" v-bind="activatorProps">
+                  作成
+                </v-btn>
+              </template>
+              <!-- タイトル入力ダイアログ ここから -->
+              <template v-slot:default="{ isActive }">
+                <v-card>
+                  <v-card-title class="headline font-weight-bold" style="background-color: #81D4FA">
+                    タイトル入力
+                  </v-card-title>
+                  <v-card-text>
+                    <v-text-field label="タイトル">
+                    </v-text-field>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn class="ui-btn bg-grey-lighten-2" @click="isActive.value = false">
+                      戻る
+                    </v-btn>
+                    <v-btn class="ui-btn bg-grey-lighten-2">
+                      作成
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </template>
+              <!-- タイトル入力ダイアログ ここまで -->
+            </v-dialog>
           </v-col>
         </v-row>
       </v-container>

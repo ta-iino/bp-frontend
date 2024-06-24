@@ -636,7 +636,7 @@ const disableMatchingBtn = computed((): boolean => {
  * レター作成ボタン押下時の処理
  * @param approachListId
  */
-const clickCreateLetterBtn = (approachListId: number):void => {
+const clickCreateLetterBtn = ():void => {
   const createLetterUrl = router.resolve({
     path: `/createLetter`
   })

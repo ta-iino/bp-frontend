@@ -638,7 +638,7 @@ const disableMatchingBtn = computed((): boolean => {
  */
 const clickCreateLetterBtn = ():void => {
   const createLetterUrl = router.resolve({
-    path: `/createLetter`
+    path: `/createLetter/${approachListId}`
   })
   window.open(createLetterUrl.href, '_blank')
 }

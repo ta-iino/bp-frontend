@@ -70,7 +70,12 @@ export default defineNuxtConfig({
             name: 'buyneedsMatchResult',
             path: '/buyneedsMatchResult/:id',
             file: '~/pages/buyneedsMatchResult/index.vue'
-        })        
+        })
+        pages.push({
+            name: 'createLetter',
+            path: '/createLetter/:id',
+            file: '~/pages/createLetter/index.vue'
+        })
     }
   }
 });

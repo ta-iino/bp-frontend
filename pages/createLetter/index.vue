@@ -291,12 +291,11 @@ export default {
   border: 1px solid #ECEFF1;
 }
 
-// 画面モック用
 .text-center {
-  text-align: center; /* テキストを水平中央に配置 */
+  text-align: center;
   display: flex;
-  justify-content: center; /* 横方向（左右）を中央に配置 */
-  align-items: center; /* 縦方向（上下）を中央に配置 */
-  height: 100%; /* 必要に応じて高さを設定 */
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 </style>

@@ -76,6 +76,7 @@
 </template>
 
 <script setup lang="ts">
+const { $approach }: any = useNuxtApp()
 
 interface Emits {
   (e: "update:File", value: File): void;
@@ -87,6 +88,8 @@ const isDragged = ref<boolean>(false)
 const selectedFile = ref<File | null>(null)
 
 const uploadAreaMsg = "ファイルをドラッグ&ドロップ\nor\nここをクリック"
+
+const formData = new FormData()
 
 // ボタンクリックでファイル選択を開く
 const uploader = ref<HTMLInputElement>()
@@ -142,6 +145,15 @@ function fileEmit(file: object){
     errMsg.style.visibility = 'visible'
     displayText.textContent = uploadAreaMsg
   }
+}
+
+/**
+ * 登録ボタン押下時の処理
+ */
+const clickCreateBtn = async (): Promise<void> => {
+  formData.append('file', selectedFile.value, selectedFile.value.name);
+  // 新規雛形情報登録処理APIの呼び出し
+  await $approach.newTemplateInfoRegist(formData)
 }
 
 </script>

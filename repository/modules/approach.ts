@@ -9,6 +9,7 @@ export class ApproachModule extends BaseApiFactory {
     getBuyneedsMatchingHistory: '/approach/api/buyneeds_matching_history/',
     getBuyneedsMatchingResult: '/approach/api/buyneeds_matching_result/',
     startBuyneedsMatching: '/approach/api/buyneeds_matching_order/',
+    newTemplateInfoRegist: '/approach/api/new_template_info_regist/',
     getJmssPortalAccessToken: '/approach/api/create_jmss_portal_access_token/',
   }
 
@@ -111,6 +112,22 @@ export class ApproachModule extends BaseApiFactory {
     this.options.method = 'POST'
     return this.call(
       this.urls.startBuyneedsMatching,
+      this.baseURL,
+      this.options
+    )
+  }
+
+  /**
+   * 新規雛形情報登録API
+   * @param formData
+   * @returns
+   */
+  async newTemplateInfoRegist (formData: FormData) {
+    this.options.body = formData
+    this.options.method = 'POST'
+
+    return this.call(
+      this.urls.newTemplateInfoRegist,
       this.baseURL,
       this.options
     )

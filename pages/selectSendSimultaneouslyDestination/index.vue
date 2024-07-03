@@ -15,35 +15,51 @@
         <v-row>
           <v-col cols="2" class="px-0 py-0">
             <v-autocomplete
+              v-model="searchParams.dmListId"
               label="DMリスト"
+              item-title="name"
+              item-value="id"
+              :items="pulldownDmList"
               clearable
             ></v-autocomplete>
           </v-col>
           <v-col cols="2" class="px-0 py-0">
             <v-autocomplete
+              v-model="searchParams.consultantId"
               label="担当コンサルタント"
-              item-title="consultantName"
+              item-title="name"
+              item-value="id"
+              :items="pulldownConsultant"
               clearable
             ></v-autocomplete>
           </v-col>
           <v-col cols="2" class="px-0 py-0">
             <v-autocomplete
+              v-model="searchParams.templateId"
               label="雛形名"
-              item-title="templateName"
+              item-title="name"
+              item-value="id"
+              :items="pulldownTemplate"
               clearable
             />
           </v-col>
           <v-col cols="2" class="px-0 py-0">
             <v-select
+              v-model="searchParams.letterStatusId"
               label="ステータス"
-              item-title="status"
+              item-title="name"
+              item-value="id"
+              :items="letterStatus"
               clearable
             />
           </v-col>
           <v-col cols="2" class="px-0 py-0">
-            <v-select
+            <v-autocomplete
+              v-model="searchParams.createdBy"
               label="作成者"
-              item-title="creatorName"
+              item-title="name"
+              item-value="id"              
+              :items="pulldownConsultant"
               clearable
             />
           </v-col>
@@ -51,7 +67,7 @@
         <v-row>
           <v-col col="11" />
           <v-col class="pt-2" cols="1">
-            <v-btn class="ui-btn" depressed color="light-blue-darken-3">
+            <v-btn class="ui-btn" depressed color="light-blue-darken-3" @click="searchButton()">
               <v-icon dark size="large">
                 mdi-magnify
               </v-icon>
@@ -65,10 +81,14 @@
       　<v-row>
           <v-data-table
             :headers="headers"
+            :items="dmLetters"
             hide-default-footer
             class="elevation-1 ui-vdatatable"
             show-select
           >
+            <template #[`item.createAt`]="{ item }">
+              {{ formatDate(item.raw.createAt) }}
+            </template>
             <!-- ページネーション ここから -->
             <template #bottom>
               <div class="text-center pt-2">
@@ -138,19 +158,104 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { VDataTable } from 'vuetify/lib/labs/components.mjs'
 import '@mdi/font/css/materialdesignicons.css'
+import camelcaseKeys from 'camelcase-keys'
+
+const { $approach, $jmssPortal } = useNuxtApp()
+const page: Ref<number> = ref(1) //現在のページ番号
+const perPage: Ref<number> = ref(50) //1ページ当たりのアイテム数
+const totalPage: Ref<number> = ref(0) //全体のページ数
+watch(page ,() => {
+  getDmLetter(searchParams)
+})
+const isPageLoading: Ref<boolean> = ref(false)
+const searchParams: Ref<any> = ref(
+  {
+    dmListId: null,
+    consultantId: null,
+    templateId: null,
+    letterStatusId: null,
+    createdBy: null
+  }
+)
+
+/**
+ * 全てのユーザー、DMリストを取得
+ */
+const allUsers: any = await $jmssPortal.getUsersById(undefined, page.value, perPage.value)
+const allDmLists: any = await $jmssPortal.getApproachLists(undefined, undefined, page.value, perPage.value)
+
+/**
+ * プルダウンリスト作成メソッド
+ * @param array
+ */
+const createPulldown = (array: any): {id: number, name: string}[] => {
+  const pulldownMap = array.map((value: any) => ({id: value.id, name: value.name}))
+  return pulldownMap.filter((item, index, self) =>
+    index === self.findIndex((t) => (
+      t.name === item.name
+    ))
+  )
+}
+
+/**
+ * 雛形ファイル取得メソッド
+ * @returns 雛形ファイル一覧
+ */
+const getTemplate = async () => {
+  const templatesResponce = await $approach.getTemplate()
+  console.log(templatesResponce.value.templates)
+  pulldownTemplate.value = templatesResponce.value.templates
+}
+
+// 各プルダウンを作成
+const pulldownDmList: {id: number, name: string}[] = createPulldown(allDmLists.value.data);
+const pulldownConsultant: {id: number, name: string}[] = createPulldown(allUsers.value);
+const pulldownTemplate: Ref<any> = ref()
+getTemplate()
+
+const letterStatus = [
+  { id: '1', name: 'レター登録済み' },
+  { id: '2', name: 'レター作成中' },
+  { id: '3', name: '完了' },
+  { id: '4', name: 'レター作成失敗' }
+]
+
+const dmLetters: Ref<any> = ref()
+
+/**
+ * DMレター取得メソッド
+ * @param searchParams?
+ */
+const getDmLetter = async (searchParams?: any): Promise<void> => {
+  const dmLettersResponce = await $approach.getDmLetter(searchParams?.value)
+  dmLetters.value = dmLettersResponce.value.dmLetters
+}
+
+// 初期表示用に呼び出し
+getDmLetter()
 
 // ヘッダ
 const headers = ref(
   [
-    { title: 'DMリスト', key: 'dmList'　},
+    { title: 'DMリスト', key: 'dmListName'　},
     { title: 'コンサルタント', key: 'consultantName'　},
-    { title: '雛形', key: 'template'　},
-    { title: 'レター作成者', key: 'letterCreator'　},
-    { title: 'ステータス', key: 'status'　},
-    { title: '日付', key: 'datetime'　}
+    { title: '雛形', key: 'templateName'　},
+    { title: 'レター作成者', key: 'createdBy'　},
+    { title: 'ステータス', key: 'letterStatus'　},
+    { title: '日付', key: 'createAt'　}
   ]
 )
+
+/**
+ * 検索ボタン押下時処理
+*/
+const searchButton = (): void => {
+  page.value = 1
+  // 一覧に表示するアプローチリストのデータを取得する
+  getDmLetter(searchParams)
+}
 
 </script>

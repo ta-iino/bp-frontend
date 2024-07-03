@@ -10,6 +10,9 @@ export class ApproachModule extends BaseApiFactory {
     getBuyneedsMatchingResult: '/approach/api/buyneeds_matching_result/',
     startBuyneedsMatching: '/approach/api/buyneeds_matching_order/',
     newTemplateInfoRegist: '/approach/api/new_template_info_regist/',
+    dmLetterRegist: '/approach/api/dm_letter_regist/',
+    getDmLetter: '/approach/api/get_dm_letter/',
+    getTemplate: '/approach/api/get_template/',
     getJmssPortalAccessToken: '/approach/api/create_jmss_portal_access_token/',
   }
 
@@ -128,6 +131,55 @@ export class ApproachModule extends BaseApiFactory {
 
     return this.call(
       this.urls.newTemplateInfoRegist,
+      this.baseURL,
+      this.options
+    )
+  }
+
+  /**
+   * DMレター情報登録API
+   * @param formData
+   * @returns
+   */
+  async dmLetterRegist (formData: FormData) {
+    this.options.body = formData
+    this.options.method = 'POST'
+
+    return this.call(
+      this.urls.dmLetterRegist,
+      this.baseURL,
+      this.options
+    )
+  }
+
+  /**
+   * DMレター情報取得API
+   * @param
+   * @returns DMレター一覧
+   */
+  async getDmLetter (searchParams?: [{string: string}]) {
+    this.options.params = {
+      search_params: searchParams,
+    }
+    this.options.method = 'POST'
+
+    return this.call(
+      this.urls.getDmLetter,
+      this.baseURL,
+      this.options
+    )
+  }
+
+  /**
+   * 雛形ファイル一覧取得API
+   * @param
+   * @returns 雛形ファイル一覧
+   */
+  async getTemplate () {
+    this.options.method = 'POST'
+
+    return this.call(
+      this.urls.getTemplate,
       this.baseURL,
       this.options
     )

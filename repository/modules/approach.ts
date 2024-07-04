@@ -12,7 +12,7 @@ export class ApproachModule extends BaseApiFactory {
     newTemplateInfoRegist: '/approach/api/new_template_info_regist/',
     dmLetterRegist: '/approach/api/dm_letter_regist/',
     getDmLetter: '/approach/api/get_dm_letter/',
-    getTemplate: '/approach/api/get_template/',
+    getTemplateList: '/approach/api/get_template_list/',
     getJmssPortalAccessToken: '/approach/api/create_jmss_portal_access_token/',
   }
 
@@ -171,15 +171,14 @@ export class ApproachModule extends BaseApiFactory {
   }
 
   /**
-   * 雛形ファイル一覧取得API
-   * @param
-   * @returns 雛形ファイル一覧
+   * 雛形情報取得API
+   * @returns
    */
-  async getTemplate () {
-    this.options.method = 'POST'
+  async getTemplateList () {
+    this.options.method = 'GET'
 
     return this.call(
-      this.urls.getTemplate,
+      this.urls.getTemplateList,
       this.baseURL,
       this.options
     )

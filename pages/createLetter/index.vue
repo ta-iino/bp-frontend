@@ -194,20 +194,13 @@ const toDmDestinationCompanyClickEvent = () => {
 }
 
 /**
- * 雛形リスト取得メソッド
+ * 雛形リスト取得処理
  */
-const getTemplates = () => {
-  // TODO Amazon S3から雛形ファイル名のリストを取得する処理
-  return ref<string[]>([ // 仮の雛形ファイル名リストを返す
-    'テスト雛形_1.docx',
-    'テスト雛形_2.docx',
-    'テスト雛形_3.docx',
-    'テスト雛形_4.docx',
-    'テスト雛形_5.docx',
-  ])
-}
-
-const templates = getTemplates();
+const templatesResponse: any = await $approach.getTemplateList()
+const templates: any = ref(
+  // 雛形情報から雛形名を取得する
+  templatesResponse.value.template_lists.map((template: any) => template.templateName)
+)
 
 // 選択された雛形を保持するための変数
 const selectedTemplates = ref<string | null>(null);

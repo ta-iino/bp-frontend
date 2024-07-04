@@ -201,20 +201,19 @@ const createPulldown = (array: any): {id: number, name: string}[] => {
 }
 
 /**
- * 雛形ファイル取得メソッド
- * @returns 雛形ファイル一覧
+ * 雛形リスト取得処理
  */
-const getTemplate = async () => {
-  const templatesResponce = await $approach.getTemplate()
-  console.log(templatesResponce.value.templates)
-  pulldownTemplate.value = templatesResponce.value.templates
-}
+const templatesResponse: any = await $approach.getTemplateList()
 
 // 各プルダウンを作成
-const pulldownDmList: {id: number, name: string}[] = createPulldown(allDmLists.value.data);
-const pulldownConsultant: {id: number, name: string}[] = createPulldown(allUsers.value);
-const pulldownTemplate: Ref<any> = ref()
-getTemplate()
+const pulldownDmList: {id: number, name: string}[] = createPulldown(allDmLists.value.data)
+const pulldownConsultant: {id: number, name: string}[] = createPulldown(allUsers.value)
+const pulldownTemplate: Ref<any> = ref(
+  templatesResponse.value.template_lists.map((template: any) => ({
+    id: template.id,
+    name: template.templateName
+  }))
+)
 
 const letterStatus = [
   { id: '1', name: 'レター登録済み' },
